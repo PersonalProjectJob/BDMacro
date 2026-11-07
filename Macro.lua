@@ -113,15 +113,65 @@ end
 macro = xMacro.Run
 xmacro = xMacro.Run
 
+local nLastSyncCheckFrame = -999
+local szLastReportedCommit = nil
+
+local function CheckGitHubSyncNotification()
+    local nCurFrame = (GetLogicFrameCount and GetLogicFrameCount()) or 0
+    if nCurFrame - nLastSyncCheckFrame < 160 then return end
+    nLastSyncCheckFrame = nCurFrame
+
+    if not LoadLUAData then return end
+    local statusFile = "interface\\xMacro\\github_sync_status.jx3dat"
+    local ok, data = pcall(LoadLUAData, statusFile)
+    if ok and type(data) == "table" and data.new_update == true then
+        data.new_update = false
+        if SaveLUAData then pcall(SaveLUAData, statusFile, data) end
+        local sha = data.sha or ""
+        local msg = data.message or ""
+        if OutputMessage and sha ~= szLastReportedCommit then
+            szLastReportedCommit = sha
+            OutputMessage("MSG_SYS", string.format("[xMacro] GitHub Sync: Da tu dong cap nhat rotation moi tu GitHub (Commit: %s - %s)!\n", sha, msg))
+        end
+    end
+end
+
 local function OnXMacroCommand(szText)
     if szText and type(szText) == "string" then
         szText = string.gsub(szText, "^%s*(.-)%s*$", "%1")
-        if szText == "" or string.lower(szText) == "auto" then
+        local upper = string.upper(szText)
+        if upper == "SYNC" or upper == "UPDATE" then
+            local reqFile = "interface\\xMacro\\github_sync_request.jx3dat"
+            if SaveLUAData then
+                pcall(SaveLUAData, reqFile, {action = "SYNC", time = (GetLogicFrameCount and GetLogicFrameCount()) or 0})
+            end
+            if OutputMessage then
+                OutputMessage("MSG_SYS", "[xMacro] Da gui tin hieu dong bo toi GitHub API Bridge. Vui long cho 2-3 giay...\n")
+            end
+            return true
+        elseif upper == "STATUS" or upper == "CHECK" then
+            local statusFile = "interface\\xMacro\\github_sync_status.jx3dat"
+            local ok, data = pcall(LoadLUAData, statusFile)
+            if ok and type(data) == "table" and data.sha then
+                if OutputMessage then
+                    OutputMessage("MSG_SYS", string.format("[xMacro] GitHub Commit hien tai: %s (%s) - Trang thai: %s\n", data.sha, data.updated_at or "", data.status or "OK"))
+                end
+            else
+                if OutputMessage then
+                    OutputMessage("MSG_SYS", "[xMacro] Chua co thong tin dong bo. Hay mo start_xmacro.bat de bat Sync Bridge.\n")
+                end
+            end
+            return true
+        end
+
+        if szText == "" or upper == "AUTO" then
             szText = nil
         end
     else
         szText = nil
     end
+
+    pcall(CheckGitHubSyncNotification)
     return xMacro.Run(szText)
 end
 
