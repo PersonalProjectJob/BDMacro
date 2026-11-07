@@ -701,6 +701,7 @@ xMacro.SchoolFactories.NguDoc.BoThien = CreateBoThien
 -- =====================================================================
 -- That Tu: Bang Tam Quyet (v80 PVE - Cap Khuc Tu Kich No - No Giang Hai)
 -- =====================================================================
+
 -- Verified That Tu Bang Tam Quyet v80 rotation for xMacro (No Giang Hai Ngung Quang).
 
 local DEFAULT_THATTU_BANGTAM_MACRO = [[
@@ -845,6 +846,177 @@ if xMacro.SchoolProfiles and xMacro.SchoolProfiles.ThatTu then
     xMacro.SchoolProfiles.ThatTu.BangTam = nil
 end
 xMacro.SchoolFactories.ThatTu.BangTam = CreateBangTam
+
+-- Schools/Priority.lua
+do
+-- Shared guard for PvE damage scripts in the Hoang Cung Nam Chieu client.
+function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
+    local factories = xMacro.SchoolFactories
+    factories[school] = factories[school] or {}
+    factories[school][profile] = function(deps)
+        local function Run()
+            local player = GetClientPlayer and GetClientPlayer()
+            if not player or not player.GetKungfuMount or not player.GetSkillLevel or player.bDeathFlag then
+                return false
+            end
+            local mount = player.GetKungfuMount()
+            local script = mount and scriptsByMount[mount.dwSkillID]
+            if not script then return false end
+
+            local target = deps.GetCurrentTargetObject()
+            if not target or not target.dwID or target.dwID == player.dwID or target.bDeathFlag then
+                return false
+            end
+            if IsEnemy and not IsEnemy(player.dwID, target.dwID) then return false end
+            if type(script) == "function" then script = script(player) end
+            -- The generic numeric /skill handler accepts unknown IDs at level 1.
+            -- Skip unlearned skills so the client can fall through to the next priority.
+            script = script:gsub("/skill [^\r\n]+", function(command)
+                local skillID = tonumber(command:match(" (%d+)$"))
+                if skillID and (player.GetSkillLevel(skillID) or 0) > 0 then return command end
+                return ""
+            end)
+            -- A previous profile may have left its /config before filter active.
+            return ExecuteMacroCommand("/config before:null\n" .. script)
+        end
+        return {run = Run}
+    end
+    if xMacro.SchoolProfiles[school] then xMacro.SchoolProfiles[school][profile] = nil end
+end
+end
+
+-- Schools/ThienSach/DPS.lua
+do
+-- Ngạo Huyết Chiến Ý. IDs cross-checked against DKMacro/ThienSach.lua.
+xMacro.Schools.RegisterDamageScript("ThienSach", "DPS", {[10026] = [[
+#name ThienSach_NgaoHuyet_80
+-- Phá Phong keeps Lưu Huyết active, then spend Trí Tàn on Long Nha.
+/skill [distance<=4,xmtnobuff:3442] 401
+/skill [distance<=4,xmtbuff:540] 415
+/skill [distance<=4] 403
+/skill [distance<=4,tlife<0.30] 423
+/skill [distance<=4] 400
+]]})
+end
+
+-- Schools/TangKiem/DPS.lua
+do
+-- Vấn Thủy builds sword energy, Sơn Cư spends it. Skill 1656 is Khiếu Nhật.
+-- Stance IDs and base skills cross-checked against DKMacro/TangKiem.lua.
+local light = [[
+/skill [distance<=4] 1646
+/skill [distance<=8] 1579
+]]
+local heavy = [[
+/skill [distance<=8,rage>=20] 1593
+/skill [distance<=8,rage>=20] 1600
+/skill [distance<=4] 1646
+]]
+
+local function LightSword(player)
+    local energy = player.nCurrentRage or 0
+    local maxEnergy = player.nMaxRage or 0
+    if maxEnergy > 0 and energy >= maxEnergy * 0.95 then
+        return "/skill [distance<=4] 1656\n" .. light
+    end
+    return light
+end
+
+local function HeavySword(player)
+    if player.nCurrentRage and player.nCurrentRage < 20 then
+        return "/skill [distance<=4] 1656\n" .. heavy
+    end
+    return heavy
+end
+
+xMacro.Schools.RegisterDamageScript("TangKiem", "DPS", {
+    [10144] = LightSword,
+    [10145] = HeavySword,
+})
+end
+
+-- Schools/DuongMon/KinhVu.lua
+do
+-- Kinh Vũ Quyết, damage priority for one selected target.
+-- Hóa Huyết Tiêu (3087) applies debuff 2237. DKMacro/DuongMon.lua.
+xMacro.Schools.RegisterDamageScript("DuongMon", "KinhVu", {[10224] = [[
+#name DuongMon_KinhVu_80
+/skill [distance<=25,energy>=20,xmtnobuff:2237] 3087
+/skill [distance<=25,energy>=30] 3098
+/skill [distance<=25,energy>=30] 3093
+/skill [distance<=25,energy>=30] 3095
+/skill [distance<=25,energy>=15] 3088
+/skill [energy<30] 3100
+]]})
+end
+
+-- Schools/DuongMon/ThienLa.lua
+do
+-- Thiên La Quỷ Đạo, direct-target damage. Place traps and the turret manually.
+-- Classic skill IDs from DKMacro/DuongMon.lua.
+xMacro.Schools.RegisterDamageScript("DuongMon", "ThienLa", {[10225] = [[
+#name DuongMon_ThienLa_80
+/skill [distance<=25,energy>=20,xmtnobuff:2237] 3087
+/skill [distance<=25,energy>=30] 3093
+/skill [distance<=25,energy>=30] 3105
+/skill [distance<=25,energy>=15] 3088
+/skill [energy<30] 3100
+]]})
+end
+
+-- Schools/MinhGiao/PhanAnh.lua
+do
+-- Phần Ảnh Thánh Quyết. Base solar/lunar cycle, without level-90 talents.
+-- IDs cross-checked against DKMacro/MinhGiao.lua.
+xMacro.Schools.RegisterDamageScript("MinhGiao", "PhanAnh", {[10242] = [[
+#name MinhGiao_PhanAnh_80
+/skill [distance<=5,fullsun] 3967
+/skill [distance<=5,fullmoon] 3967
+/skill [distance<=5,xmbuff:4052] 3979
+/skill [distance<=5] 3963
+/skill [distance<=5] 3960
+/skill [distance<=5,sun>=moon] 3962
+/skill [distance<=5] 3959
+]]})
+end
+
+-- Schools/ThieuLam/DichCanKinh.lua
+do
+-- Dịch Cân Kinh, three-point damage spenders and classic point builders.
+-- IDs cross-checked against DKMacro/ThieuLam.lua.
+xMacro.Schools.RegisterDamageScript("ThieuLam", "DichCanKinh", {[10003] = [[
+#name ThieuLam_DichCanKinh_80
+/skill [distance<=4,qidian>=3,tlife<0.30] 243
+/skill [distance<=4,qidian>=3] 233
+/skill [distance<=5] 235
+/skill [distance<=8] 2572
+/skill [distance<=4] 232
+]]})
+end
+
+-- Schools/ThuanDuong/TuHaCong.lua
+do
+-- Tử Hà Công, build khí điểm then use Lưỡng Nghi Hóa Hình.
+-- IDs cross-checked against DKMacro/ThuanDuong.lua.
+xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10014] = [[
+#name ThuanDuong_TuHaCong_80
+/skill [distance<=20,qidian>=9] 301
+/skill [distance<=20,qidian<=8] 367
+/skill [distance<=20] 306
+]]})
+end
+
+-- Schools/ThuanDuong/ThaiHuKiemY.lua
+do
+-- Thái Hư Kiếm Ý, direct melee priority with classical khí điểm thresholds.
+-- IDs cross-checked against DKMacro/ThuanDuong.lua.
+xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10015] = [[
+#name ThuanDuong_ThaiHuKiemY_80
+/skill [distance<=4,qidian>=8] 365
+/skill [distance<=4,qidian<=7] 2699
+/skill [distance<=4] 364
+]]})
+end
 end
 local ok, result = pcall(InitializeModule)
 runtimeStatus.modules["Schools/NguDoc/DocKinh.lua"] = ok

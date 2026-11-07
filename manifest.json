@@ -7,7 +7,7 @@
       "sha256": "6b00310bb26768ff014d93fc270bfc41680b2a2993c99dc6f25c999fcfb66141"
     },
     "Native/XM06_NguDoc.lua": {
-      "sha256": "0cb04685c0ee52126876473d76cfbc5205963af788b26afda84277ab7cdf86d8"
+      "sha256": "9dfbca6ed81d7bf0cfdc1cb049602a26e80978792f144bbf8dee738045c46503"
     }
   },
   "profiles": {
@@ -15,6 +15,9 @@
       "path": "Native/XM05_VanHoa.lua",
       "aliases": [
         "VH"
+      ],
+      "kungfuIds": [
+        10021
       ]
     },
     "NguDoc/DocKinh": {
@@ -22,18 +25,100 @@
       "aliases": [
         "ND",
         "NDDK"
+      ],
+      "kungfuIds": [
+        10175
       ]
     },
     "NguDoc/BoThien": {
       "path": "Native/XM06_NguDoc.lua",
       "aliases": [
         "NDBT"
+      ],
+      "kungfuIds": [
+        10176
       ]
     },
     "ThatTu/BangTam": {
       "path": "Native/XM06_NguDoc.lua",
       "aliases": [
         "7T"
+      ],
+      "kungfuIds": [
+        10081
+      ]
+    },
+    "ThienSach/DPS": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "TS"
+      ],
+      "kungfuIds": [
+        10026
+      ]
+    },
+    "TangKiem/DPS": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "TK"
+      ],
+      "kungfuIds": [
+        10144,
+        10145
+      ]
+    },
+    "DuongMon/KinhVu": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "DMKV"
+      ],
+      "kungfuIds": [
+        10224
+      ]
+    },
+    "DuongMon/ThienLa": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "DMTL"
+      ],
+      "kungfuIds": [
+        10225
+      ]
+    },
+    "MinhGiao/PhanAnh": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "MG"
+      ],
+      "kungfuIds": [
+        10242
+      ]
+    },
+    "ThieuLam/DichCanKinh": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "TL"
+      ],
+      "kungfuIds": [
+        10003
+      ]
+    },
+    "ThuanDuong/TuHaCong": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "TDTH"
+      ],
+      "kungfuIds": [
+        10014
+      ]
+    },
+    "ThuanDuong/ThaiHuKiemY": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "TDTK"
+      ],
+      "kungfuIds": [
+        10015
       ]
     }
   }
