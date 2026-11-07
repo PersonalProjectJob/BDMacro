@@ -40,12 +40,137 @@ local function Read(path)
     local ok, data = pcall(LoadLUAData, path)
     if ok and type(data) == "table" then return data end
 end
-local names = {SPACE=32, TAB=9, ENTER=13, BACKSPACE=8, INSERT=45, DELETE=46,
-    HOME=36, END=35, LEFT=37, UP=38, RIGHT=39, DOWN=40, PGUP=33, PGDN=34,
-    ["~"]=192, ["`"]=192}
-for i=48,57 do names[string.char(i)]=i end
-for i=65,90 do names[string.char(i)]=i end
-for i=1,24 do names["F"..i]=111+i end
+local MOD_SHIFT, MOD_CTRL, MOD_ALT = 256, 512, 1024
+local names = {
+    LBUTTON=1, MOUSE1=1, LMB=1,
+    RBUTTON=2, MOUSE2=2, RMB=2,
+    CANCEL=3,
+    MBUTTON=4, MOUSE3=4, MMB=4,
+    MOUSE4=5, XBUTTON1=5, MB4=5, M4=5,
+    MOUSE5=6, XBUTTON2=6, MB5=6, M5=6,
+    BACKSPACE=8, BS=8, BKSP=8, BACK=8,
+    TAB=9,
+    CLEAR=12,
+    ENTER=13, RETURN=13, RET=13,
+    SHIFT=16, LSHIFT=160, RSHIFT=161,
+    CTRL=17, CONTROL=17, CTL=17, LCTRL=162, LCONTROL=162, RCTRL=163, RCONTROL=163,
+    ALT=18, MENU=18, LALT=164, LMENU=164, RALT=165, RMENU=165,
+    PAUSE=19, BREAK=19,
+    CAPS=20, CAPSLOCK=20, CAPITAL=20,
+    ESC=27, ESCAPE=27,
+    SPACE=32, SPC=32, SPACEBAR=32,
+    PGUP=33, PAGEUP=33, PRIOR=33,
+    PGDN=34, PAGEDOWN=34, NEXT=34,
+    END=35, HOME=36,
+    LEFT=37, UP=38, RIGHT=39, DOWN=40,
+    SELECT=41, PRINT=44, PRINTSCREEN=44, PRTSC=44, SYSRQ=44, SNAPSHOT=44,
+    INSERT=45, INS=45, DELETE=46, DEL=46, HELP=47,
+    LWIN=91, WIN=91, RWIN=92, APPS=93, MENUKEY=93, CONTEXT=93,
+    ["NUM*"]=106, ["NUMPAD*"]=106, MULTIPLY=106, NUMMUL=106, ["*"]=106,
+    ["NUM+"]=107, ["NUMPAD+"]=107, ADD=107, NUMADD=107, NUMPLUS=107,
+    NUMENTER=108, NUMSEP=108, SEPARATOR=108,
+    ["NUM-"]=109, ["NUMPAD-"]=109, SUBTRACT=109, NUMSUB=109, NUMMINUS=109,
+    ["NUM."]=110, ["NUMPAD."]=110, DECIMAL=110, NUMDEC=110, NUMDOT=110, NUMDEL=110,
+    ["NUM/"]=111, ["NUMPAD/"]=111, DIVIDE=111, NUMDIV=111,
+    NUMLOCK=144, NUMLK=144, SCROLL=145, SCROLLLOCK=145, SCRLK=145,
+    MUTE=173, VOLDOWN=174, VOLUP=175, NEXTTRACK=176, PREVTRACK=177, STOPMEDIA=178, PLAYPAUSE=179,
+    [";"]=186, [":"]=186, SEMICOLON=186, COLON=186, OEM1=186,
+    ["="]=187, ["+"]=187, EQUAL=187, EQUALS=187, PLUS=187, OEMPLUS=187,
+    [","]=188, ["<"]=188, COMMA=188, OEMCOMMA=188,
+    ["-"]=189, ["_"]=189, MINUS=189, DASH=189, HYPHEN=189, OEMMINUS=189,
+    ["."]=190, [">"]=190, DOT=190, PERIOD=190, OEMPERIOD=190,
+    ["/"]=191, ["?"]=191, SLASH=191, QUESTION=191, OEM2=191,
+    ["~"]=192, ["`"]=192, TILDE=192, GRAVE=192, OEM3=192,
+    ["["]=219, ["{"]=219, LBRACKET=219, OPENBRACKET=219, OEM4=219,
+    ["\\"]=220, ["|"]=220, BACKSLASH=220, PIPE=220, OEM5=220,
+    ["]"]=221, ["}"]=221, RBRACKET=221, CLOSEBRACKET=221, OEM6=221,
+    ["'"]=222, ["\""]=222, QUOTE=222, APOSTROPHE=222, OEM7=222,
+    OEM8=223, OEM102=226, OEM_102=226,
+    WHEELDOWN=253, MWHEELDOWN=253, WD=253,
+    WHEELUP=254, MWHEELUP=254, WU=254,
+}
+local canonicalName = {
+    [1]="MOUSE1", [2]="MOUSE2", [3]="CANCEL", [4]="MOUSE3", [5]="MOUSE4", [6]="MOUSE5",
+    [8]="BACKSPACE", [9]="TAB", [12]="CLEAR", [13]="ENTER", [16]="SHIFT", [17]="CTRL", [18]="ALT",
+    [19]="PAUSE", [20]="CAPSLOCK", [27]="ESC", [32]="SPACE", [33]="PGUP", [34]="PGDN",
+    [35]="END", [36]="HOME", [37]="LEFT", [38]="UP", [39]="RIGHT", [40]="DOWN",
+    [44]="PRINT", [45]="INSERT", [46]="DELETE", [91]="LWIN", [92]="RWIN", [93]="APPS",
+    [106]="NUM*", [107]="NUM+", [108]="NUMENTER", [109]="NUM-", [110]="NUM.", [111]="NUM/",
+    [144]="NUMLOCK", [145]="SCROLL", [160]="LSHIFT", [161]="RSHIFT", [162]="LCTRL", [163]="RCTRL",
+    [164]="LALT", [165]="RALT", [173]="MUTE", [174]="VOLDOWN", [175]="VOLUP",
+    [176]="NEXTTRACK", [177]="PREVTRACK", [178]="STOPMEDIA", [179]="PLAYPAUSE",
+    [186]=";", [187]="=", [188]=",", [189]="-", [190]=".", [191]="/", [192]="~",
+    [219]="[", [220]="\\", [221]="]", [222]="'", [226]="OEM102", [253]="WHEELDOWN", [254]="WHEELUP",
+}
+for i=48,57 do local ch=string.char(i); names[ch]=i; canonicalName[i]=ch end
+for i=65,90 do local ch=string.char(i); names[ch]=i; canonicalName[i]=ch end
+for i=0,9 do
+    local vk = 96 + i
+    local k = "NUM"..i
+    names[k]=vk; names["NUMPAD"..i]=vk; names["NP"..i]=vk
+    canonicalName[vk]=k
+end
+for i=1,24 do local k="F"..i; names[k]=111+i; canonicalName[111+i]=k end
+for i=1,254 do
+    local vkKey = "VK"..i
+    if not names[vkKey] then names[vkKey]=i end
+    if not names["VK_"..i] then names["VK_"..i]=i end
+    local hexKey = string.format("0X%02X", i)
+    if not names[hexKey] then names[hexKey]=i end
+    if not canonicalName[i] then canonicalName[i]=vkKey end
+end
+local modTokens = {
+    CTRL = MOD_CTRL, CONTROL = MOD_CTRL, CTL = MOD_CTRL, LCTRL = MOD_CTRL, RCTRL = MOD_CTRL, LCONTROL = MOD_CTRL, RCONTROL = MOD_CTRL, C = MOD_CTRL,
+    SHIFT = MOD_SHIFT, SHF = MOD_SHIFT, LSHIFT = MOD_SHIFT, RSHIFT = MOD_SHIFT, S = MOD_SHIFT,
+    ALT = MOD_ALT, MENU = MOD_ALT, LALT = MOD_ALT, RALT = MOD_ALT, LMENU = MOD_ALT, RMENU = MOD_ALT, A = MOD_ALT,
+    CS = MOD_CTRL + MOD_SHIFT, SC = MOD_CTRL + MOD_SHIFT,
+    CA = MOD_CTRL + MOD_ALT, AC = MOD_CTRL + MOD_ALT,
+    AS = MOD_ALT + MOD_SHIFT, SA = MOD_ALT + MOD_SHIFT,
+    CAS = MOD_CTRL + MOD_ALT + MOD_SHIFT, CSA = MOD_CTRL + MOD_ALT + MOD_SHIFT,
+    ACS = MOD_CTRL + MOD_ALT + MOD_SHIFT, ASC = MOD_CTRL + MOD_ALT + MOD_SHIFT,
+    SCA = MOD_CTRL + MOD_ALT + MOD_SHIFT, SAC = MOD_CTRL + MOD_ALT + MOD_SHIFT,
+}
+local function FormatKeyCode(code)
+    code = tonumber(code) or 0
+    if code <= 0 then return "" end
+    local vk = code % 256
+    if vk <= 0 or vk > 254 then return "" end
+    local flags = math.floor(code / 256)
+    local hasShift = (flags % 2) == 1
+    local hasCtrl = (math.floor(flags / 2) % 2) == 1
+    local hasAlt = (math.floor(flags / 4) % 2) == 1
+    local base = canonicalName[vk] or ("VK"..vk)
+    return (hasCtrl and "CTRL+" or "") .. (hasAlt and "ALT+" or "") .. (hasShift and "SHIFT+" or "") .. base
+end
+local function ParseKeySpec(raw)
+    local s = string.upper(string.match(tostring(raw or ""), "^%s*(.-)%s*$"))
+    if s == "" then return 0, "" end
+    if names[s] then
+        local vk = names[s]
+        return vk, canonicalName[vk] or s
+    end
+    local rest = s
+    local hasShift, hasCtrl, hasAlt = false, false, false
+    for _ = 1, 4 do
+        local prefix, rem = string.match(rest, "^([A-Z]+)%s*[+%-%s]%s*(.+)$")
+        local mod = prefix and modTokens[prefix]
+        if not mod or not rem or rem == "" then break end
+        if (mod % 512) >= 256 then hasShift = true end
+        if (mod % 1024) >= 512 then hasCtrl = true end
+        if mod >= 1024 then hasAlt = true end
+        rest = string.match(rem, "^%s*(.-)%s*$")
+        if names[rest] then break end
+    end
+    local vk = names[rest]
+    if not vk then return nil end
+    if (vk == 16 or vk == 160 or vk == 161) then hasShift = false end
+    if (vk == 17 or vk == 162 or vk == 163) then hasCtrl = false end
+    if (vk == 18 or vk == 164 or vk == 165) then hasAlt = false end
+    local code = vk + (hasShift and MOD_SHIFT or 0) + (hasCtrl and MOD_CTRL or 0) + (hasAlt and MOD_ALT or 0)
+    return code, FormatKeyCode(code)
+end
+hold.ParseKeySpec = ParseKeySpec
+hold.FormatKeyCode = FormatKeyCode
 local old = Read(controlFile)
 if old and old.version == 2 then
     runId = tonumber(old.run_id) or 0
@@ -53,11 +178,7 @@ if old and old.version == 2 then
         interval_ms = math.max(20, math.min(1000, math.floor(old.interval_ms)))
     end
     for i=1,4 do
-        local vk=old["key_"..i]
-        keys[i]=""
-        for name, code in pairs(names) do
-            if code==vk then keys[i]=name; break end
-        end
+        keys[i] = FormatKeyCode(old["key_"..i])
     end
 end
 local pos=Read(uiFile)
@@ -102,12 +223,12 @@ local function CurrentValues()
     for i=1,4 do
         local edit=Child("Edit_"..i)
         local text=(edit and edit:GetText()) or keys[i]
-        text=string.upper(string.match(tostring(text),"^%s*(.-)%s*$"))
-        local vk=text=="" and 0 or names[text]
+        local vk, label = ParseKeySpec(text)
         if not vk then return nil,"Phim "..i.." khong hop le." end
         if vk~=0 and used[vk] then return nil,"Khong gan trung phim." end
         if vk~=0 then used[vk]=true;count=count+1 end
-        values[i]=vk;keys[i]=text
+        values[i]=vk;keys[i]=label
+        if edit and edit:GetText() ~= label then edit:SetText(label) end
     end
     if count==0 then return nil,"Hay gan it nhat 1 phim." end
     return values
@@ -141,7 +262,7 @@ function hold.SetInterval(val)
         local values = CurrentValues()
         if not values then
             values = {}
-            for i = 1, 4 do values[i] = names[keys[i]] or 0 end
+            for i = 1, 4 do values[i] = (ParseKeySpec(keys[i])) or 0 end
         end
         Write(true, values)
     else
@@ -149,8 +270,7 @@ function hold.SetInterval(val)
         for i = 1, 4 do
             local editKey = Child("Edit_"..i)
             local txt = (editKey and editKey:GetText()) or keys[i]
-            txt = string.upper(string.match(tostring(txt), "^%s*(.-)%s*$"))
-            values[i] = names[txt] or 0
+            values[i] = (ParseKeySpec(txt)) or 0
         end
         Write(false, values)
     end
@@ -183,7 +303,7 @@ function hold.SetEnabled(want)
     else
         if not values then
             values={}
-            for i=1,4 do values[i]=names[keys[i]] or 0 end
+            for i=1,4 do values[i]=(ParseKeySpec(keys[i])) or 0 end
         end
         if Write(want,values) then notice=want and "Da gui lenh. Dang cho helper..." or "Da gui lenh DUNG." end
     end
@@ -227,7 +347,7 @@ function hold.UpdateHUD()
     Text("Text_Status",label.." | "..interval_ms.." ms")
     Text("Text_Helper",live and "Helper: ONLINE" or "Helper: OFFLINE - mo launcher")
     Text("Text_Notice",notice)
-    Text("Text_Help","1-9, A-Z, F1-F24, SPACE, ~")
+    Text("Text_Help","Moi phim & to hop: ALT+1, CTRL+Q, SHIFT+F1, -, =...")
     Text("Text_Background","Alt+Tab: de game o che do cua so.")
     Text("Text_Speed","Toc do:")
     ButtonText("Btn_On","BAT DAU")
@@ -436,7 +556,7 @@ if RegisterEvent then
 end
 -- Reload always stops the old run; saved bindings are preserved.
 local initial={}
-for i=1,4 do initial[i]=names[keys[i]] or 0 end
+for i=1,4 do initial[i]=(ParseKeySpec(keys[i])) or 0 end
 Write(false,initial)
 end
 local ok, result = pcall(InitializeModule)
