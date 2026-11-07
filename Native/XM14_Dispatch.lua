@@ -143,6 +143,28 @@ function xMacro.Run(...)
 end
 
 macro = xMacro.Run
+xmacro = xMacro.Run
+
+local function OnXMacroCommand(szText)
+    if szText and type(szText) == "string" then
+        szText = string.gsub(szText, "^%s*(.-)%s*$", "%1")
+        if szText == "" or string.lower(szText) == "auto" then
+            szText = nil
+        end
+    else
+        szText = nil
+    end
+    return xMacro.Run(szText)
+end
+
+local function RegisterSlashCommands()
+    if AppendCommand then
+        pcall(AppendCommand, "xmacro", OnXMacroCommand)
+        pcall(AppendCommand, "xm", OnXMacroCommand)
+    end
+end
+
+RegisterSlashCommands()
 
 -- Optional menu integration. The existing HUD also opens on its own.
 local registeredPanels = {}
@@ -161,6 +183,7 @@ local function RegisterAddonPanels()
     end
     Register(AIO)
     Register(HM)
+    RegisterSlashCommands()
 end
 
 RegisterAddonPanels()
