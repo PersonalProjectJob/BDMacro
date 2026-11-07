@@ -6570,12 +6570,32 @@ local function FormatKeyCode(code)
     local base = canonicalName[vk] or ("VK"..vk)
     return (hasCtrl and "CTRL+" or "") .. (hasAlt and "ALT+" or "") .. (hasShift and "SHIFT+" or "") .. base
 end
+local function NormalizeKeyToken(token)
+    token = string.upper(string.match(tostring(token or ""), "^%s*(.-)%s*$"))
+    if names[token] then return token end
+    local fnum = tonumber(string.match(token, "^F[N]?%s*[+%-%s]+%s*(%d+)$") or string.match(token, "^FN(%d+)$"))
+    if fnum and fnum >= 1 and fnum <= 24 then
+        return "F" .. fnum
+    end
+    local nnum = tonumber(string.match(token, "^NUM[PAD]*%s*[+%-%s]+%s*(%d)$") or string.match(token, "^NP%s*[+%-%s]+%s*(%d)$"))
+    if nnum and nnum >= 0 and nnum <= 9 then
+        return "NUM" .. nnum
+    end
+    if not string.find(token, "[+%-%s]") then
+        local tailF = string.match(token, "^.+(F%d+)$")
+        if tailF and names[tailF] then
+            return tailF
+        end
+    end
+    return token
+end
 local function ParseKeySpec(raw)
     local s = string.upper(string.match(tostring(raw or ""), "^%s*(.-)%s*$"))
     if s == "" then return 0, "" end
-    if names[s] then
-        local vk = names[s]
-        return vk, canonicalName[vk] or s
+    local norm = NormalizeKeyToken(s)
+    if names[norm] then
+        local vk = names[norm]
+        return vk, canonicalName[vk] or norm
     end
     local rest = s
     local hasShift, hasCtrl, hasAlt = false, false, false
@@ -6586,9 +6606,10 @@ local function ParseKeySpec(raw)
         if (mod % 512) >= 256 then hasShift = true end
         if (mod % 1024) >= 512 then hasCtrl = true end
         if mod >= 1024 then hasAlt = true end
-        rest = string.match(rem, "^%s*(.-)%s*$")
+        rest = NormalizeKeyToken(rem)
         if names[rest] then break end
     end
+    rest = NormalizeKeyToken(rest)
     local vk = names[rest]
     if not vk then return nil end
     if (vk == 16 or vk == 160 or vk == 161) then hasShift = false end
@@ -6872,7 +6893,7 @@ function hold.EnsureHUD()
     if GetClientPlayer and not GetClientPlayer() then return false end
     local current=Station and Station.Lookup and Station.Lookup("Normal/XMacroHoldKeyHUD")
     if frame and current==frame then return true end
-    if current and (not current:Lookup("Btn_Mini") or not current:Lookup("Edit_Speed") or not current:Lookup("Btn_ModeTarget")) and Wnd.CloseWindow then
+    if current and Wnd.CloseWindow then
         pcall(Wnd.CloseWindow,current)
         current=nil
     end
@@ -6893,7 +6914,71 @@ function hold.EnsureHUD()
     for i=1,4 do
         local edit=Child("Edit_"..i)
         if not edit then frame=nil;return false end
+        if edit.SetLimit then pcall(edit.SetLimit, edit, 32) end
+        if edit.SetMaxLen then pcall(edit.SetMaxLen, edit, 32) end
         edit:SetText(keys[i])
+        local idx = i
+        local capturedLabel, capturedAt = nil, -1000
+        local function CaptureKey(isIgnoreHook)
+            if not (Station and Station.GetMessageKey) then return 0 end
+            local ok, vk = pcall(Station.GetMessageKey)
+            vk = (ok and tonumber(vk)) or 0
+            if vk <= 0 or vk > 254 then return 0 end
+            if vk == 16 or vk == 17 or vk == 18 or (vk >= 160 and vk <= 165) then
+                return 0
+            end
+            local hasShift, hasCtrl, hasAlt = false, false, false
+            if Hotkey and Hotkey.IsKeyDown then
+                local okS, s = pcall(Hotkey.IsKeyDown, 16)
+                local okC, c = pcall(Hotkey.IsKeyDown, 17)
+                local okA, a = pcall(Hotkey.IsKeyDown, 18)
+                hasShift = okS and (s == true or s == 1)
+                hasCtrl = okC and (c == true or c == 1)
+                hasAlt = okA and (a == true or a == 1)
+            end
+            if not hasShift and not hasCtrl and not hasAlt then
+                if vk == 8 or vk == 46 or vk == 37 or vk == 39 then
+                    return 0
+                end
+            end
+            local isNavOrClip = (vk >= 33 and vk <= 40) or vk == 45 or (hasCtrl and (vk == 65 or vk == 67 or vk == 86 or vk == 88))
+            if isIgnoreHook and not isNavOrClip then
+                return 0
+            end
+            local isFunctionKey = (vk >= 112 and vk <= 135)
+            local isSpecialKey = (vk == 9 or vk == 13 or vk == 19 or vk == 20 or vk == 27 or (vk >= 32 and vk <= 45) or (vk >= 91 and vk <= 93) or vk == 144 or vk == 145)
+            if isFunctionKey or isSpecialKey or hasCtrl or hasAlt or hasShift then
+                local code = vk + (hasShift and MOD_SHIFT or 0) + (hasCtrl and MOD_CTRL or 0) + (hasAlt and MOD_ALT or 0)
+                local label = FormatKeyCode(code)
+                if label ~= "" then
+                    capturedLabel = label
+                    capturedAt = Now()
+                    keys[idx] = label
+                    edit:SetText(label)
+                    return 1
+                end
+            end
+            return 0
+        end
+        edit.OnIgnoreKeyDown = function() return CaptureKey(true) end
+        edit.OnEditSpecialKeyDown = function() return CaptureKey(false) end
+        edit.OnSetFocus = function()
+            if edit.SelectAll then pcall(edit.SelectAll, edit) end
+        end
+        edit.OnEditChanged = function()
+            if capturedLabel and (Now() - capturedAt) <= 80 then
+                if edit:GetText() ~= capturedLabel then
+                    edit:SetText(capturedLabel)
+                end
+            end
+        end
+        edit.OnKillFocus = function()
+            local code, label = ParseKeySpec(edit:GetText())
+            if code and code > 0 and label and edit:GetText() ~= label then
+                keys[idx] = label
+                edit:SetText(label)
+            end
+        end
     end
     local editSpeed=Child("Edit_Speed")
     if editSpeed then
