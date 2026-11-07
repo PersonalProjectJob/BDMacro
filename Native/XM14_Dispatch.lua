@@ -204,6 +204,9 @@ local function OnXMacroCommand(szText)
     end
 
     pcall(CheckGitHubSyncNotification)
+    if szText == nil then
+        return xMacro.Run()
+    end
     return xMacro.Run(szText)
 end
 

@@ -4122,10 +4122,22 @@ function CheckTargetBuffs()
 end
 
 
+local function RunMacroSlashCommand(szText)
+    if type(szText) == "string" then
+        szText = string.gsub(szText, "^%s*(.-)%s*$", "%1")
+    else
+        szText = nil
+    end
+    if not szText or szText == "" then
+        return macro()
+    end
+    return macro(szText)
+end
+
 if AppendCommand then
-    pcall(AppendCommand, "macro", function(szText) macro(szText) end)
-    pcall(AppendCommand, "xmacro", function(szText) macro(szText) end)
-    pcall(AppendCommand, "xm", function(szText) macro(szText) end)
+    pcall(AppendCommand, "macro", RunMacroSlashCommand)
+    pcall(AppendCommand, "xmacro", RunMacroSlashCommand)
+    pcall(AppendCommand, "xm", RunMacroSlashCommand)
     pcall(AppendCommand, "checkbuff", CheckTargetBuffs)
     pcall(AppendCommand, "xmcheck", CheckTargetBuffs)
     pcall(AppendCommand, "reload", function() if ReloadUIAddon then ReloadUIAddon() end end)
@@ -6366,6 +6378,9 @@ local function OnXMacroCommand(szText)
     end
 
     pcall(CheckGitHubSyncNotification)
+    if szText == nil then
+        return xMacro.Run()
+    end
     return xMacro.Run(szText)
 end
 
