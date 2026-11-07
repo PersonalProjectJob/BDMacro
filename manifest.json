@@ -18,7 +18,8 @@
       ],
       "kungfuIds": [
         10021
-      ]
+      ],
+      "sourcePath": "Schools/VanHoa/HoaGian.lua"
     },
     "NguDoc/DocKinh": {
       "path": "Native/XM06_NguDoc.lua",
@@ -28,7 +29,8 @@
       ],
       "kungfuIds": [
         10175
-      ]
+      ],
+      "sourcePath": "Schools/NguDoc/DocKinh_BoThien.lua"
     },
     "NguDoc/BoThien": {
       "path": "Native/XM06_NguDoc.lua",
@@ -37,7 +39,8 @@
       ],
       "kungfuIds": [
         10176
-      ]
+      ],
+      "sourcePath": "Schools/NguDoc/DocKinh_BoThien.lua"
     },
     "ThatTu/BangTam": {
       "path": "Native/XM06_NguDoc.lua",
@@ -46,7 +49,8 @@
       ],
       "kungfuIds": [
         10081
-      ]
+      ],
+      "sourcePath": "Schools/ThatTu/BangTam.lua"
     },
     "ThienSach/DPS": {
       "path": "Native/XM06_NguDoc.lua",
@@ -55,7 +59,8 @@
       ],
       "kungfuIds": [
         10026
-      ]
+      ],
+      "sourcePath": "Schools/ThienSach/DPS.lua"
     },
     "TangKiem/DPS": {
       "path": "Native/XM06_NguDoc.lua",
@@ -65,7 +70,8 @@
       "kungfuIds": [
         10144,
         10145
-      ]
+      ],
+      "sourcePath": "Schools/TangKiem/DPS.lua"
     },
     "DuongMon/KinhVu": {
       "path": "Native/XM06_NguDoc.lua",
@@ -74,7 +80,8 @@
       ],
       "kungfuIds": [
         10224
-      ]
+      ],
+      "sourcePath": "Schools/DuongMon/KinhVu.lua"
     },
     "DuongMon/ThienLa": {
       "path": "Native/XM06_NguDoc.lua",
@@ -83,7 +90,8 @@
       ],
       "kungfuIds": [
         10225
-      ]
+      ],
+      "sourcePath": "Schools/DuongMon/ThienLa.lua"
     },
     "MinhGiao/PhanAnh": {
       "path": "Native/XM06_NguDoc.lua",
@@ -92,7 +100,8 @@
       ],
       "kungfuIds": [
         10242
-      ]
+      ],
+      "sourcePath": "Schools/MinhGiao/PhanAnh.lua"
     },
     "ThieuLam/DichCanKinh": {
       "path": "Native/XM06_NguDoc.lua",
@@ -101,7 +110,8 @@
       ],
       "kungfuIds": [
         10003
-      ]
+      ],
+      "sourcePath": "Schools/ThieuLam/DichCanKinh.lua"
     },
     "ThuanDuong/TuHaCong": {
       "path": "Native/XM06_NguDoc.lua",
@@ -110,7 +120,8 @@
       ],
       "kungfuIds": [
         10014
-      ]
+      ],
+      "sourcePath": "Schools/ThuanDuong/TuHaCong.lua"
     },
     "ThuanDuong/ThaiHuKiemY": {
       "path": "Native/XM06_NguDoc.lua",
@@ -119,7 +130,8 @@
       ],
       "kungfuIds": [
         10015
-      ]
+      ],
+      "sourcePath": "Schools/ThuanDuong/ThaiHuKiemY.lua"
     }
   }
 }
