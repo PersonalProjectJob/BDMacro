@@ -18,16 +18,17 @@ end
 -- BEGIN Schools/DuongMon/KinhVu.lua
 do
 local function InitializeModule()
--- Kinh Vũ Quyết, damage priority for one selected target.
--- Hóa Huyết Tiêu (3087) applies debuff 2237. DKMacro/DuongMon.lua.
+-- Kinh Vũ Quyết (10224) - Nội công DPS Nỏ Đường Môn v80
+-- Kỹ năng: Tập Trung (3100), Truy Mệnh Tiễn (3098), Hóa Huyết Tiêu (3087 - debuff 2237),
+-- Bạo Vũ Lê Hoa Châm (3093), Trục Tinh Tiễn (3095), Đoạt Phách Tiễn (3088).
 xMacro.Schools.RegisterDamageScript("DuongMon", "KinhVu", {[10224] = [[
 #name DuongMon_KinhVu_80
+/skill [energy<35] 3100
+/skill [distance<=25,xmbuff:3317] 3098
 /skill [distance<=25,energy>=20,xmtnobuff:2237] 3087
-/skill [distance<=25,energy>=30] 3098
 /skill [distance<=25,energy>=30] 3093
-/skill [distance<=25,energy>=30] 3095
-/skill [distance<=25,energy>=15] 3088
-/skill [energy<30] 3100
+/skill [distance<=25,energy<=70] 3095
+/skill [distance<=25,energy>=30] 3088
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -42,15 +43,16 @@ end
 -- BEGIN Schools/DuongMon/ThienLa.lua
 do
 local function InitializeModule()
--- Thiên La Quỷ Đạo, direct-target damage. Place traps and the turret manually.
--- Classic skill IDs from DKMacro/DuongMon.lua.
+-- Thiên La Quỹ Đạo (10225) - Nội công DPS Cơ quan Đường Môn v80
+-- Kỹ năng: Tập Trung (3100), Hóa Huyết Tiêu (3087 - debuff 2237),
+-- Bạo Vũ Lê Hoa Châm (3093), Thực Cơ Đạn (3105), Đoạt Phách Tiễn (3088).
 xMacro.Schools.RegisterDamageScript("DuongMon", "ThienLa", {[10225] = [[
 #name DuongMon_ThienLa_80
+/skill [energy<40] 3100
 /skill [distance<=25,energy>=20,xmtnobuff:2237] 3087
 /skill [distance<=25,energy>=30] 3093
 /skill [distance<=25,energy>=30] 3105
 /skill [distance<=25,energy>=15] 3088
-/skill [energy<30] 3100
 ]]})
 end
 local ok, result = pcall(InitializeModule)

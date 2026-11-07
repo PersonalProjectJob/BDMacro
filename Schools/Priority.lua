@@ -18,12 +18,20 @@ function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
             end
             if IsEnemy and not IsEnemy(player.dwID, target.dwID) then return false end
             if type(script) == "function" then script = script(player) end
-            -- The generic numeric /skill handler accepts unknown IDs at level 1.
+            -- The generic numeric /skill or /cast handler accepts unknown IDs at level 1.
             -- Skip unlearned skills so the client can fall through to the next priority.
-            script = script:gsub("/skill [^\r\n]+", function(command)
-                local skillID = tonumber(command:match(" (%d+)$"))
-                if skillID and (player.GetSkillLevel(skillID) or 0) > 0 then return command end
-                return ""
+            script = script:gsub("(/[a-z]+%s+[^\r\n]+)", function(command)
+                local cmd, body = command:match("^/([a-z]+)%s+(.*)$")
+                if cmd == "skill" or cmd == "cast" or cmd == "fcast" then
+                    local skillTarget = body:match("%]%s*(.-)%s*$") or body:match("^%s*(.-)%s*$")
+                    if skillTarget and skillTarget ~= "" then
+                        local skillID = tonumber(skillTarget)
+                        if skillID and (player.GetSkillLevel(skillID) or 0) <= 0 then
+                            return ""
+                        end
+                    end
+                end
+                return command
             end)
             -- A previous profile may have left its /config before filter active.
             return ExecuteMacroCommand("/config before:null\n" .. script)

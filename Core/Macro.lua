@@ -2405,6 +2405,7 @@ end
 
 AppendCommand("skill", ExecuteSkillCommand)
 AppendCommand("cast", ExecuteSkillCommand)
+AppendCommand("fcast", ExecuteSkillCommand)
 
 AppendCommand("config", function(szText)
 	szText = szText or ""

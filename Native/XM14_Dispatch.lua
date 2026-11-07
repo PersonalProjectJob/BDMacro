@@ -23,11 +23,13 @@ xMacro = xMacro or {}
 local SCHOOL_CODES = xMacro.Core.SchoolAliases
 -- Use the active inner kungfu, since one school can have multiple rotations.
 local KUNGFU_CODES = {
+    [10002] = "TLTT",
     [10003] = "TL",
     [10014] = "TDTH",
     [10015] = "TDTK",
     [10021] = "VH",
     [10026] = "TS",
+    [10062] = "TSTL",
     [10081] = "7T",
     [10144] = "TK",
     [10145] = "TK",
@@ -36,6 +38,7 @@ local KUNGFU_CODES = {
     [10224] = "DMKV",
     [10225] = "DMTL",
     [10242] = "MG",
+    [10243] = "MGMT",
 }
 local lastFailure, initializedProfile = nil, nil
 local function ReportFailure(failure)

@@ -2425,6 +2425,7 @@ end
 
 AppendCommand("skill", ExecuteSkillCommand)
 AppendCommand("cast", ExecuteSkillCommand)
+AppendCommand("fcast", ExecuteSkillCommand)
 
 AppendCommand("config", function(szText)
 	szText = szText or ""
@@ -3605,18 +3606,32 @@ xMacro.Core = xMacro.Core or {}
 -- Command codes are independent of installed rotations. Missing profiles fail closed.
 xMacro.Core.SchoolAliases = {
     ["VH"] = {school = "VanHoa", profile = "HoaGian"},
+    ["VHHG"] = {school = "VanHoa", profile = "HoaGian"},
     ["ND"] = {school = "NguDoc", profile = "DocKinh"},
     ["NDDK"] = {school = "NguDoc", profile = "DocKinh"},
     ["NDBT"] = {school = "NguDoc", profile = "BoThien"},
     ["7T"] = {school = "ThatTu", profile = "BangTam"},
+    ["TTBT"] = {school = "ThatTu", profile = "BangTam"},
     ["TS"] = {school = "ThienSach", profile = "DPS"},
+    ["TSNH"] = {school = "ThienSach", profile = "DPS"},
+    ["TSTL"] = {school = "ThienSach", profile = "ThietLao"},
+    ["TSTANK"] = {school = "ThienSach", profile = "ThietLao"},
     ["TK"] = {school = "TangKiem", profile = "DPS"},
+    ["TKCJ"] = {school = "TangKiem", profile = "DPS"},
     ["DMKV"] = {school = "DuongMon", profile = "KinhVu"},
     ["DMTL"] = {school = "DuongMon", profile = "ThienLa"},
     ["MG"] = {school = "MinhGiao", profile = "PhanAnh"},
+    ["MGPA"] = {school = "MinhGiao", profile = "PhanAnh"},
+    ["MGMT"] = {school = "MinhGiao", profile = "MinhTon"},
+    ["MGTANK"] = {school = "MinhGiao", profile = "MinhTon"},
     ["TL"] = {school = "ThieuLam", profile = "DichCanKinh"},
+    ["TLDC"] = {school = "ThieuLam", profile = "DichCanKinh"},
+    ["TLTT"] = {school = "ThieuLam", profile = "TayTuyKinh"},
+    ["TLTANK"] = {school = "ThieuLam", profile = "TayTuyKinh"},
     ["TDTH"] = {school = "ThuanDuong", profile = "TuHaCong"},
+    ["QC"] = {school = "ThuanDuong", profile = "TuHaCong"},
     ["TDTK"] = {school = "ThuanDuong", profile = "ThaiHuKiemY"},
+    ["JC"] = {school = "ThuanDuong", profile = "ThaiHuKiemY"},
 }
 
 function xMacro.Core.SchoolDependencies()

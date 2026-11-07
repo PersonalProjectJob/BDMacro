@@ -18,12 +18,16 @@ end
 -- BEGIN Schools/ThienSach/DPS.lua
 do
 local function InitializeModule()
--- Ngạo Huyết Chiến Ý. IDs cross-checked against DKMacro/ThienSach.lua.
+-- Ngạo Huyết Chiến Ý (10026) - Nội công DPS Thiên Sách v80
+-- Kỹ năng: Từ Như Lâm (405), Thủ Như Sơn (407), Phá Phong (401 - duy trì debuff Lưu Huyết 3442),
+-- Long Nha (415 - khi có Trí Tàn 540), Diệt (423), Long Ngâm (403), Xuyên Vân (400).
 xMacro.Schools.RegisterDamageScript("ThienSach", "DPS", {[10026] = [[
 #name ThienSach_NgaoHuyet_80
--- Phá Phong keeps Lưu Huyết active, then spend Trí Tàn on Long Nha.
+/skill [mana<0.50] 405
+/skill [life<0.30] 407
 /skill [distance<=4,xmtnobuff:3442] 401
 /skill [distance<=4,xmtbuff:540] 415
+/skill [distance<=4,xmtbuff:540] 423
 /skill [distance<=4] 403
 /skill [distance<=4,tlife<0.30] 423
 /skill [distance<=4] 400
@@ -37,3 +41,32 @@ if not ok then
 end
 end
 -- END Schools/ThienSach/DPS.lua
+
+-- BEGIN Schools/ThienSach/ThietLao.lua
+do
+local function InitializeModule()
+-- Thiết Lao Luật (10062) - Nội công Tank Thiên Sách v80
+-- Kỹ năng: Thủ Như Sơn (407), Ngự (424), Từ Như Lâm (405),
+-- Định Quân (402 - Taunt cừu hận chính), Phá Phong (401 - duy trì debuff Lưu Huyết 3442),
+-- Long Nha (415 - khi có Trí Tàn 540 tạo cừu hận lớn), Long Ngâm (403), Diệt (423), Xuyên Vân (400).
+xMacro.Schools.RegisterDamageScript("ThienSach", "ThietLao", {[10062] = [[
+#name ThienSach_ThietLao_80
+/skill [life<0.35] 407
+/skill [life<0.60] 424
+/skill [mana<0.50] 405
+/skill [distance<=4] 402
+/skill [distance<=4,xmtnobuff:3442] 401
+/skill [distance<=4,xmtbuff:540] 415
+/skill [distance<=4] 403
+/skill [distance<=4] 423
+/skill [distance<=4] 400
+]]})
+end
+local ok, result = pcall(InitializeModule)
+runtimeStatus.modules["Schools/ThienSach/ThietLao.lua"] = ok
+if not ok then
+    runtimeStatus.errors["Schools/ThienSach/ThietLao.lua"] = tostring(result)
+    ReportStartup("LOAD_ERROR Schools/ThienSach/ThietLao.lua: " .. tostring(result))
+end
+end
+-- END Schools/ThienSach/ThietLao.lua

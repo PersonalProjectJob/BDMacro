@@ -12,11 +12,14 @@ xMacro.Runtime = {version = "0.9.7", ready = false, nativeLayout = "ordered-v2",
     ["Schools/NguDoc/DocKinh_BoThien.lua"] = false,
     ["Schools/ThatTu/BangTam.lua"] = false,
     ["Schools/ThienSach/DPS.lua"] = false,
+    ["Schools/ThienSach/ThietLao.lua"] = false,
     ["Schools/TangKiem/DPS.lua"] = false,
     ["Schools/DuongMon/KinhVu.lua"] = false,
     ["Schools/DuongMon/ThienLa.lua"] = false,
     ["Schools/MinhGiao/PhanAnh.lua"] = false,
+    ["Schools/MinhGiao/MinhTon.lua"] = false,
     ["Schools/ThieuLam/DichCanKinh.lua"] = false,
+    ["Schools/ThieuLam/TayTuyKinh.lua"] = false,
     ["Schools/ThuanDuong/TuHaCong.lua"] = false,
     ["Schools/ThuanDuong/ThaiHuKiemY.lua"] = false,
     ["Macro.lua"] = false,
@@ -433,12 +436,20 @@ function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
             end
             if IsEnemy and not IsEnemy(player.dwID, target.dwID) then return false end
             if type(script) == "function" then script = script(player) end
-            -- The generic numeric /skill handler accepts unknown IDs at level 1.
+            -- The generic numeric /skill or /cast handler accepts unknown IDs at level 1.
             -- Skip unlearned skills so the client can fall through to the next priority.
-            script = script:gsub("/skill [^\r\n]+", function(command)
-                local skillID = tonumber(command:match(" (%d+)$"))
-                if skillID and (player.GetSkillLevel(skillID) or 0) > 0 then return command end
-                return ""
+            script = script:gsub("(/[a-z]+%s+[^\r\n]+)", function(command)
+                local cmd, body = command:match("^/([a-z]+)%s+(.*)$")
+                if cmd == "skill" or cmd == "cast" or cmd == "fcast" then
+                    local skillTarget = body:match("%]%s*(.-)%s*$") or body:match("^%s*(.-)%s*$")
+                    if skillTarget and skillTarget ~= "" then
+                        local skillID = tonumber(skillTarget)
+                        if skillID and (player.GetSkillLevel(skillID) or 0) <= 0 then
+                            return ""
+                        end
+                    end
+                end
+                return command
             end)
             -- A previous profile may have left its /config before filter active.
             return ExecuteMacroCommand("/config before:null\n" .. script)
@@ -2972,6 +2983,7 @@ end
 
 AppendCommand("skill", ExecuteSkillCommand)
 AppendCommand("cast", ExecuteSkillCommand)
+AppendCommand("fcast", ExecuteSkillCommand)
 
 AppendCommand("config", function(szText)
 	szText = szText or ""
@@ -4152,18 +4164,32 @@ xMacro.Core = xMacro.Core or {}
 -- Command codes are independent of installed rotations. Missing profiles fail closed.
 xMacro.Core.SchoolAliases = {
     ["VH"] = {school = "VanHoa", profile = "HoaGian"},
+    ["VHHG"] = {school = "VanHoa", profile = "HoaGian"},
     ["ND"] = {school = "NguDoc", profile = "DocKinh"},
     ["NDDK"] = {school = "NguDoc", profile = "DocKinh"},
     ["NDBT"] = {school = "NguDoc", profile = "BoThien"},
     ["7T"] = {school = "ThatTu", profile = "BangTam"},
+    ["TTBT"] = {school = "ThatTu", profile = "BangTam"},
     ["TS"] = {school = "ThienSach", profile = "DPS"},
+    ["TSNH"] = {school = "ThienSach", profile = "DPS"},
+    ["TSTL"] = {school = "ThienSach", profile = "ThietLao"},
+    ["TSTANK"] = {school = "ThienSach", profile = "ThietLao"},
     ["TK"] = {school = "TangKiem", profile = "DPS"},
+    ["TKCJ"] = {school = "TangKiem", profile = "DPS"},
     ["DMKV"] = {school = "DuongMon", profile = "KinhVu"},
     ["DMTL"] = {school = "DuongMon", profile = "ThienLa"},
     ["MG"] = {school = "MinhGiao", profile = "PhanAnh"},
+    ["MGPA"] = {school = "MinhGiao", profile = "PhanAnh"},
+    ["MGMT"] = {school = "MinhGiao", profile = "MinhTon"},
+    ["MGTANK"] = {school = "MinhGiao", profile = "MinhTon"},
     ["TL"] = {school = "ThieuLam", profile = "DichCanKinh"},
+    ["TLDC"] = {school = "ThieuLam", profile = "DichCanKinh"},
+    ["TLTT"] = {school = "ThieuLam", profile = "TayTuyKinh"},
+    ["TLTANK"] = {school = "ThieuLam", profile = "TayTuyKinh"},
     ["TDTH"] = {school = "ThuanDuong", profile = "TuHaCong"},
+    ["QC"] = {school = "ThuanDuong", profile = "TuHaCong"},
     ["TDTK"] = {school = "ThuanDuong", profile = "ThaiHuKiemY"},
+    ["JC"] = {school = "ThuanDuong", profile = "ThaiHuKiemY"},
 }
 
 function xMacro.Core.SchoolDependencies()
@@ -5879,12 +5905,16 @@ end
 -- BEGIN Schools/ThienSach/DPS.lua
 do
 local function InitializeModule()
--- Ngạo Huyết Chiến Ý. IDs cross-checked against DKMacro/ThienSach.lua.
+-- Ngạo Huyết Chiến Ý (10026) - Nội công DPS Thiên Sách v80
+-- Kỹ năng: Từ Như Lâm (405), Thủ Như Sơn (407), Phá Phong (401 - duy trì debuff Lưu Huyết 3442),
+-- Long Nha (415 - khi có Trí Tàn 540), Diệt (423), Long Ngâm (403), Xuyên Vân (400).
 xMacro.Schools.RegisterDamageScript("ThienSach", "DPS", {[10026] = [[
 #name ThienSach_NgaoHuyet_80
--- Phá Phong keeps Lưu Huyết active, then spend Trí Tàn on Long Nha.
+/skill [mana<0.50] 405
+/skill [life<0.30] 407
 /skill [distance<=4,xmtnobuff:3442] 401
 /skill [distance<=4,xmtbuff:540] 415
+/skill [distance<=4,xmtbuff:540] 423
 /skill [distance<=4] 403
 /skill [distance<=4,tlife<0.30] 423
 /skill [distance<=4] 400
@@ -5898,6 +5928,35 @@ if not ok then
 end
 end
 -- END Schools/ThienSach/DPS.lua
+
+-- BEGIN Schools/ThienSach/ThietLao.lua
+do
+local function InitializeModule()
+-- Thiết Lao Luật (10062) - Nội công Tank Thiên Sách v80
+-- Kỹ năng: Thủ Như Sơn (407), Ngự (424), Từ Như Lâm (405),
+-- Định Quân (402 - Taunt cừu hận chính), Phá Phong (401 - duy trì debuff Lưu Huyết 3442),
+-- Long Nha (415 - khi có Trí Tàn 540 tạo cừu hận lớn), Long Ngâm (403), Diệt (423), Xuyên Vân (400).
+xMacro.Schools.RegisterDamageScript("ThienSach", "ThietLao", {[10062] = [[
+#name ThienSach_ThietLao_80
+/skill [life<0.35] 407
+/skill [life<0.60] 424
+/skill [mana<0.50] 405
+/skill [distance<=4] 402
+/skill [distance<=4,xmtnobuff:3442] 401
+/skill [distance<=4,xmtbuff:540] 415
+/skill [distance<=4] 403
+/skill [distance<=4] 423
+/skill [distance<=4] 400
+]]})
+end
+local ok, result = pcall(InitializeModule)
+runtimeStatus.modules["Schools/ThienSach/ThietLao.lua"] = ok
+if not ok then
+    runtimeStatus.errors["Schools/ThienSach/ThietLao.lua"] = tostring(result)
+    ReportStartup("LOAD_ERROR Schools/ThienSach/ThietLao.lua: " .. tostring(result))
+end
+end
+-- END Schools/ThienSach/ThietLao.lua
 end
 
 do
@@ -5920,29 +5979,36 @@ end
 -- BEGIN Schools/TangKiem/DPS.lua
 do
 local function InitializeModule()
--- Vấn Thủy builds sword energy, Sơn Cư spends it. Skill 1656 is Khiếu Nhật.
--- Stance IDs and base skills cross-checked against DKMacro/TangKiem.lua.
+-- Vấn Thủy Quyết (10144 - Khinh Kiếm tích kiếm khí) & Sơn Cư Kiếm Ý (10145 - Trọng Kiếm xả kiếm khí).
+-- Kỹ năng: Mai Ẩn Hương (1649), Khiếu Nhật (1656), Tuyết Đoạn Kiều (1609),
+-- Vân Phi Ngọc Hoàng (1593), Tịch Chiếu Lôi Phong (1592), Thính Lôi (1646),
+-- Đoạn Triều (1600), Cửu Khê Di Yên (1579).
 local light = [[
+/skill [distance<=8,xmtnobuff:1649] 1649
+/skill [distance<=4] 1600
 /skill [distance<=4] 1646
 /skill [distance<=8] 1579
 ]]
 local heavy = [[
+/skill [distance<=8,xmtnobuff:1649] 1649
+/skill [distance<=8,rage<20] 1609
+/skill [distance<=4] 1600
 /skill [distance<=8,rage>=20] 1593
-/skill [distance<=8,rage>=20] 1600
+/skill [distance<=8,rage>=20] 1592
 /skill [distance<=4] 1646
 ]]
 
 local function LightSword(player)
     local energy = player.nCurrentRage or 0
     local maxEnergy = player.nMaxRage or 0
-    if maxEnergy > 0 and energy >= maxEnergy * 0.95 then
+    if maxEnergy > 0 and energy >= maxEnergy * 0.90 then
         return "/skill [distance<=4] 1656\n" .. light
     end
     return light
 end
 
 local function HeavySword(player)
-    if player.nCurrentRage and player.nCurrentRage < 20 then
+    if player.nCurrentRage and player.nCurrentRage < 15 then
         return "/skill [distance<=4] 1656\n" .. heavy
     end
     return heavy
@@ -5983,16 +6049,17 @@ end
 -- BEGIN Schools/DuongMon/KinhVu.lua
 do
 local function InitializeModule()
--- Kinh Vũ Quyết, damage priority for one selected target.
--- Hóa Huyết Tiêu (3087) applies debuff 2237. DKMacro/DuongMon.lua.
+-- Kinh Vũ Quyết (10224) - Nội công DPS Nỏ Đường Môn v80
+-- Kỹ năng: Tập Trung (3100), Truy Mệnh Tiễn (3098), Hóa Huyết Tiêu (3087 - debuff 2237),
+-- Bạo Vũ Lê Hoa Châm (3093), Trục Tinh Tiễn (3095), Đoạt Phách Tiễn (3088).
 xMacro.Schools.RegisterDamageScript("DuongMon", "KinhVu", {[10224] = [[
 #name DuongMon_KinhVu_80
+/skill [energy<35] 3100
+/skill [distance<=25,xmbuff:3317] 3098
 /skill [distance<=25,energy>=20,xmtnobuff:2237] 3087
-/skill [distance<=25,energy>=30] 3098
 /skill [distance<=25,energy>=30] 3093
-/skill [distance<=25,energy>=30] 3095
-/skill [distance<=25,energy>=15] 3088
-/skill [energy<30] 3100
+/skill [distance<=25,energy<=70] 3095
+/skill [distance<=25,energy>=30] 3088
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6007,15 +6074,16 @@ end
 -- BEGIN Schools/DuongMon/ThienLa.lua
 do
 local function InitializeModule()
--- Thiên La Quỷ Đạo, direct-target damage. Place traps and the turret manually.
--- Classic skill IDs from DKMacro/DuongMon.lua.
+-- Thiên La Quỹ Đạo (10225) - Nội công DPS Cơ quan Đường Môn v80
+-- Kỹ năng: Tập Trung (3100), Hóa Huyết Tiêu (3087 - debuff 2237),
+-- Bạo Vũ Lê Hoa Châm (3093), Thực Cơ Đạn (3105), Đoạt Phách Tiễn (3088).
 xMacro.Schools.RegisterDamageScript("DuongMon", "ThienLa", {[10225] = [[
 #name DuongMon_ThienLa_80
+/skill [energy<40] 3100
 /skill [distance<=25,energy>=20,xmtnobuff:2237] 3087
 /skill [distance<=25,energy>=30] 3093
 /skill [distance<=25,energy>=30] 3105
 /skill [distance<=25,energy>=15] 3088
-/skill [energy<30] 3100
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6048,10 +6116,12 @@ end
 -- BEGIN Schools/MinhGiao/PhanAnh.lua
 do
 local function InitializeModule()
--- Phần Ảnh Thánh Quyết. Base solar/lunar cycle, without level-90 talents.
--- IDs cross-checked against DKMacro/MinhGiao.lua.
+-- Phần Ảnh Thánh Quyết (10242) - Nội công DPS Minh Giáo v80
+-- Kỹ năng: Tham Ma Thể (3965), Tịnh Thế Phá Ma Kích (3967), Khu Dạ Đoạn Sầu (3979),
+-- Ngân Nguyệt Trảm (3963), Liệt Nhật Trảm (3960), U Nguyệt Luân (3962), Xích Nhật Luân (3959).
 xMacro.Schools.RegisterDamageScript("MinhGiao", "PhanAnh", {[10242] = [[
 #name MinhGiao_PhanAnh_80
+/skill [life<0.30] 3965
 /skill [distance<=5,fullsun] 3967
 /skill [distance<=5,fullmoon] 3967
 /skill [distance<=5,xmbuff:4052] 3979
@@ -6069,6 +6139,37 @@ if not ok then
 end
 end
 -- END Schools/MinhGiao/PhanAnh.lua
+
+-- BEGIN Schools/MinhGiao/MinhTon.lua
+do
+local function InitializeModule()
+-- Minh Tôn Lưu Hỏa Thể (10243) - Nội công Tank Minh Giáo v80
+-- Kỹ năng: Tham Ma Thể (3965), Thánh Minh Hựu (3966), Từ Bi Nguyện (3972 - Taunt cừu hận chính),
+-- Giới Hỏa Trảm (3973), Hoàng Nhật Chiếu (3975), Tịnh Thế Phá Ma Kích (3967),
+-- Liệt Nhật Trảm (3960), Ngân Nguyệt Trảm (3963), Xích Nhật Luân (3959), U Nguyệt Luân (3962).
+xMacro.Schools.RegisterDamageScript("MinhGiao", "MinhTon", {[10243] = [[
+#name MinhGiao_MinhTon_80
+/skill [life<0.30] 3965
+/skill [life<0.40,fullsun] 3966
+/skill [distance<=5] 3972
+/skill [distance<=8] 3973
+/skill [distance<=5] 3975
+/skill [distance<=5,fullsun] 3967
+/skill [distance<=5,fullmoon] 3967
+/skill [distance<=5,sun>=moon] 3960
+/skill [distance<=5,moon>sun] 3963
+/skill [distance<=5,sun>=moon] 3959
+/skill [distance<=5] 3962
+]]})
+end
+local ok, result = pcall(InitializeModule)
+runtimeStatus.modules["Schools/MinhGiao/MinhTon.lua"] = ok
+if not ok then
+    runtimeStatus.errors["Schools/MinhGiao/MinhTon.lua"] = tostring(result)
+    ReportStartup("LOAD_ERROR Schools/MinhGiao/MinhTon.lua: " .. tostring(result))
+end
+end
+-- END Schools/MinhGiao/MinhTon.lua
 end
 
 do
@@ -6091,14 +6192,21 @@ end
 -- BEGIN Schools/ThieuLam/DichCanKinh.lua
 do
 local function InitializeModule()
--- Dịch Cân Kinh, three-point damage spenders and classic point builders.
--- IDs cross-checked against DKMacro/ThieuLam.lua.
+-- Dịch Cân Kinh (10003) - Nội công DPS Thiếu Lâm v80
+-- Kỹ năng: Vô Tướng Quyết (245), Diệc Khô Diệc Vinh (242), Cầm Long Quyết (246),
+-- Nã Vân Thức (243), Kim Cương Nộ Mục (239), Vi Đà Hiến Chử (233),
+-- Thủ Khuyết Thức (235), Đảo Hư Thức (2572), Hoành Tảo Lục Hợp (234), Phổ Độ Tứ Phương (232).
 xMacro.Schools.RegisterDamageScript("ThieuLam", "DichCanKinh", {[10003] = [[
 #name ThieuLam_DichCanKinh_80
+/skill [life<0.35] 245
+/skill [mana<0.40,qidian>=3] 242
+/skill [qidian<1] 246
 /skill [distance<=4,qidian>=3,tlife<0.30] 243
+/skill [distance<=4,qidian>=3] 239
 /skill [distance<=4,qidian>=3] 233
 /skill [distance<=5] 235
 /skill [distance<=8] 2572
+/skill [distance<=5,qidian<3] 234
 /skill [distance<=4] 232
 ]]})
 end
@@ -6110,6 +6218,35 @@ if not ok then
 end
 end
 -- END Schools/ThieuLam/DichCanKinh.lua
+
+-- BEGIN Schools/ThieuLam/TayTuyKinh.lua
+do
+local function InitializeModule()
+-- Tẩy Tủy Kinh (10002) - Nội công Tank Thiếu Lâm v80
+-- Kỹ năng: Vô Tướng Quyết (245), Đoán Cốt Quyết (247), Cầm Long Quyết (246),
+-- Vạn Phật Triều Tông (236 - Taunt), Lập Địa Thành Phật (241), Vi Đà Hiến Chử (233),
+-- Ma Ha Vô Lượng (237), Hoành Tảo Lục Hợp (234), Phổ Độ Tứ Phương (232).
+xMacro.Schools.RegisterDamageScript("ThieuLam", "TayTuyKinh", {[10002] = [[
+#name ThieuLam_TayTuyKinh_80
+/skill [life<0.35] 245
+/skill [life<0.40] 247
+/skill [qidian<1] 246
+/skill [distance<=4] 236
+/skill [distance<=4,qidian>=3] 241
+/skill [distance<=4,qidian>=3] 233
+/skill [distance<=4] 237
+/skill [distance<=5] 234
+/skill [distance<=4] 232
+]]})
+end
+local ok, result = pcall(InitializeModule)
+runtimeStatus.modules["Schools/ThieuLam/TayTuyKinh.lua"] = ok
+if not ok then
+    runtimeStatus.errors["Schools/ThieuLam/TayTuyKinh.lua"] = tostring(result)
+    ReportStartup("LOAD_ERROR Schools/ThieuLam/TayTuyKinh.lua: " .. tostring(result))
+end
+end
+-- END Schools/ThieuLam/TayTuyKinh.lua
 end
 
 do
@@ -6132,12 +6269,15 @@ end
 -- BEGIN Schools/ThuanDuong/TuHaCong.lua
 do
 local function InitializeModule()
--- Tử Hà Công, build khí điểm then use Lưỡng Nghi Hóa Hình.
--- IDs cross-checked against DKMacro/ThuanDuong.lua.
+-- Tử Hà Công (10014) - Nội công DPS Khí Thuần Dương v80
+-- Kỹ năng: Tọa Vọng Vô Ngã (305), Bão Nguyên Thủ Khuyết (302),
+-- Lưỡng Nghi Hóa Hình (301), Tứ Tượng Luân Hồi (367), Thái Cực Vô Cực (306).
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10014] = [[
 #name ThuanDuong_TuHaCong_80
-/skill [distance<=20,qidian>=9] 301
-/skill [distance<=20,qidian<=8] 367
+/skill [nobuff:305] 305
+/skill [mana<0.60,qidian>=8] 302
+/skill [distance<=20,qidian>=8] 301
+/skill [distance<=20,qidian<=7] 367
 /skill [distance<=20] 306
 ]]})
 end
@@ -6153,11 +6293,14 @@ end
 -- BEGIN Schools/ThuanDuong/ThaiHuKiemY.lua
 do
 local function InitializeModule()
--- Thái Hư Kiếm Ý, direct melee priority with classical khí điểm thresholds.
--- IDs cross-checked against DKMacro/ThuanDuong.lua.
+-- Thái Hư Kiếm Ý (10015) - Nội công DPS Kiếm Thuần Dương v80
+-- Kỹ năng: Tọa Vọng Vô Ngã (305), Vô Ngã Vô Kiếm (365),
+-- Bát Hoang Quy Nguyên (2699), Tam Hoàn Sáo Nguyệt (364).
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10015] = [[
 #name ThuanDuong_ThaiHuKiemY_80
+/skill [nobuff:305] 305
 /skill [distance<=4,qidian>=8] 365
+/skill [distance<=4,tlife<0.40] 2699
 /skill [distance<=4,qidian<=7] 2699
 /skill [distance<=4] 364
 ]]})
@@ -6197,11 +6340,13 @@ xMacro = xMacro or {}
 local SCHOOL_CODES = xMacro.Core.SchoolAliases
 -- Use the active inner kungfu, since one school can have multiple rotations.
 local KUNGFU_CODES = {
+    [10002] = "TLTT",
     [10003] = "TL",
     [10014] = "TDTH",
     [10015] = "TDTK",
     [10021] = "VH",
     [10026] = "TS",
+    [10062] = "TSTL",
     [10081] = "7T",
     [10144] = "TK",
     [10145] = "TK",
@@ -6210,6 +6355,7 @@ local KUNGFU_CODES = {
     [10224] = "DMKV",
     [10225] = "DMTL",
     [10242] = "MG",
+    [10243] = "MGMT",
 }
 local lastFailure, initializedProfile = nil, nil
 local function ReportFailure(failure)
