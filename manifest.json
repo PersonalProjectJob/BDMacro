@@ -1,13 +1,55 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "client": "JX3-v80",
-  "nativeLayout": "ordered-v1",
+  "nativeLayout": "ordered-v2",
   "files": {
+    "Native/XM00_Bootstrap.lua": {
+      "sha256": "786cedb147776217a8828313566b704c1592b9eace7f428487c405c86b66a7ca"
+    },
+    "Native/XM01_Config.lua": {
+      "sha256": "874c249e55881d3951fe42c5c69f433ef019d5630032b93206b9d8201b1d4790"
+    },
+    "Native/XM02_Registry.lua": {
+      "sha256": "79f5bf0e8fa5771cb7728fd0803ae56864f7490621d145f494898081a9691813"
+    },
+    "Native/XM03_Functions.lua": {
+      "sha256": "5c111ad68e6b9198e8aaafaef947438e44b7d3f671d7018b9760b18005650fac"
+    },
+    "Native/XM04_Core.lua": {
+      "sha256": "3895621f9c93e05c650689c255dfd8e11dacc4edb8d263ae0c656a79b2fe9f89"
+    },
     "Native/XM05_VanHoa.lua": {
-      "sha256": "6b00310bb26768ff014d93fc270bfc41680b2a2993c99dc6f25c999fcfb66141"
+      "sha256": "a8d7a8d41f1026a38a531bf90cd9b980eb6fc7277f89f6ef0c757c91544a02cb"
     },
     "Native/XM06_NguDoc.lua": {
-      "sha256": "9dfbca6ed81d7bf0cfdc1cb049602a26e80978792f144bbf8dee738045c46503"
+      "sha256": "b33fb709deed4c34037fa06c98d771b793e86602a87d6ae8c608a48361f9c1b5"
+    },
+    "Native/XM07_ThatTu.lua": {
+      "sha256": "17f9465d49fe70d5a56995fc19c4a2c218dc91d641f460763e96b94ae6d302a9"
+    },
+    "Native/XM08_ThienSach.lua": {
+      "sha256": "2f7d996681691caece6df234ae6761957e2edb7cbb30e3f996a25d7ce80750cd"
+    },
+    "Native/XM09_TangKiem.lua": {
+      "sha256": "37f962c44541be60383992da42ef5b3fc0578d6a0a9fff50a937f3f009da8d3b"
+    },
+    "Native/XM10_DuongMon.lua": {
+      "sha256": "17e7e97832d56f28f9e78f2d01ed5014dc2aa3e7724584c2ee0d2d211b31d7d4"
+    },
+    "Native/XM11_MinhGiao.lua": {
+      "sha256": "f6ace2eaca1d4b893cecb595a6fc669da4e397ac4d186c3975a77e1cbcea5978"
+    },
+    "Native/XM12_ThieuLam.lua": {
+      "sha256": "b437919ad56eda9766faadf1b5f98cab1c6782f3e63c43f7c7366d01f52d77b3"
+    },
+    "Native/XM13_ThuanDuong.lua": {
+      "sha256": "e0c2cce424605c14bf472b837659ce55bff9c50eaaa5e73d5844ea7e06662c9e"
+    },
+    "Native/XM14_Dispatch.lua": {
+      "sha256": "79c83a82c19d72cccf16937a00f3f564935bc98323b272360d3e95beb148d13b"
+    },
+    "Native/XM15_KeySpam.lua": {
+      "sha256": "24258969086e73658f0d90d02bf0439c1f89d8d974e2341bed0ed3ed21730a7e"
     }
   },
   "profiles": {
@@ -43,7 +85,7 @@
       "sourcePath": "Schools/NguDoc/DocKinh_BoThien.lua"
     },
     "ThatTu/BangTam": {
-      "path": "Native/XM06_NguDoc.lua",
+      "path": "Native/XM07_ThatTu.lua",
       "aliases": [
         "7T"
       ],
@@ -53,7 +95,7 @@
       "sourcePath": "Schools/ThatTu/BangTam.lua"
     },
     "ThienSach/DPS": {
-      "path": "Native/XM06_NguDoc.lua",
+      "path": "Native/XM08_ThienSach.lua",
       "aliases": [
         "TS"
       ],
@@ -63,7 +105,7 @@
       "sourcePath": "Schools/ThienSach/DPS.lua"
     },
     "TangKiem/DPS": {
-      "path": "Native/XM06_NguDoc.lua",
+      "path": "Native/XM09_TangKiem.lua",
       "aliases": [
         "TK"
       ],
@@ -74,7 +116,7 @@
       "sourcePath": "Schools/TangKiem/DPS.lua"
     },
     "DuongMon/KinhVu": {
-      "path": "Native/XM06_NguDoc.lua",
+      "path": "Native/XM10_DuongMon.lua",
       "aliases": [
         "DMKV"
       ],
@@ -84,7 +126,7 @@
       "sourcePath": "Schools/DuongMon/KinhVu.lua"
     },
     "DuongMon/ThienLa": {
-      "path": "Native/XM06_NguDoc.lua",
+      "path": "Native/XM10_DuongMon.lua",
       "aliases": [
         "DMTL"
       ],
@@ -94,7 +136,7 @@
       "sourcePath": "Schools/DuongMon/ThienLa.lua"
     },
     "MinhGiao/PhanAnh": {
-      "path": "Native/XM06_NguDoc.lua",
+      "path": "Native/XM11_MinhGiao.lua",
       "aliases": [
         "MG"
       ],
@@ -104,7 +146,7 @@
       "sourcePath": "Schools/MinhGiao/PhanAnh.lua"
     },
     "ThieuLam/DichCanKinh": {
-      "path": "Native/XM06_NguDoc.lua",
+      "path": "Native/XM12_ThieuLam.lua",
       "aliases": [
         "TL"
       ],
@@ -114,7 +156,7 @@
       "sourcePath": "Schools/ThieuLam/DichCanKinh.lua"
     },
     "ThuanDuong/TuHaCong": {
-      "path": "Native/XM06_NguDoc.lua",
+      "path": "Native/XM13_ThuanDuong.lua",
       "aliases": [
         "TDTH"
       ],
@@ -124,7 +166,7 @@
       "sourcePath": "Schools/ThuanDuong/TuHaCong.lua"
     },
     "ThuanDuong/ThaiHuKiemY": {
-      "path": "Native/XM06_NguDoc.lua",
+      "path": "Native/XM13_ThuanDuong.lua",
       "aliases": [
         "TDTK"
       ],
@@ -133,5 +175,23 @@
       ],
       "sourcePath": "Schools/ThuanDuong/ThaiHuKiemY.lua"
     }
-  }
+  },
+  "loadOrder": [
+    "Native/XM00_Bootstrap.lua",
+    "Native/XM01_Config.lua",
+    "Native/XM02_Registry.lua",
+    "Native/XM03_Functions.lua",
+    "Native/XM04_Core.lua",
+    "Native/XM05_VanHoa.lua",
+    "Native/XM06_NguDoc.lua",
+    "Native/XM07_ThatTu.lua",
+    "Native/XM08_ThienSach.lua",
+    "Native/XM09_TangKiem.lua",
+    "Native/XM10_DuongMon.lua",
+    "Native/XM11_MinhGiao.lua",
+    "Native/XM12_ThieuLam.lua",
+    "Native/XM13_ThuanDuong.lua",
+    "Native/XM14_Dispatch.lua",
+    "Native/XM15_KeySpam.lua"
+  ]
 }

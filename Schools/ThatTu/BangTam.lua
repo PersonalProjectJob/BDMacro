@@ -25,7 +25,7 @@ local DEFAULT_THATTU_BANGTAM_MACRO = [[
 ]]
 
 local function CreateBangTam(deps)
-    local H = BuildCommonHelpers(deps)
+    local H = xMacro.Schools.BuildCombatHelpers(deps)
     local ExecuteMacroCommand = _G.ExecuteMacroCommand
     local XMCore_UseEquipSlot = deps.XMCore_UseEquipSlot
     local XMCore_Sys = deps.XMCore_Sys
