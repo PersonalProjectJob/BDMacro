@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "client": "JX3-v80",
+  "nativeLayout": "ordered-v1",
+  "files": {
+    "Native/XM05_VanHoa.lua": {
+      "sha256": "6b00310bb26768ff014d93fc270bfc41680b2a2993c99dc6f25c999fcfb66141"
+    },
+    "Native/XM06_NguDoc.lua": {
+      "sha256": "0cb04685c0ee52126876473d76cfbc5205963af788b26afda84277ab7cdf86d8"
+    }
+  },
+  "profiles": {
+    "VanHoa/HoaGian": {
+      "path": "Native/XM05_VanHoa.lua",
+      "aliases": [
+        "VH"
+      ]
+    },
+    "NguDoc/DocKinh": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "ND",
+        "NDDK"
+      ]
+    },
+    "NguDoc/BoThien": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "NDBT"
+      ]
+    },
+    "ThatTu/BangTam": {
+      "path": "Native/XM06_NguDoc.lua",
+      "aliases": [
+        "7T"
+      ]
+    }
+  }
+}
