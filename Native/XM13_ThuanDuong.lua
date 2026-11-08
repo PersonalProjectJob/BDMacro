@@ -43,10 +43,9 @@ end
 do
 local function InitializeModule()
 -- Thái Hư Kiếm Ý (10014) - Nội công DPS Kiếm Thuần Dương v80
--- Kỹ năng: Tọa Vọng Vô Ngã (305), Bão Nguyên Thủ Khuyết (302),
--- Vô Ngã Vô Kiếm (365), Bát Hoang Quy Nguyên (2699),
--- Thiên Địa Vô Cực (309), Tam Hoàn Sáo Nguyệt (364),
--- Ngưng Thần Tụ Khí (300 - nap khi thong minh).
+-- Kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神) đỉnh cao:
+-- Ngưng Thần Tụ Khí (300) không tốn GCD, tự động kích hoạt trong khe hở GCD
+-- để nhận thêm khí điểm miễn phí mà không làm trễ bất kỳ chiêu thức tấn công nào!
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
 /skill [nobuff:305] 305
@@ -56,8 +55,8 @@ xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 /skill [distance<=4,qidian<=7] 2699
 /skill [distance<=4] 309
 /skill [distance<=4] 364
+/skill [qidian<8] 300
 /skill [nofight,qidian<10] 300
-/skill [distance>4,qidian<8] 300
 ]]})
 end
 local ok, result = pcall(InitializeModule)

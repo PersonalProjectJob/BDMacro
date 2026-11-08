@@ -54,8 +54,8 @@
 /skill [distance<=4,qidian<=7] 2699
 /skill [distance<=4] 309
 /skill [distance<=4] 364
+/skill [qidian<8] 300
 /skill [nofight,qidian<10] 300
-/skill [distance>4,qidian<8] 300
 ]]
         },
         [10015] = {
