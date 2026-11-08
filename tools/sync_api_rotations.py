@@ -43,9 +43,11 @@ scripts = {
         "name": "ThuanDuong_ThaiHuKiemY_80",
         "script": """#name ThuanDuong_ThaiHuKiemY_80
 /skill [nobuff:305] 305
-/skill [distance<=4,qidian>=8] 365
+/skill [mana<0.40,qidian>=8] 302
 /skill [distance<=4,tlife<0.40] 2699
+/skill [distance<=4,qidian>=8] 365
 /skill [distance<=4,qidian<=7] 2699
+/skill [distance<=4] 309
 /skill [distance<=4] 364"""
     },
     10015: {
