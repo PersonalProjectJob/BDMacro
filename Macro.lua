@@ -140,6 +140,221 @@ end
 macro = xMacro.Run
 xmacro = xMacro.Run
 
+-- =========================================================================
+-- xMacro In-Game Cloud API Direct Sync Engine (DKMacro-like Architecture)
+-- =========================================================================
+xMacro.Cloud = xMacro.Cloud or {}
+local Cloud = xMacro.Cloud
+Cloud.version = "built-in"
+Cloud.lastSyncTime = 0
+Cloud.rotationsCount = 0
+Cloud.status = "IDLE"
+
+local CLOUD_ENDPOINTS = {
+    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.html",
+    "https://raw.githubusercontent.com/PersonalProjectJob/BDMacro/main/api/cloud_rotations.html",
+    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.lua",
+    "https://raw.githubusercontent.com/PersonalProjectJob/BDMacro/main/api/cloud_rotations.lua",
+}
+
+local function OutputSys(msg)
+    if OutputMessage then
+        OutputMessage("MSG_SYS", "[xMacro Cloud] " .. msg .. "\n")
+    end
+end
+
+local function ApplyCloudPayload(payloadOrString)
+    local payload = nil
+    if type(payloadOrString) == "table" then
+        payload = payloadOrString
+    elseif type(payloadOrString) == "string" then
+        local raw = payloadOrString
+        local preData = string.match(raw, "<pre.->(.-)</pre>")
+        if preData then raw = preData end
+        local retPos = string.find(raw, "return%s*{")
+        if retPos then raw = string.sub(raw, retPos) end
+        local fn, compileErr = loadstring(raw)
+        if not fn then
+            return false, "compile_error: " .. tostring(compileErr)
+        end
+        local ok, res = pcall(fn)
+        if not ok or type(res) ~= "table" then
+            return false, "eval_error: " .. tostring(res)
+        end
+        payload = res
+    else
+        return false, "invalid_type"
+    end
+
+    if type(payload.rotations) ~= "table" then
+        return false, "missing_rotations_table"
+    end
+
+    local nLoaded = 0
+    for kfID, data in pairs(payload.rotations) do
+        local nID = tonumber(kfID)
+        if nID and type(data) == "table" and data.school and data.profile and data.script then
+            if xMacro.Schools and type(xMacro.Schools.RegisterDamageScript) == "function" then
+                xMacro.Schools.RegisterDamageScript(data.school, data.profile, {[nID] = data.script})
+            end
+            KUNGFU_TO_SELECTION[nID] = {school = data.school, profile = data.profile}
+            if data.alias then
+                KUNGFU_CODES[nID] = data.alias
+                if xMacro.Core and xMacro.Core.SchoolAliases then
+                    xMacro.Core.SchoolAliases[data.alias] = {school = data.school, profile = data.profile}
+                end
+            end
+            nLoaded = nLoaded + 1
+        end
+    end
+
+    Cloud.version = payload.version or "cloud"
+    Cloud.rotationsCount = nLoaded
+    Cloud.lastSyncTime = (GetTime and GetTime()) or 0
+    Cloud.status = "SUCCESS"
+
+    -- Ghi nho vao offline cache de lan dang nhap sau nap tuc thi
+    local cacheFile = "interface\\xMacro\\xmacro_cloud_cache.jx3dat"
+    if SaveLUAData then
+        pcall(SaveLUAData, cacheFile, payload)
+    end
+
+    return true, nLoaded, Cloud.version
+end
+
+local function LoadOfflineCloudCache()
+    if not LoadLUAData then return false end
+    local cacheFile = "interface\\xMacro\\xmacro_cloud_cache.jx3dat"
+    local ok, data = pcall(LoadLUAData, cacheFile)
+    if ok and type(data) == "table" and type(data.rotations) == "table" then
+        local success, count, ver = ApplyCloudPayload(data)
+        if success then
+            OutputSys(string.format("Da nap %d macro tu cache cuc bo (v%s).", count, tostring(ver)))
+            return true
+        end
+    end
+    return false
+end
+
+local bIsFetching = false
+local nLastCloudFetchTime = 0
+
+function xMacro.FetchCloudRotations(bSilent)
+    local curTime = (GetTime and GetTime()) or 0
+    if bIsFetching and curTime - nLastCloudFetchTime < 15 then
+        if not bSilent then OutputSys("Dang tai du lieu macro, vui long cho trong giay lat...") end
+        return
+    end
+    if curTime - nLastCloudFetchTime < 4 then
+        if not bSilent then OutputSys("Vui long khong goi lenh qua nhanh.") end
+        return
+    end
+
+    nLastCloudFetchTime = curTime
+    bIsFetching = true
+
+    if not bSilent then
+        OutputSys("Dang ket noi truc tiep toi Cloud API de cap nhat macro...")
+    end
+
+    local endpointIdx = 1
+    local function TryNextEndpoint()
+        if endpointIdx > #CLOUD_ENDPOINTS then
+            bIsFetching = false
+            Cloud.status = "FAILED"
+            if not bSilent then
+                OutputSys("Khong the tai tu Cloud API. Dang dung macro noi bo san co.")
+            end
+            return
+        end
+
+        local szUrl = CLOUD_ENDPOINTS[endpointIdx]
+        endpointIdx = endpointIdx + 1
+        local bTriggered = false
+
+        -- Channel 1: HM.RemoteRequest
+        if HM and type(HM.RemoteRequest) == "function" then
+            local ok = pcall(HM.RemoteRequest, szUrl, function(szTitle)
+                local content = szTitle
+                local page = Station and Station.Lookup and Station.Lookup("Normal/HM/Page_1")
+                if page and page.GetDocument then
+                    local okDoc, doc = pcall(function() return page:GetDocument() end)
+                    if okDoc and doc and doc.body then
+                        local okBody, bodyText = pcall(function() return doc.body.innerText or doc.body.outerText end)
+                        if okBody and type(bodyText) == "string" and #bodyText > 20 then
+                            content = bodyText
+                        end
+                    end
+                end
+
+                local success, count, ver = ApplyCloudPayload(content)
+                if success then
+                    bIsFetching = false
+                    OutputSys(string.format("Dong bo thanh cong %d macro tu Cloud API (v%s) qua HM!", count, tostring(ver)))
+                else
+                    TryNextEndpoint()
+                end
+            end)
+            if ok then bTriggered = true end
+        end
+
+        -- Channel 2: Standalone xMacro CloudAPI_Page
+        if not bTriggered then
+            local frame = Station and Station.Lookup and (Station.Lookup("Lowest/xMacro") or Station.Lookup("Normal/xMacro"))
+            if not frame and Wnd and Wnd.OpenWindow then
+                pcall(Wnd.OpenWindow, "Interface/xMacro/xMacro.ini", "xMacro")
+                frame = Station and Station.Lookup and (Station.Lookup("Lowest/xMacro") or Station.Lookup("Normal/xMacro"))
+            end
+            local page = frame and frame.Lookup and frame:Lookup("CloudAPI_Page")
+            if page and page.Navigate then
+                xMacro._PendingCloudCallback = function(content)
+                    local success, count, ver = ApplyCloudPayload(content)
+                    if success then
+                        bIsFetching = false
+                        OutputSys(string.format("Dong bo thanh cong %d macro tu Cloud API (v%s)!", count, tostring(ver)))
+                    else
+                        TryNextEndpoint()
+                    end
+                end
+                xMacro._PendingCloudUrl = szUrl
+                local okNav = pcall(function() page:Navigate(szUrl) end)
+                if okNav then bTriggered = true end
+            end
+        end
+
+        if not bTriggered then
+            TryNextEndpoint()
+        end
+    end
+
+    TryNextEndpoint()
+end
+
+function xMacro.OnTitleChanged()
+    local page = this
+    if not page then return end
+    local szTitle = page.GetLocationName and page:GetLocationName()
+    local content = szTitle
+
+    if page.GetDocument then
+        local okDoc, doc = pcall(function() return page:GetDocument() end)
+        if okDoc and doc and doc.body then
+            local okBody, bodyText = pcall(function() return doc.body.innerText or doc.body.outerText end)
+            if okBody and type(bodyText) == "string" and #bodyText > 20 then
+                content = bodyText
+            end
+        end
+    end
+
+    if xMacro._PendingCloudCallback and content and #content > 0 then
+        local cb = xMacro._PendingCloudCallback
+        xMacro._PendingCloudCallback = nil
+        pcall(cb, content)
+    end
+end
+xMacro.CloudAPI_Page_OnTitleChanged = xMacro.OnTitleChanged
+
+-- GitHub Bridge File Sync companion check
 local nLastSyncCheckFrame = -999
 local szLastReportedCommit = nil
 
@@ -167,27 +382,25 @@ local function OnXMacroCommand(szText)
     if szText and type(szText) == "string" then
         szText = string.gsub(szText, "^%s*(.-)%s*$", "%1")
         local upper = string.upper(szText)
-        if upper == "SYNC" or upper == "UPDATE" then
+        if upper == "SYNC" or upper == "UPDATE" or upper == "API" or upper == "CLOUD" then
+            -- 1. Goi truc tiep Cloud API in-game (DKMacro style)
+            xMacro.FetchCloudRotations(false)
+            -- 2. Dong thoi gui tin hieu cho background bridge neu dang mo start_xmacro.bat
             local reqFile = "interface\\xMacro\\github_sync_request.jx3dat"
             if SaveLUAData then
                 pcall(SaveLUAData, reqFile, {action = "SYNC", time = (GetLogicFrameCount and GetLogicFrameCount()) or 0})
             end
-            if OutputMessage then
-                OutputMessage("MSG_SYS", "[xMacro] Da gui tin hieu dong bo toi GitHub API Bridge. Vui long cho 2-3 giay...\n")
-            end
             return true
         elseif upper == "STATUS" or upper == "CHECK" then
-            local statusFile = "interface\\xMacro\\github_sync_status.jx3dat"
-            local ok, data = pcall(LoadLUAData, statusFile)
-            if ok and type(data) == "table" and data.sha then
-                if OutputMessage then
-                    OutputMessage("MSG_SYS", string.format("[xMacro] GitHub Commit hien tai: %s (%s) - Trang thai: %s\n", data.sha, data.updated_at or "", data.status or "OK"))
-                end
-            else
-                if OutputMessage then
-                    OutputMessage("MSG_SYS", "[xMacro] Chua co thong tin dong bo. Hay mo start_xmacro.bat de bat Sync Bridge.\n")
-                end
-            end
+            local me = GetClientPlayer and GetClientPlayer()
+            local curSel, curKf = nil, nil
+            if me then curSel, curKf = xMacro.ActiveSelection(me) end
+            local curInfo = curSel and (curSel.school .. "/" .. curSel.profile) or "Chua ro"
+            OutputSys(string.format("Trang thai: %s | Phien ban Cloud: %s | Tong so macro: %d", Cloud.status or "IDLE", Cloud.version or "built-in", Cloud.rotationsCount or 16))
+            OutputSys(string.format("Noi cong hien tai: %s (ID: %s) -> Profile: %s", tostring(curKf), tostring(curKf), curInfo))
+            return true
+        elseif upper == "HELP" then
+            OutputSys("Lenh ho tro: /xmacro (chay macro), /xmacro update (dong bo API), /xmacro status (kiem tra trang thai)")
             return true
         end
 
@@ -213,6 +426,34 @@ local function RegisterSlashCommands()
 end
 
 RegisterSlashCommands()
+
+-- Auto-sync on player login / load
+local bCloudInitDone = false
+local function OnPlayerEnterWorld()
+    if bCloudInitDone then return end
+    bCloudInitDone = true
+
+    -- 1. Nap offline cache tuc thi
+    LoadOfflineCloudCache()
+
+    -- 2. Tu dong dong bo Cloud API chay ngam sau khi vao game
+    if HM and type(HM.DelayCall) == "function" then
+        HM.DelayCall(4000, function()
+            xMacro.FetchCloudRotations(true)
+        end)
+    else
+        xMacro.FetchCloudRotations(true)
+    end
+end
+
+if RegisterEvent then
+    pcall(RegisterEvent, "PLAYER_ENTER_GAME", OnPlayerEnterWorld)
+    pcall(RegisterEvent, "LOADING_END", function()
+        if not bCloudInitDone then
+            OnPlayerEnterWorld()
+        end
+    end)
+end
 
 -- Optional menu integration. The existing HUD also opens on its own.
 local registeredPanels = {}
