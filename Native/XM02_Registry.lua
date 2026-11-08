@@ -357,8 +357,10 @@ function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
             if not player or not player.GetKungfuMount or not player.GetSkillLevel or player.bDeathFlag then
                 return false
             end
-            local mount = player.GetKungfuMount()
-            local script = mount and scriptsByMount[mount.dwSkillID]
+            local mount = player.GetKungfuMount and player.GetKungfuMount()
+            local kungfuID = mount and (mount.dwSkillID or mount.dwMountKungfuID) or (type(mount) == "number" and mount)
+            if kungfuID then kungfuID = tonumber(kungfuID) or kungfuID end
+            local script = kungfuID and (scriptsByMount[kungfuID] or (type(kungfuID) == "number" and scriptsByMount[tostring(kungfuID)]))
             if not script then return false end
 
             local target = deps.GetCurrentTargetObject()

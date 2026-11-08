@@ -338,15 +338,17 @@ end
 
 local function Compare(szCmp, szRes, szTar)
 	local nRes, nTar = tonumber(szRes), tonumber(szTar)
-	local tCompare = {
-		["="] = nRes == nTar,
-		[">"] = nRes > nTar,
-		["<"] = nRes < nTar,
-		[">="] = nRes >= nTar,
-		["<="] = nRes <= nTar,
-	}
-	if tCompare[szCmp] then
-		return tCompare[szCmp]
+	if not nRes or not nTar then return false end
+	if szCmp == "=" or szCmp == "==" then
+		return nRes == nTar
+	elseif szCmp == ">" then
+		return nRes > nTar
+	elseif szCmp == "<" then
+		return nRes < nTar
+	elseif szCmp == ">=" then
+		return nRes >= nTar
+	elseif szCmp == "<=" then
+		return nRes <= nTar
 	end
 	return false
 end
@@ -1243,17 +1245,19 @@ local tOptions = {
 
 	["sun"] = function(szCmp, szVal, me, tar)
 		if szVal == "moon" then
-			return Compare(szCmp, me.nCurrentSunEnergy, me.nCurrentMoonEnergy)
+			return Compare(szCmp, me.nCurrentSunEnergy or 0, me.nCurrentMoonEnergy or 0)
 		end
-		nPer = me.nCurrentSunEnergy / me.nMaxSunEnergy * 100
+		local maxSun = me.nMaxSunEnergy or 100
+		local nPer = ((me.nCurrentSunEnergy or 0) / (maxSun > 0 and maxSun or 100)) * 100
 		return Compare(szCmp, nPer, szVal)
 	end,
 
 	["moon"] = function(szCmp, szVal, me, tar)
 		if szVal == "sun" then
-			return Compare(szCmp, me.nCurrentMoonEnergy, me.nCurrentSunEnergy)
+			return Compare(szCmp, me.nCurrentMoonEnergy or 0, me.nCurrentSunEnergy or 0)
 		end
-		nPer = me.nCurrentMoonEnergy / me.nMaxMoonEnergy * 100
+		local maxMoon = me.nMaxMoonEnergy or 100
+		local nPer = ((me.nCurrentMoonEnergy or 0) / (maxMoon > 0 and maxMoon or 100)) * 100
 		return Compare(szCmp, nPer, szVal)
 	end,
 

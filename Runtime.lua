@@ -426,8 +426,10 @@ function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
             if not player or not player.GetKungfuMount or not player.GetSkillLevel or player.bDeathFlag then
                 return false
             end
-            local mount = player.GetKungfuMount()
-            local script = mount and scriptsByMount[mount.dwSkillID]
+            local mount = player.GetKungfuMount and player.GetKungfuMount()
+            local kungfuID = mount and (mount.dwSkillID or mount.dwMountKungfuID) or (type(mount) == "number" and mount)
+            if kungfuID then kungfuID = tonumber(kungfuID) or kungfuID end
+            local script = kungfuID and (scriptsByMount[kungfuID] or (type(kungfuID) == "number" and scriptsByMount[tostring(kungfuID)]))
             if not script then return false end
 
             local target = deps.GetCurrentTargetObject()
@@ -916,15 +918,17 @@ end
 
 local function Compare(szCmp, szRes, szTar)
 	local nRes, nTar = tonumber(szRes), tonumber(szTar)
-	local tCompare = {
-		["="] = nRes == nTar,
-		[">"] = nRes > nTar,
-		["<"] = nRes < nTar,
-		[">="] = nRes >= nTar,
-		["<="] = nRes <= nTar,
-	}
-	if tCompare[szCmp] then
-		return tCompare[szCmp]
+	if not nRes or not nTar then return false end
+	if szCmp == "=" or szCmp == "==" then
+		return nRes == nTar
+	elseif szCmp == ">" then
+		return nRes > nTar
+	elseif szCmp == "<" then
+		return nRes < nTar
+	elseif szCmp == ">=" then
+		return nRes >= nTar
+	elseif szCmp == "<=" then
+		return nRes <= nTar
 	end
 	return false
 end
@@ -1821,17 +1825,19 @@ local tOptions = {
 
 	["sun"] = function(szCmp, szVal, me, tar)
 		if szVal == "moon" then
-			return Compare(szCmp, me.nCurrentSunEnergy, me.nCurrentMoonEnergy)
+			return Compare(szCmp, me.nCurrentSunEnergy or 0, me.nCurrentMoonEnergy or 0)
 		end
-		nPer = me.nCurrentSunEnergy / me.nMaxSunEnergy * 100
+		local maxSun = me.nMaxSunEnergy or 100
+		local nPer = ((me.nCurrentSunEnergy or 0) / (maxSun > 0 and maxSun or 100)) * 100
 		return Compare(szCmp, nPer, szVal)
 	end,
 
 	["moon"] = function(szCmp, szVal, me, tar)
 		if szVal == "sun" then
-			return Compare(szCmp, me.nCurrentMoonEnergy, me.nCurrentSunEnergy)
+			return Compare(szCmp, me.nCurrentMoonEnergy or 0, me.nCurrentSunEnergy or 0)
 		end
-		nPer = me.nCurrentMoonEnergy / me.nMaxMoonEnergy * 100
+		local maxMoon = me.nMaxMoonEnergy or 100
+		local nPer = ((me.nCurrentMoonEnergy or 0) / (maxMoon > 0 and maxMoon or 100)) * 100
 		return Compare(szCmp, nPer, szVal)
 	end,
 
@@ -6387,10 +6393,37 @@ local function HasExtraArgument(first, ...)
     -- type() rejects a missing argument but accepts an explicit nil.
     return pcall(type, ...)
 end
+local KUNGFU_TO_SELECTION = {
+    [10002] = {school = "ThieuLam", profile = "TayTuyKinh"},
+    [10003] = {school = "ThieuLam", profile = "DichCanKinh"},
+    [10014] = {school = "ThuanDuong", profile = "TuHaCong"},
+    [10015] = {school = "ThuanDuong", profile = "ThaiHuKiemY"},
+    [10021] = {school = "VanHoa", profile = "HoaGian"},
+    [10026] = {school = "ThienSach", profile = "DPS"},
+    [10062] = {school = "ThienSach", profile = "ThietLao"},
+    [10081] = {school = "ThatTu", profile = "BangTam"},
+    [10144] = {school = "TangKiem", profile = "DPS"},
+    [10145] = {school = "TangKiem", profile = "DPS"},
+    [10175] = {school = "NguDoc", profile = "DocKinh"},
+    [10176] = {school = "NguDoc", profile = "BoThien"},
+    [10224] = {school = "DuongMon", profile = "KinhVu"},
+    [10225] = {school = "DuongMon", profile = "ThienLa"},
+    [10242] = {school = "MinhGiao", profile = "PhanAnh"},
+    [10243] = {school = "MinhGiao", profile = "MinhTon"},
+}
+
 function xMacro.ActiveSelection(player)
     local mount = player and player.GetKungfuMount and player.GetKungfuMount()
-    local kungfuID = mount and mount.dwSkillID
-    return SCHOOL_CODES[KUNGFU_CODES[kungfuID]], kungfuID
+    local kungfuID = mount and (mount.dwSkillID or mount.dwMountKungfuID)
+    if not kungfuID and type(mount) == "number" then kungfuID = mount end
+    if kungfuID then kungfuID = tonumber(kungfuID) or kungfuID end
+    local schoolCodes = (xMacro.Core and xMacro.Core.SchoolAliases) or SCHOOL_CODES
+    local alias = kungfuID and (KUNGFU_CODES[kungfuID] or (type(kungfuID) == "string" and KUNGFU_CODES[tonumber(kungfuID)]))
+    local selection = schoolCodes and alias and schoolCodes[alias]
+    if not selection and kungfuID and KUNGFU_TO_SELECTION then
+        selection = KUNGFU_TO_SELECTION[kungfuID] or (type(kungfuID) == "string" and KUNGFU_TO_SELECTION[tonumber(kungfuID)])
+    end
+    return selection, kungfuID
 end
 
 local function Dispatch(...)

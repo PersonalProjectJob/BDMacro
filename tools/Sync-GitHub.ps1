@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     xMacro Live GitHub Sync Bridge
     Tự động kiểm tra và đồng bộ macro rotation từ kho lưu trữ GitHub BDMacro.
@@ -85,6 +85,9 @@ function Check-And-Update() {
                 Expand-Archive -LiteralPath $tempZip -DestinationPath $tempExtract -Force
 
                 $extractedAddon = Join-Path $tempExtract "interface\xMacro"
+                if (-not (Test-Path -LiteralPath $extractedAddon)) {
+                    $extractedAddon = Join-Path $tempExtract "xMacro-v80-HCNC-0.9.7-addon\interface\xMacro"
+                }
                 if (Test-Path -LiteralPath $extractedAddon) {
                     # Cập nhật các Native modules (XM00..XM15)
                     $extractedNative = Join-Path $extractedAddon "Native"
