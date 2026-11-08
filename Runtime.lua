@@ -440,11 +440,6 @@ function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
             end
             if not script then return false end
 
-            local target = deps.GetCurrentTargetObject()
-            if not target or not target.dwID or target.dwID == player.dwID or target.bDeathFlag then
-                return false
-            end
-            if IsEnemy and not IsEnemy(player.dwID, target.dwID) then return false end
             if type(script) == "function" then script = script(player) end
             -- The generic numeric /skill or /cast handler accepts unknown IDs at level 1.
             -- Skip unlearned skills so the client can fall through to the next priority.
