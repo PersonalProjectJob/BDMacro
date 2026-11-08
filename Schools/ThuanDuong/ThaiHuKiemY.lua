@@ -1,19 +1,19 @@
 ﻿-- Thái Hư Kiếm Ý (10014) - Nội công DPS Kiếm Thuần Dương v80
--- Tự động duy trì Khí Trường Toái Tinh Thần và Hóa Tam Thanh khi thiếu mana.
--- Kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神) đỉnh cao:
--- Ngưng Thần Tụ Khí không tốn GCD, tự động kích hoạt trong khe hở GCD
--- để nhận thêm khí điểm miễn phí mà không làm trễ bất kỳ chiêu thức tấn công nào!
+-- Khí trường: Toái Tinh Thần (tăng bạo kích ngoại công và sát thương bạo kích).
+-- Tự hồi mana bằng Bão Nguyên Quy Nhất khi mana < 40% và Khí Điểm >= 8.
+-- Chuỗi dồn sát thương: Bát Hoang Quy Nguyên + Vô Ngã Vô Kiếm (khi Khí Điểm >= 8).
+-- Tích khí điểm: Tam Hoàn Sáo Nguyệt / Tam Hoàn Quy Nguyệt + Thiên Địa Vô Cực.
+-- Kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神) đỉnh cao để tích thêm khí điểm.
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
-/skill [nobuff:Tọa Vong Vô Ngã] Tọa Vong Vô Ngã
 /skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
-/skill [mana<0.40,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
 /skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
 /skill [distance<=4,tlife<0.40] Bát Hoang Quy Nguyên
 /skill [distance<=4,qidian>=8] Vô Ngã Vô Kiếm
-/skill [distance<=4,qidian<=7] Bát Hoang Quy Nguyên
-/skill [distance<=4] Tam Hoàn Quy Nguyệt
-/skill [distance<=4] Kiếm Phi Kinh Thiên
-/skill [qidian<8] Ngưng Thần Tụ Khí
-/skill [nofight,qidian<10] Ngưng Thần Tụ Khí
+/skill [distance<=4] Bát Hoang Quy Nguyên
+/skill [distance<=4] Thiên Địa Vô Cực
+/skill [distance<=4,qidian<8] Tam Hoàn Sáo Nguyệt
+/skill [distance<=4,qidian<8] Tam Hoàn Quy Nguyệt
+/skill [distance<=4] Tam Hoàn Sáo Nguyệt
+/skill [qidian<10] Ngưng Thần Tụ Khí
 ]]})

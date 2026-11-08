@@ -418,6 +418,7 @@ local function GetPlayerSkillInfo(szName)
 		["Bão Nguyên Quy Nhất"]=302, ["Bao Nguyen Quy Nhat"]=302, ["Bão Nguyên Thủ Khuyết"]=302, ["Bao Nguyen Thu Khuyet"]=302, ["抱元守缺"]=302,
 		["Bát Hoang Quy Nguyên"]=2699, ["Bat Hoang Quy Nguyen"]=2699, ["bat hoang quy nguyen"]=2699, ["八荒归元"]=2699,
 		["Vô Ngã Vô Kiếm"]=365, ["Vo Nga Vo Kiem"]=365, ["vo nga vo kiem"]=365, ["无我无剑"]=365,
+		["Thiên Địa Vô Cực"]=308, ["Thien Dia Vo Cuc"]=308, ["thien dia vo cuc"]=308, ["天地无极"]=308,
 		["Tam Hoàn Quy Nguyệt"]=309, ["Tam Hoan Quy Nguyet"]=309, ["Tam Hoàn Sáo Nguyệt"]=309, ["Tam Hoan Sao Nguyet"]=309, ["三环套月"]=309,
 		["Kiếm Phi Kinh Thiên"]=364, ["Kiem Phi Kinh Thien"]=364, ["kiem phi kinh thien"]=364, ["剑飞惊天"]=364,
 		["Lưỡng Nghi Hóa Hình"]=301, ["Luong Nghi Hoa Hinh"]=301, ["luong nghi hoa hinh"]=301, ["两仪化形"]=301,

@@ -986,6 +986,7 @@ local function GetPlayerSkillInfo(szName)
 		["Bão Nguyên Quy Nhất"]=302, ["Bao Nguyen Quy Nhat"]=302, ["Bão Nguyên Thủ Khuyết"]=302, ["Bao Nguyen Thu Khuyet"]=302, ["抱元守缺"]=302,
 		["Bát Hoang Quy Nguyên"]=2699, ["Bat Hoang Quy Nguyen"]=2699, ["bat hoang quy nguyen"]=2699, ["八荒归元"]=2699,
 		["Vô Ngã Vô Kiếm"]=365, ["Vo Nga Vo Kiem"]=365, ["vo nga vo kiem"]=365, ["无我无剑"]=365,
+		["Thiên Địa Vô Cực"]=308, ["Thien Dia Vo Cuc"]=308, ["thien dia vo cuc"]=308, ["天地无极"]=308,
 		["Tam Hoàn Quy Nguyệt"]=309, ["Tam Hoan Quy Nguyet"]=309, ["Tam Hoàn Sáo Nguyệt"]=309, ["Tam Hoan Sao Nguyet"]=309, ["三环套月"]=309,
 		["Kiếm Phi Kinh Thiên"]=364, ["Kiem Phi Kinh Thien"]=364, ["kiem phi kinh thien"]=364, ["剑飞惊天"]=364,
 		["Lưỡng Nghi Hóa Hình"]=301, ["Luong Nghi Hoa Hinh"]=301, ["luong nghi hoa hinh"]=301, ["两仪化形"]=301,
@@ -6390,23 +6391,23 @@ end
 do
 local function InitializeModule()
 -- Thái Hư Kiếm Ý (10014) - Nội công DPS Kiếm Thuần Dương v80
--- Tự động duy trì Khí Trường Toái Tinh Thần và Hóa Tam Thanh khi thiếu mana.
--- Kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神) đỉnh cao:
--- Ngưng Thần Tụ Khí không tốn GCD, tự động kích hoạt trong khe hở GCD
--- để nhận thêm khí điểm miễn phí mà không làm trễ bất kỳ chiêu thức tấn công nào!
+-- Khí trường: Toái Tinh Thần (tăng bạo kích ngoại công và sát thương bạo kích).
+-- Tự hồi mana bằng Bão Nguyên Quy Nhất khi mana < 40% và Khí Điểm >= 8.
+-- Chuỗi dồn sát thương: Bát Hoang Quy Nguyên + Vô Ngã Vô Kiếm (khi Khí Điểm >= 8).
+-- Tích khí điểm: Tam Hoàn Sáo Nguyệt / Tam Hoàn Quy Nguyệt + Thiên Địa Vô Cực.
+-- Kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神) đỉnh cao để tích thêm khí điểm.
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
-/skill [nobuff:Tọa Vong Vô Ngã] Tọa Vong Vô Ngã
 /skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
-/skill [mana<0.40,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
 /skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
 /skill [distance<=4,tlife<0.40] Bát Hoang Quy Nguyên
 /skill [distance<=4,qidian>=8] Vô Ngã Vô Kiếm
-/skill [distance<=4,qidian<=7] Bát Hoang Quy Nguyên
-/skill [distance<=4] Tam Hoàn Quy Nguyệt
-/skill [distance<=4] Kiếm Phi Kinh Thiên
-/skill [qidian<8] Ngưng Thần Tụ Khí
-/skill [nofight,qidian<10] Ngưng Thần Tụ Khí
+/skill [distance<=4] Bát Hoang Quy Nguyên
+/skill [distance<=4] Thiên Địa Vô Cực
+/skill [distance<=4,qidian<8] Tam Hoàn Sáo Nguyệt
+/skill [distance<=4,qidian<8] Tam Hoàn Quy Nguyệt
+/skill [distance<=4] Tam Hoàn Sáo Nguyệt
+/skill [qidian<10] Ngưng Thần Tụ Khí
 ]]})
 end
 local ok, result = pcall(InitializeModule)
