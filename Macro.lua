@@ -422,6 +422,7 @@ local function RegisterSlashCommands()
     if AppendCommand then
         pcall(AppendCommand, "xmacro", OnXMacroCommand)
         pcall(AppendCommand, "xm", OnXMacroCommand)
+        pcall(AppendCommand, "macro", OnXMacroCommand)
     end
 end
 

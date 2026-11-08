@@ -354,7 +354,7 @@ function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
     factories[school][profile] = function(deps)
         local function Run()
             local player = GetClientPlayer and GetClientPlayer()
-            if not player or not player.GetKungfuMount or not player.GetSkillLevel or player.bDeathFlag then
+            if not player or not player.GetKungfuMount or player.bDeathFlag then
                 return false
             end
             local mount = player.GetKungfuMount and player.GetKungfuMount()
@@ -372,22 +372,7 @@ function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
             if not script then return false end
 
             if type(script) == "function" then script = script(player) end
-            -- The generic numeric /skill or /cast handler accepts unknown IDs at level 1.
-            -- Skip unlearned skills so the client can fall through to the next priority.
-            script = script:gsub("(/[a-z]+%s+[^\r\n]+)", function(command)
-                local cmd, body = command:match("^/([a-z]+)%s+(.*)$")
-                if cmd == "skill" or cmd == "cast" or cmd == "fcast" then
-                    local skillTarget = body:match("%]%s*(.-)%s*$") or body:match("^%s*(.-)%s*$")
-                    if skillTarget and skillTarget ~= "" then
-                        local skillID = tonumber(skillTarget)
-                        if skillID and (player.GetSkillLevel(skillID) or 0) <= 0 then
-                            return ""
-                        end
-                    end
-                end
-                return command
-            end)
-            -- A previous profile may have left its /config before filter active.
+            -- Execute macro script cleanly through xMacro core engine
             return ExecuteMacroCommand("/config before:null\n" .. script)
         end
         return {run = Run}
