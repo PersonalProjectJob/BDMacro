@@ -107,6 +107,18 @@ function Check-And-Update() {
                         Copy-Item -Path $extractedIni -Destination (Join-Path $AddonDir "info.ini") -Force
                     }
 
+                    # Cập nhật Tools (kể cả Sync-GitHub.ps1) & start_xmacro.bat
+                    $extractedTools = Join-Path $extractedAddon "Tools"
+                    $targetTools = Join-Path $AddonDir "Tools"
+                    if (Test-Path -LiteralPath $extractedTools) {
+                        if (-not (Test-Path -LiteralPath $targetTools)) { New-Item -ItemType Directory -Path $targetTools -Force | Out-Null }
+                        Copy-Item -Path (Join-Path $extractedTools "*") -Destination (Join-Path $targetTools "\") -Force
+                    }
+                    $extractedBat = Join-Path $extractedAddon "start_xmacro.bat"
+                    if (Test-Path -LiteralPath $extractedBat) {
+                        Copy-Item -Path $extractedBat -Destination (Join-Path $AddonDir "start_xmacro.bat") -Force
+                    }
+
                     # Lưu SHA mới
                     Set-Content -LiteralPath $CommitFile -Value $latestSha -NoNewline
 
