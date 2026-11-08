@@ -84,7 +84,7 @@ $rc = [Lua5TestCloud]::luaL_loadbuffer($L, $bytes, [System.UIntPtr][uint32]$byte
 if ($rc -ne 0) {
     $len = [UIntPtr]::Zero
     $ptr = [Lua5TestCloud]::lua_tolstring($L, -1, [ref]$len)
-    $msg = [System.Runtime.InteropServices.Marshal]::PtrToStringAnsi($ptr, [int]$len)
+    $msg = [System.Runtime.InteropServices.Marshal]::PtrToStringAnsi($ptr)
     [Lua5TestCloud]::lua_close($L)
     Write-Error "[FAILED LOAD BUFFER] $msg"
 }
@@ -93,7 +93,7 @@ $rc = [Lua5TestCloud]::lua_pcall($L, 0, 0, 0)
 if ($rc -ne 0) {
     $len = [UIntPtr]::Zero
     $ptr = [Lua5TestCloud]::lua_tolstring($L, -1, [ref]$len)
-    $msg = [System.Runtime.InteropServices.Marshal]::PtrToStringAnsi($ptr, [int]$len)
+    $msg = [System.Runtime.InteropServices.Marshal]::PtrToStringAnsi($ptr)
     [Lua5TestCloud]::lua_close($L)
     Write-Error "[FAILED EXECUTION] $msg"
 }

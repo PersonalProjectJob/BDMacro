@@ -18,10 +18,10 @@ end
 -- BEGIN Schools/ThuanDuong/TuHaCong.lua
 do
 local function InitializeModule()
--- Tử Hà Công (10014) - Nội công DPS Khí Thuần Dương v80
+-- Tử Hà Công (10015) - Nội công DPS Khí Thuần Dương v80
 -- Kỹ năng: Tọa Vọng Vô Ngã (305), Bão Nguyên Thủ Khuyết (302),
 -- Lưỡng Nghi Hóa Hình (301), Tứ Tượng Luân Hồi (367), Thái Cực Vô Cực (306).
-xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10014] = [[
+xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10015] = [[
 #name ThuanDuong_TuHaCong_80
 /skill [nobuff:305] 305
 /skill [mana<0.60,qidian>=8] 302
@@ -42,10 +42,10 @@ end
 -- BEGIN Schools/ThuanDuong/ThaiHuKiemY.lua
 do
 local function InitializeModule()
--- Thái Hư Kiếm Ý (10015) - Nội công DPS Kiếm Thuần Dương v80
+-- Thái Hư Kiếm Ý (10014) - Nội công DPS Kiếm Thuần Dương v80
 -- Kỹ năng: Tọa Vọng Vô Ngã (305), Vô Ngã Vô Kiếm (365),
 -- Bát Hoang Quy Nguyên (2699), Tam Hoàn Sáo Nguyệt (364).
-xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10015] = [[
+xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
 /skill [nobuff:305] 305
 /skill [distance<=4,qidian>=8] 365

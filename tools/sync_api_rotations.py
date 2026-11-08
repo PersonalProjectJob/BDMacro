@@ -38,18 +38,6 @@ scripts = {
     },
     10014: {
         "school": "ThuanDuong",
-        "profile": "TuHaCong",
-        "alias": "TDTH",
-        "name": "ThuanDuong_TuHaCong_80",
-        "script": """#name ThuanDuong_TuHaCong_80
-/skill [nobuff:305] 305
-/skill [mana<0.60,qidian>=8] 302
-/skill [distance<=20,qidian>=8] 301
-/skill [distance<=20,qidian<=7] 367
-/skill [distance<=20] 306"""
-    },
-    10015: {
-        "school": "ThuanDuong",
         "profile": "ThaiHuKiemY",
         "alias": "TDTK",
         "name": "ThuanDuong_ThaiHuKiemY_80",
@@ -59,6 +47,18 @@ scripts = {
 /skill [distance<=4,tlife<0.40] 2699
 /skill [distance<=4,qidian<=7] 2699
 /skill [distance<=4] 364"""
+    },
+    10015: {
+        "school": "ThuanDuong",
+        "profile": "TuHaCong",
+        "alias": "TDTH",
+        "name": "ThuanDuong_TuHaCong_80",
+        "script": """#name ThuanDuong_TuHaCong_80
+/skill [nobuff:305] 305
+/skill [mana<0.60,qidian>=8] 302
+/skill [distance<=20,qidian>=8] 301
+/skill [distance<=20,qidian<=7] 367
+/skill [distance<=20] 306"""
     },
     10021: {
         "school": "VanHoa",

@@ -361,6 +361,14 @@ function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
             local kungfuID = mount and (mount.dwSkillID or mount.dwMountKungfuID) or (type(mount) == "number" and mount)
             if kungfuID then kungfuID = tonumber(kungfuID) or kungfuID end
             local script = kungfuID and (scriptsByMount[kungfuID] or (type(kungfuID) == "number" and scriptsByMount[tostring(kungfuID)]))
+            if not script then
+                for _, s in pairs(scriptsByMount) do
+                    if type(s) == "string" or type(s) == "function" then
+                        script = s
+                        break
+                    end
+                end
+            end
             if not script then return false end
 
             local target = deps.GetCurrentTargetObject()

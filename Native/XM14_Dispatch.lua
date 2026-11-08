@@ -25,8 +25,8 @@ local SCHOOL_CODES = xMacro.Core.SchoolAliases
 local KUNGFU_CODES = {
     [10002] = "TLTT",
     [10003] = "TL",
-    [10014] = "TDTH",
-    [10015] = "TDTK",
+    [10014] = "TDTK",
+    [10015] = "TDTH",
     [10021] = "VH",
     [10026] = "TS",
     [10062] = "TSTL",
@@ -73,8 +73,8 @@ end
 local KUNGFU_TO_SELECTION = {
     [10002] = {school = "ThieuLam", profile = "TayTuyKinh"},
     [10003] = {school = "ThieuLam", profile = "DichCanKinh"},
-    [10014] = {school = "ThuanDuong", profile = "TuHaCong"},
-    [10015] = {school = "ThuanDuong", profile = "ThaiHuKiemY"},
+    [10014] = {school = "ThuanDuong", profile = "ThaiHuKiemY"},
+    [10015] = {school = "ThuanDuong", profile = "TuHaCong"},
     [10021] = {school = "VanHoa", profile = "HoaGian"},
     [10026] = {school = "ThienSach", profile = "DPS"},
     [10062] = {school = "ThienSach", profile = "ThietLao"},

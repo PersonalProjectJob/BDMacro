@@ -430,6 +430,14 @@ function xMacro.Schools.RegisterDamageScript(school, profile, scriptsByMount)
             local kungfuID = mount and (mount.dwSkillID or mount.dwMountKungfuID) or (type(mount) == "number" and mount)
             if kungfuID then kungfuID = tonumber(kungfuID) or kungfuID end
             local script = kungfuID and (scriptsByMount[kungfuID] or (type(kungfuID) == "number" and scriptsByMount[tostring(kungfuID)]))
+            if not script then
+                for _, s in pairs(scriptsByMount) do
+                    if type(s) == "string" or type(s) == "function" then
+                        script = s
+                        break
+                    end
+                end
+            end
             if not script then return false end
 
             local target = deps.GetCurrentTargetObject()
@@ -6275,10 +6283,10 @@ end
 -- BEGIN Schools/ThuanDuong/TuHaCong.lua
 do
 local function InitializeModule()
--- Tử Hà Công (10014) - Nội công DPS Khí Thuần Dương v80
+-- Tử Hà Công (10015) - Nội công DPS Khí Thuần Dương v80
 -- Kỹ năng: Tọa Vọng Vô Ngã (305), Bão Nguyên Thủ Khuyết (302),
 -- Lưỡng Nghi Hóa Hình (301), Tứ Tượng Luân Hồi (367), Thái Cực Vô Cực (306).
-xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10014] = [[
+xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10015] = [[
 #name ThuanDuong_TuHaCong_80
 /skill [nobuff:305] 305
 /skill [mana<0.60,qidian>=8] 302
@@ -6299,10 +6307,10 @@ end
 -- BEGIN Schools/ThuanDuong/ThaiHuKiemY.lua
 do
 local function InitializeModule()
--- Thái Hư Kiếm Ý (10015) - Nội công DPS Kiếm Thuần Dương v80
+-- Thái Hư Kiếm Ý (10014) - Nội công DPS Kiếm Thuần Dương v80
 -- Kỹ năng: Tọa Vọng Vô Ngã (305), Vô Ngã Vô Kiếm (365),
 -- Bát Hoang Quy Nguyên (2699), Tam Hoàn Sáo Nguyệt (364).
-xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10015] = [[
+xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
 /skill [nobuff:305] 305
 /skill [distance<=4,qidian>=8] 365
@@ -6348,8 +6356,8 @@ local SCHOOL_CODES = xMacro.Core.SchoolAliases
 local KUNGFU_CODES = {
     [10002] = "TLTT",
     [10003] = "TL",
-    [10014] = "TDTH",
-    [10015] = "TDTK",
+    [10014] = "TDTK",
+    [10015] = "TDTH",
     [10021] = "VH",
     [10026] = "TS",
     [10062] = "TSTL",
@@ -6396,8 +6404,8 @@ end
 local KUNGFU_TO_SELECTION = {
     [10002] = {school = "ThieuLam", profile = "TayTuyKinh"},
     [10003] = {school = "ThieuLam", profile = "DichCanKinh"},
-    [10014] = {school = "ThuanDuong", profile = "TuHaCong"},
-    [10015] = {school = "ThuanDuong", profile = "ThaiHuKiemY"},
+    [10014] = {school = "ThuanDuong", profile = "ThaiHuKiemY"},
+    [10015] = {school = "ThuanDuong", profile = "TuHaCong"},
     [10021] = {school = "VanHoa", profile = "HoaGian"},
     [10026] = {school = "ThienSach", profile = "DPS"},
     [10062] = {school = "ThienSach", profile = "ThietLao"},
