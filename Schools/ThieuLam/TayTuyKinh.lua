@@ -1,16 +1,16 @@
 ﻿-- Tẩy Tủy Kinh (10002) - Nội công Tank Thiếu Lâm v80
--- Kỹ năng: Vô Tướng Quyết (245), Đoán Cốt Quyết (247), Cầm Long Quyết (246),
--- Vạn Phật Triều Tông (236 - Taunt), Lập Địa Thành Phật (241), Vi Đà Hiến Chử (233),
--- Ma Ha Vô Lượng (237), Hoành Tảo Lục Hợp (234), Phổ Độ Tứ Phương (232).
+-- Kỹ năng: Vô Tướng Quyết, Đoán Cốt Quyết, Cầm Long Quyết,
+-- Vạn Phật Triều Tông (Taunt), Lập Địa Thành Phật, Vi Đà Hiến Chử,
+-- Ma Ha Vô Lượng, Hoành Tảo Lục Hợp, Phổ Độ Tứ Phương.
 xMacro.Schools.RegisterDamageScript("ThieuLam", "TayTuyKinh", {[10002] = [[
 #name ThieuLam_TayTuyKinh_80
-/skill [life<0.35] 245
-/skill [life<0.40] 247
-/skill [qidian<1] 246
-/skill [distance<=4] 236
-/skill [distance<=4,qidian>=3] 241
-/skill [distance<=4,qidian>=3] 233
-/skill [distance<=4] 237
-/skill [distance<=5] 234
-/skill [distance<=4] 232
+/skill [life<0.35] Vô Tướng Quyết
+/skill [life<0.40] Đoán Cốt Quyết
+/skill [qidian<1] Cầm Long Quyết
+/skill [distance<=4] Vạn Phật Triều Tông
+/skill [distance<=4,qidian>=3] Lập Địa Thành Phật
+/skill [distance<=4,qidian>=3] Vi Đà Hiến Chử
+/skill [distance<=4] Ma Ha Vô Lượng
+/skill [distance<=5] Hoành Tảo Lục Hợp
+/skill [distance<=4] Phổ Độ Tứ Phương
 ]]})

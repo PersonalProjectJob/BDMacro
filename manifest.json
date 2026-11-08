@@ -16,10 +16,10 @@
       "sha256": "5c111ad68e6b9198e8aaafaef947438e44b7d3f671d7018b9760b18005650fac"
     },
     "Native/XM04_Core.lua": {
-      "sha256": "0ffa22e4842d5cd0ab7b9856181b822a03ec62845307c9dbe4b7ab5de71a1600"
+      "sha256": "e45c648f6d0d536c863fb5d3b20c8631adfc364bb9e8131cc24fcf885032845e"
     },
     "Native/XM05_VanHoa.lua": {
-      "sha256": "a8d7a8d41f1026a38a531bf90cd9b980eb6fc7277f89f6ef0c757c91544a02cb"
+      "sha256": "bc0fc0c473c038b6d330a8e01ef0d5fadebbf5179c7f76adf6a561b5a865f5ab"
     },
     "Native/XM06_NguDoc.lua": {
       "sha256": "b33fb709deed4c34037fa06c98d771b793e86602a87d6ae8c608a48361f9c1b5"
@@ -28,22 +28,22 @@
       "sha256": "17f9465d49fe70d5a56995fc19c4a2c218dc91d641f460763e96b94ae6d302a9"
     },
     "Native/XM08_ThienSach.lua": {
-      "sha256": "b27c34dd54de4fc85178af2fd02875cfe7f0e4dae82a1342a70908c92358d0ee"
+      "sha256": "04b824ff05a5fa291359c9c2e5c3a3371ee4b3ef25a4dc337de2f74cbbbe7c9a"
     },
     "Native/XM09_TangKiem.lua": {
-      "sha256": "d0f1afc285619f47d28aac4b09d83c89c3f2b336a3b41ba43ca1632adae5a3da"
+      "sha256": "92fb469cbd4200f16c1d5fc7873b34c0332b3352dd78269c2bdbc9e0b572d240"
     },
     "Native/XM10_DuongMon.lua": {
-      "sha256": "5e2b37c8c84ed979605689aa24a152a2013519cecbf567034a95268fd51d9537"
+      "sha256": "8162779fc615d18b6af242946d5509c80fbc60d82e48f88aa88f371986faa704"
     },
     "Native/XM11_MinhGiao.lua": {
-      "sha256": "9149ba1eb635d52cfc1b1754561b4f6acaabaf94a3db67c7c28850294fe102eb"
+      "sha256": "e173e72b918fffffee866a7d78f71e96e4259cf3200e0bc361002f31fa2c5ded"
     },
     "Native/XM12_ThieuLam.lua": {
-      "sha256": "9a2c503fc10be52077326f06731e0e4f5d778a28653ba488b18a0a40c569e480"
+      "sha256": "947f8007751bb531170d7a28df61dee388b11ecc1f0d2deaf181868ad5f87628"
     },
     "Native/XM13_ThuanDuong.lua": {
-      "sha256": "5e24dcaeee06702101d9f09b8bfcdf22e703948024fd8c61c31a8e1b055fe705"
+      "sha256": "b5f0f9c085c3b947b2a40430684af122395bb3f5b9c9484493aaaaabcd3cec17"
     },
     "Native/XM14_Dispatch.lua": {
       "sha256": "73902f902311ba08f2b8cfa3ff3b85347134a40f5aa17fe4a31d7c6e49fa6f19"

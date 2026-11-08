@@ -978,6 +978,79 @@ local function GetPlayerSkillInfo(szName)
 	end
 	-- Static fallback cho Mon phai Van Hoa, That Tu & Ngu Doc (chuan 100% C++ Engine JX3)
 	local tStatic = {
+		-- Thuần Dương
+		["Tọa Vong Vô Ngã"]=305, ["Toa Vong Vo Nga"]=305, ["Tọa Vọng Vô Ngã"]=305, ["Toa Vong"]=305, ["坐忘无我"]=305,
+		["Toái Tinh Thần"]=362, ["Toai Tinh Than"]=362, ["toai tinh than"]=362, ["碎星辰"]=362,
+		["Phá Thương Khung"]=359, ["Pha Thuong Khung"]=359, ["pha thuong khung"]=359, ["破苍穹"]=359,
+		["Hóa Tam Thanh"]=357, ["Hoa Tam Thanh"]=357, ["hoa tam thanh"]=357, ["化三清"]=357,
+		["Bão Nguyên Quy Nhất"]=302, ["Bao Nguyen Quy Nhat"]=302, ["Bão Nguyên Thủ Khuyết"]=302, ["Bao Nguyen Thu Khuyet"]=302, ["抱元守缺"]=302,
+		["Bát Hoang Quy Nguyên"]=2699, ["Bat Hoang Quy Nguyen"]=2699, ["bat hoang quy nguyen"]=2699, ["八荒归元"]=2699,
+		["Vô Ngã Vô Kiếm"]=365, ["Vo Nga Vo Kiem"]=365, ["vo nga vo kiem"]=365, ["无我无剑"]=365,
+		["Tam Hoàn Quy Nguyệt"]=309, ["Tam Hoan Quy Nguyet"]=309, ["Tam Hoàn Sáo Nguyệt"]=309, ["Tam Hoan Sao Nguyet"]=309, ["三环套月"]=309,
+		["Kiếm Phi Kinh Thiên"]=364, ["Kiem Phi Kinh Thien"]=364, ["kiem phi kinh thien"]=364, ["剑飞惊天"]=364,
+		["Lưỡng Nghi Hóa Hình"]=301, ["Luong Nghi Hoa Hinh"]=301, ["luong nghi hoa hinh"]=301, ["两仪化形"]=301,
+		["Tứ Tượng Luân Hồi"]=367, ["Tu Tuong Luan Hoi"]=367, ["tu tuong luan hoi"]=367, ["四象轮回"]=367,
+		["Thái Cực Vô Cực"]=306, ["Thai Cuc Vo Cuc"]=306, ["thai cuc vo cuc"]=306, ["太极无极"]=306,
+		["Ngưng Thần Tụ Khí"]=300, ["Ngung Than Tu Khi"]=300, ["ngung than tu khi"]=300, ["凝神聚气"]=300,
+
+		-- Thiếu Lâm
+		["Vô Tướng Quyết"]=245, ["Vo Tuong Quyet"]=245, ["vo tuong quyet"]=245, ["无相诀"]=245,
+		["Đoán Cốt Quyết"]=247, ["Doan Cot Quyet"]=247, ["doan cot quyet"]=247, ["锻骨诀"]=247,
+		["Cầm Long Quyết"]=246, ["Cam Long Quyet"]=246, ["cam long quyet"]=246, ["擒龙诀"]=246,
+		["Diệc Khô Diệc Vinh"]=242, ["Diec Kho Diec Vinh"]=242, ["diec kho diec vinh"]=242, ["亦枯亦荣"]=242,
+		["Nã Vân Thức"]=243, ["Na Van Thuc"]=243, ["na van thuc"]=243, ["拿云式"]=243,
+		["Kim Cương Nộ Mục"]=239, ["Kim Cuong No Muc"]=239, ["kim cuong no muc"]=239, ["金刚怒目"]=239,
+		["Vi Đà Hiến Chử"]=233, ["Vi Da Hien Chu"]=233, ["vi da hien chu"]=233, ["韦陀献杵"]=233,
+		["Thủ Khuyết Thức"]=235, ["Thu Khuyet Thuc"]=235, ["thu khuyet thuc"]=235, ["守缺式"]=235,
+		["Đảo Hư Thức"]=2572, ["Dao Hu Thuc"]=2572, ["dao hu thuc"]=2572, ["捣虚式"]=2572,
+		["Hoành Tảo Lục Hợp"]=234, ["Hoanh Tao Luc Hop"]=234, ["hoanh tao luc hop"]=234, ["横扫六合"]=234,
+		["Phổ Độ Tứ Phương"]=232, ["Pho Do Tu Phuong"]=232, ["pho do tu phuong"]=232, ["普渡四方"]=232,
+		["Vạn Phật Triều Tông"]=236, ["Van Phat Trieu Tong"]=236, ["van phat trieu tong"]=236, ["万佛朝宗"]=236,
+		["Lập Địa Thành Phật"]=241, ["Lap Dia Thanh Phat"]=241, ["lap dia thanh phat"]=241, ["立地成佛"]=241,
+		["Ma Ha Vô Lượng"]=237, ["Ma Ha Vo Luong"]=237, ["ma ha vo luong"]=237, ["摩诃无量"]=237,
+
+		-- Thiên Sách
+		["Từ Như Lâm"]=405, ["Tu Nhu Lam"]=405, ["tu nhu lam"]=405, ["徐如林"]=405,
+		["Thủ Như Sơn"]=407, ["Thu Nhu Son"]=407, ["thu nhu son"]=407, ["守如山"]=407,
+		["Ngự"]=424, ["Ngu"]=424, ["ngu"]=424, ["御"]=424,
+		["Định Quân"]=402, ["Dinh Quan"]=402, ["dinh quan"]=402, ["定军"]=402,
+		["Phá Phong"]=401, ["Pha Phong"]=401, ["pha phong"]=401, ["破风"]=401,
+		["Long Nha"]=415, ["long nha"]=415, ["龙牙"]=415,
+		["Long Ngâm"]=403, ["Long Ngam"]=403, ["long ngam"]=403, ["龙吟"]=403,
+		["Diệt"]=423, ["Diet"]=423, ["diet"]=423, ["灭"]=423,
+		["Xuyên Vân"]=400, ["Xuyen Van"]=400, ["xuyen van"]=400, ["穿云"]=400,
+
+		-- Tàng Kiếm
+		["Mai Ẩn Hương"]=1649, ["Mai An Huong"]=1649, ["mai an huong"]=1649, ["梅隐香"]=1649,
+		["Khiếu Nhật"]=1656, ["Khieu Nhat"]=1656, ["khieu nhat"]=1656, ["啸日"]=1656,
+		["Tuyết Đoạn Kiều"]=1609, ["Tuyet Doan Kieu"]=1609, ["tuyet doan kieu"]=1609, ["雪断桥"]=1609,
+		["Đoạn Triều"]=1600, ["Doan Trieu"]=1600, ["doan trieu"]=1600, ["断潮"]=1600,
+		["Thính Lôi"]=1646, ["Thinh Loi"]=1646, ["thinh loi"]=1646, ["听雷"]=1646,
+		["Cửu Khê Di Yên"]=1579, ["Cuu Khe Di Yen"]=1579, ["cuu khe di yen"]=1579, ["九溪弥烟"]=1579,
+		["Vân Phi Ngọc Hoàng"]=1593, ["Van Phi Ngoc Hoang"]=1593, ["van phi ngoc hoang"]=1593, ["云飞玉皇"]=1593,
+		["Tịch Chiếu Lôi Phong"]=1592, ["Tich Chieu Loi Phong"]=1592, ["tich chieu loi phong"]=1592, ["夕照雷峰"]=1592,
+
+		-- Đường Môn
+		["Tập Trung"]=3100, ["Tap Trung"]=3100, ["tap trung"]=3100, ["集中"]=3100,
+		["Truy Mệnh Tiễn"]=3098, ["Truy Menh Tien"]=3098, ["truy menh tien"]=3098, ["追命箭"]=3098,
+		["Hóa Huyết Tiêu"]=3087, ["Hoa Huyet Tieu"]=3087, ["hoa huyet tieu"]=3087, ["化血镖"]=3087,
+		["Bạo Vũ Lê Hoa Châm"]=3093, ["Bao Vu Le Hoa Cham"]=3093, ["bao vu le hoa cham"]=3093, ["暴雨梨花针"]=3093,
+		["Trục Tinh Tiễn"]=3095, ["Truc Tinh Tien"]=3095, ["truc tinh tien"]=3095, ["逐星箭"]=3095,
+		["Đoạt Phách Tiễn"]=3088, ["Doat Phach Tien"]=3088, ["doat phach tien"]=3088, ["夺魄箭"]=3088,
+		["Thực Cơ Đạn"]=3105, ["Thuc Co Dan"]=3105, ["thuc co dan"]=3105, ["蚀肌弹"]=3105,
+
+		-- Minh Giáo
+		["Tham Ma Thể"]=3965, ["Tham Ma The"]=3965, ["tham ma the"]=3965, ["贪魔体"]=3965,
+		["Thánh Minh Hựu"]=3966, ["Thanh Minh Huu"]=3966, ["thanh minh huu"]=3966, ["圣明佑"]=3966,
+		["Từ Bi Nguyện"]=3972, ["Tu Bi Nguyen"]=3972, ["tu bi nguyen"]=3972, ["慈悲愿"]=3972,
+		["Giới Hỏa Trảm"]=3973, ["Gioi Hoa Tram"]=3973, ["gioi hoa tram"]=3973, ["戒火斩"]=3973,
+		["Hoàng Nhật Chiếu"]=3975, ["Hoang Nhat Chieu"]=3975, ["hoang nhat chieu"]=3975, ["极乐引"]=3975,
+		["Tịnh Thế Phá Ma Kích"]=3967, ["Tinh The Pha Ma Kich"]=3967, ["tinh the pha ma kich"]=3967, ["净世破魔击"]=3967,
+		["Khu Dạ Đoạn Sầu"]=3979, ["Khu Da Doan Sau"]=3979, ["khu da doan sau"]=3979, ["驱夜断愁"]=3979,
+		["Liệt Nhật Trảm"]=3960, ["Liet Nhat Tram"]=3960, ["liet nhat tram"]=3960, ["烈日斩"]=3960,
+		["Ngân Nguyệt Trảm"]=3963, ["Ngan Nguyet Tram"]=3963, ["ngan nguyet tram"]=3963, ["银月斩"]=3963,
+		["Xích Nhật Luân"]=3959, ["Xich Nhat Luan"]=3959, ["xich nhat luan"]=3959, ["赤日轮"]=3959,
+		["U Nguyệt Luân"]=3962, ["U Nguyet Luan"]=3962, ["u nguyet luan"]=3962, ["幽月轮"]=3962,
 		["Dương Minh Chỉ"]=179, ["Duong Minh Chi"]=179, ["duong minh"]=179, ["阳明指"]=179,
 		["Thương Dương Chỉ"]=180, ["Thuong Duong Chi"]=180, ["thuong duong"]=180, ["商阳指"]=180,
 		["Thiếu Dương Chỉ"]=181, ["Thieu Duong Chi"]=181, ["少阳指"]=181,
@@ -1144,6 +1217,26 @@ local tCanonicalBuffNames = {
 }
 
 local tStaticBuffNames = {
+	-- Thuần Dương
+	["Tọa Vong Vô Ngã"] = 305, ["Toa Vong Vo Nga"] = 305, ["Tọa Vọng Vô Ngã"] = 305, ["Toa Vong"] = 305, ["坐忘无我"] = 305,
+	["Toái Tinh Thần"] = 378, ["Toai Tinh Than"] = 378, ["toai tinh than"] = 378, ["碎星辰"] = 378,
+	["Phá Thương Khung"] = 375, ["Pha Thuong Khung"] = 375, ["pha thuong khung"] = 375, ["破苍穹"] = 375,
+	["Hóa Tam Thanh"] = 373, ["Hoa Tam Thanh"] = 373, ["hoa tam thanh"] = 373, ["化三清"] = 373,
+
+	-- Thiên Sách
+	["Lưu Huyết"] = 3442, ["Luu Huyet"] = 3442, ["luu huyet"] = 3442, ["流血"] = 3442,
+	["Trí Tàn"] = 540, ["Tri Tan"] = 540, ["tri tan"] = 540, ["致残"] = 540,
+
+	-- Tàng Kiếm
+	["Mai Ẩn Hương"] = 1649, ["Mai An Huong"] = 1649, ["mai an huong"] = 1649, ["梅隐香"] = 1649,
+
+	-- Đường Môn
+	["Truy Mệnh Vô Thanh"] = 3317, ["Truy Menh Vo Thanh"] = 3317, ["truy menh vo thanh"] = 3317, ["追命无声"] = 3317,
+	["Hóa Huyết Tiêu"] = 2237, ["Hoa Huyet Tieu"] = 2237, ["hoa huyet tieu"] = 2237, ["化血镖"] = 2237,
+
+	-- Minh Giáo
+	["Ám Trần Di Sơn"] = 4052, ["Am Tran Di Son"] = 4052, ["am tran di son"] = 4052, ["暗尘弥散"] = 4052,
+
 	["Thương Dương Chỉ"] = 666, ["Thuong Duong Chi"] = 666, ["thuong duong chi"] = 666, ["Thương Dương"] = 666, ["Thuong Duong"] = 666, ["thuong duong"] = 666, ["商阳指"] = 666,
 	["Chung Linh Dục Tú"] = 714, ["Chung Linh Duc Tu"] = 714, ["chung linh duc tu"] = 714, ["Chung Linh"] = 714, ["Chung linh"] = 714, ["chung linh"] = 714, ["钟林毓秀"] = 714,
 	["Lan Thôi Ngọc Chiết"] = 711, ["Lan Thoi Ngoc Chiet"] = 711, ["lan thoi ngoc chiet"] = 711, ["Lan Thôi"] = 711, ["Lan Thoi"] = 711, ["lan thoi"] = 711, ["兰摧玉折"] = 711, ["兰摧"] = 711,
@@ -3315,6 +3408,10 @@ local function XMCore_FindBuff(obj, token, ownOnly)
     local list = MyGetBuffList(obj) or {}
     local myID = UI_GetClientPlayerID and UI_GetClientPlayerID() or nil
 
+    if not id and tStaticBuffNames and token then
+        id = tStaticBuffNames[token] or tStaticBuffNames[string.lower(tostring(token))]
+    end
+
     for _, v in pairs(list) do
         local lv = tonumber(v.nLevel or v.dwLevel or 1) or 1
         local src = tonumber(v.dwSkillSrcID or 0) or 0
@@ -3323,9 +3420,9 @@ local function XMCore_FindBuff(obj, token, ownOnly)
         if sourceOK and (not needLv or lv == needLv) then
             if id and tonumber(v.dwID) == id then
                 return v
-            elseif not id then
-                local name = Table_GetBuffName(v.dwID, lv)
-                if XMCore_SameName(name, raw) then return v end
+            else
+                local name = Table_GetBuffName and Table_GetBuffName(v.dwID, lv)
+                if name and XMCore_SameName(name, raw) then return v end
             end
         end
     end
@@ -4238,57 +4335,57 @@ local function InitializeModule()
 -- Verified Van Hoa Hoa Gian rotation; combat policy preserved from the original.
 local DEFAULT_VANHOA_MACRO = [[
 #name VanHoa_HoaGian_80
-#tip Macro Van Hoa Hoa Gian Du v80: No Ngoc Thach dau -> Loan Tuu (2645) danh DMC -> No Ngoc Thach cuoi buff
+#tip Macro Vạn Hoa Hoa Gian Du v80: Nổ Ngọc Thạch đầu -> Loạn Tửu đánh DMC -> Nổ Ngọc Thạch cuối buff
 
--- 1. Tu cuu & Sinh ton
-/skill [life<0.4] Xuan Ne Ho Hoa
-/skill [mana<0.4] Bich Thuy Thao Thien
-/skill [tprepare] Quyet Am Chi
+-- 1. Tự cứu & Sinh tồn
+/skill [life<0.4] Xuân Nê Hộ Hoa
+/skill [mana<0.4] Bích Thủy Thao Thiên
+/skill [tprepare] Quyết Âm Chỉ
 
--- 2. Ngat Duong Minh Chi khi can thiet:
-/skill [ota:Duong Minh Chi,tnobuff:Phe Cot] stopota
-/skill [ota:Duong Minh Chi,tbufftime:Phe Cot<3] stopota
--- Ngat DMC de bat Loan Tuu KHI NGOC THACH VUA NO va da phu lai 2 DOT
-/skill [ota:Duong Minh Chi,nocd:Loan Tuu Thanh Ha,cdtime:Ngoc Thach Cau Phan>0,mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu] stopota
--- Co buff Thuy Nguyet ma chua phu Lan Thoi
-/skill [ota:Duong Minh Chi,buff:Thuy Nguyet Vo Gian,nombuff:Lan Thoi Ngoc Chiet] stopota
--- Dang di chuyen ma bi ket van cong DMC
-/skill [ota:Duong Minh Chi,moving,nobuff:Loan Tuu Thanh Ha|Thuy Nguyet Vo Gian] stopota
+-- 2. Ngắt Dương Minh Chỉ khi cần thiết:
+/skill [ota:Dương Minh Chỉ,tnobuff:Phệ Cốt] stopota
+/skill [ota:Dương Minh Chỉ,tbufftime:Phệ Cốt<3] stopota
+-- Ngắt DMC để bật Loạn Tửu KHI NGỌC THẠCH VỪA NỔ và đã phủ lại 2 DOT
+/skill [ota:Dương Minh Chỉ,nocd:Loạn Tửu Thanh Hà,cdtime:Ngọc Thạch Câu Phần>0,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú] stopota
+-- Có buff Thủy Nguyệt mà chưa phủ Lan Thôi
+/skill [ota:Dương Minh Chỉ,buff:Thủy Nguyệt Vô Gian,nombuff:Lan Thôi Ngọc Chiết] stopota
+-- Đang di chuyển mà bị kẹt vận công DMC
+/skill [ota:Dương Minh Chỉ,moving,nobuff:Loạn Tửu Thanh Hà|Thủy Nguyệt Vô Gian] stopota
 
--- 3. Mo man: Thuy Nguyet (off-GCD)
-/skill [nocd:136,nombuff:Lan Thoi Ngoc Chiet] Thuy Nguyet Vo Gian
+-- 3. Mở màn: Thủy Nguyệt (off-GCD)
+/skill [nocd:Thủy Nguyệt Vô Gian,nombuff:Lan Thôi Ngọc Chiết] Thủy Nguyệt Vô Gian
 
--- 4. Giai doan 1: Mo man phu du 3 DOT va No Ngoc Thach dot dau
-/skill [buff:Thuy Nguyet Vo Gian,nombuff:Lan Thoi Ngoc Chiet] Lan Thoi Ngoc Chiet
-/skill [nombuff:Thuong Duong Chi] Thuong Duong Chi
-/skill [nombuff:Chung Linh Duc Tu] Chung Linh Duc Tu
-/skill [mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu,nocd:Ngoc Thach Cau Phan,nombuff:Lan Thoi Ngoc Chiet] Lan Thoi Ngoc Chiet
-/skill [mbuff:Lan Thoi Ngoc Chiet,mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu,nocd:Loan Tuu Thanh Ha] Ngoc Thach Cau Phan
+-- 4. Giai đoạn 1: Mở màn phủ đủ 3 DOT và Nổ Ngọc Thạch đợt đầu
+/skill [buff:Thủy Nguyệt Vô Gian,nombuff:Lan Thôi Ngọc Chiết] Lan Thôi Ngọc Chiết
+/skill [nombuff:Thương Dương Chỉ] Thương Dương Chỉ
+/skill [nombuff:Chung Linh Dục Tú] Chung Linh Dục Tú
+/skill [mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Ngọc Thạch Câu Phần,nombuff:Lan Thôi Ngọc Chiết] Lan Thôi Ngọc Chiết
+/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Loạn Tửu Thanh Hà] Ngọc Thạch Câu Phần
 
--- 5. Giai doan 2: Kich hoat Loan Tuu Thanh Ha (2645):
--- CHI BAT KHI NGOC THACH VUA NO (dang CD) VA DA PHU DU 2 DOT (Thuong Duong & Chung Linh)
-/skill [mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu,cdtime:Ngoc Thach Cau Phan>0] Loan Tuu Thanh Ha
+-- 5. Giai đoạn 2: Kích hoạt Loạn Tửu Thanh Hà:
+-- CHỈ BẬT KHI NGỌC THẠCH VỪA NỔ (đang CD) VÀ ĐÃ PHỦ ĐỦ 2 DOT (Thương Dương & Chung Linh)
+/skill [mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,cdtime:Ngọc Thạch Câu Phần>0] Loạn Tửu Thanh Hà
 
--- 6. Giai doan 3: TRONG BUFF LOAN TUU (2719/2726):
--- a) Buff lai Thuong Duong & Chung Linh neu bi thieu DOT
-/skill [buff:Loan Tuu Thanh Ha,nombuff:Thuong Duong Chi] Thuong Duong Chi
-/skill [buff:Loan Tuu Thanh Ha,nombuff:Chung Linh Duc Tu] Chung Linh Duc Tu
--- b) Cuoi Loan Tuu <=2s: no truc tiep 2 DOT con >=5s, khong them Lan Thoi
-/skill [buff:Loan Tuu Thanh Ha,bufftime:Loan Tuu Thanh Ha<=2,mbufftime:Thuong Duong Chi>=5,mbufftime:Chung Linh Duc Tu>=5,nocd:Ngoc Thach Cau Phan] Ngoc Thach Cau Phan
--- c) Chi lam moi Phe Cot khi mat / con <=4s; khong chen Thuong Duong de gom tang
--- d) Khi chua can no Ngoc Thach: CHI DANH DUONG MINH CHI!
-/skill [buff:Loan Tuu Thanh Ha] Duong Minh Chi
+-- 6. Giai đoạn 3: TRONG BUFF LOẠN TỬU:
+-- a) Buff lại Thương Dương & Chung Linh nếu bị thiếu DOT
+/skill [buff:Loạn Tửu Thanh Hà,nombuff:Thương Dương Chỉ] Thương Dương Chỉ
+/skill [buff:Loạn Tửu Thanh Hà,nombuff:Chung Linh Dục Tú] Chung Linh Dục Tú
+-- b) Cuối Loạn Tửu <=2s: nổ trực tiếp 2 DOT còn >=5s, không thêm Lan Thôi
+/skill [buff:Loạn Tửu Thanh Hà,bufftime:Loạn Tửu Thanh Hà<=2,mbufftime:Thương Dương Chỉ>=5,mbufftime:Chung Linh Dục Tú>=5,nocd:Ngọc Thạch Câu Phần] Ngọc Thạch Câu Phần
+-- c) Chỉ làm mới Phệ Cốt khi mất / còn <=4s; không chèn Thương Dương để gom tầng
+-- d) Khi chưa cần nổ Ngọc Thạch: CHỈ ĐÁNH DƯƠNG MINH CHỈ!
+/skill [buff:Loạn Tửu Thanh Hà] Dương Minh Chỉ
 
--- 7. Giai doan 4: Vong lap binh on (ngoai Loan Tuu)
-/skill [tnobuff:Phe Cot;tbufftime:Phe Cot<3] Thuong Duong Chi
-/skill [mbuff:Lan Thoi Ngoc Chiet,mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu] Ngoc Thach Cau Phan
-/skill [mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu,nocd:Ngoc Thach Cau Phan,nombuff:Lan Thoi Ngoc Chiet] Lan Thoi Ngoc Chiet
+-- 7. Giai đoạn 4: Vòng lặp bình ổn (ngoài Loạn Tửu)
+/skill [tnobuff:Phệ Cốt;tbufftime:Phệ Cốt<3] Thương Dương Chỉ
+/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú] Ngọc Thạch Câu Phần
+/skill [mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Ngọc Thạch Câu Phần,nombuff:Lan Thôi Ngọc Chiết] Lan Thôi Ngọc Chiết
 
--- 8. Di chuyen (Instant Cast - zero downtime)
-/skill [moving] Thuong Duong Chi
+-- 8. Di chuyển (Instant Cast - zero downtime)
+/skill [moving] Thương Dương Chỉ
 
--- 9. Main DPS Filler khi dung yen
-/skill Duong Minh Chi
+-- 9. Main DPS Filler khi đứng yên
+/skill Dương Minh Chỉ
 ]]
 
 local function Create(deps)
@@ -5900,18 +5997,18 @@ end
 do
 local function InitializeModule()
 -- Ngạo Huyết Chiến Ý (10026) - Nội công DPS Thiên Sách v80
--- Kỹ năng: Từ Như Lâm (405), Thủ Như Sơn (407), Phá Phong (401 - duy trì debuff Lưu Huyết 3442),
--- Long Nha (415 - khi có Trí Tàn 540), Diệt (423), Long Ngâm (403), Xuyên Vân (400).
+-- Kỹ năng: Từ Như Lâm, Thủ Như Sơn, Phá Phong (duy trì debuff Lưu Huyết),
+-- Long Nha (khi có Trí Tàn), Diệt, Long Ngâm, Xuyên Vân.
 xMacro.Schools.RegisterDamageScript("ThienSach", "DPS", {[10026] = [[
 #name ThienSach_NgaoHuyet_80
-/skill [mana<0.50] 405
-/skill [life<0.30] 407
-/skill [distance<=4,xmtnobuff:3442] 401
-/skill [distance<=4,xmtbuff:540] 415
-/skill [distance<=4,xmtbuff:540] 423
-/skill [distance<=4] 403
-/skill [distance<=4,tlife<0.30] 423
-/skill [distance<=4] 400
+/skill [mana<0.50] Từ Như Lâm
+/skill [life<0.30] Thủ Như Sơn
+/skill [distance<=4,xmtnobuff:Lưu Huyết] Phá Phong
+/skill [distance<=4,xmtbuff:Trí Tàn] Long Nha
+/skill [distance<=4,xmtbuff:Trí Tàn] Diệt
+/skill [distance<=4] Long Ngâm
+/skill [distance<=4,tlife<0.30] Diệt
+/skill [distance<=4] Xuyên Vân
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -5927,20 +6024,20 @@ end
 do
 local function InitializeModule()
 -- Thiết Lao Luật (10062) - Nội công Tank Thiên Sách v80
--- Kỹ năng: Thủ Như Sơn (407), Ngự (424), Từ Như Lâm (405),
--- Định Quân (402 - Taunt cừu hận chính), Phá Phong (401 - duy trì debuff Lưu Huyết 3442),
--- Long Nha (415 - khi có Trí Tàn 540 tạo cừu hận lớn), Long Ngâm (403), Diệt (423), Xuyên Vân (400).
+-- Kỹ năng: Thủ Như Sơn, Ngự, Từ Như Lâm,
+-- Định Quân (Taunt cừu hận chính), Phá Phong (duy trì debuff Lưu Huyết),
+-- Long Nha (khi có Trí Tàn tạo cừu hận lớn), Long Ngâm, Diệt, Xuyên Vân.
 xMacro.Schools.RegisterDamageScript("ThienSach", "ThietLao", {[10062] = [[
 #name ThienSach_ThietLao_80
-/skill [life<0.35] 407
-/skill [life<0.60] 424
-/skill [mana<0.50] 405
-/skill [distance<=4] 402
-/skill [distance<=4,xmtnobuff:3442] 401
-/skill [distance<=4,xmtbuff:540] 415
-/skill [distance<=4] 403
-/skill [distance<=4] 423
-/skill [distance<=4] 400
+/skill [life<0.35] Thủ Như Sơn
+/skill [life<0.60] Ngự
+/skill [mana<0.50] Từ Như Lâm
+/skill [distance<=4] Định Quân
+/skill [distance<=4,xmtnobuff:Lưu Huyết] Phá Phong
+/skill [distance<=4,xmtbuff:Trí Tàn] Long Nha
+/skill [distance<=4] Long Ngâm
+/skill [distance<=4] Diệt
+/skill [distance<=4] Xuyên Vân
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -5974,36 +6071,36 @@ end
 do
 local function InitializeModule()
 -- Vấn Thủy Quyết (10144 - Khinh Kiếm tích kiếm khí) & Sơn Cư Kiếm Ý (10145 - Trọng Kiếm xả kiếm khí).
--- Kỹ năng: Mai Ẩn Hương (1649), Khiếu Nhật (1656), Tuyết Đoạn Kiều (1609),
--- Vân Phi Ngọc Hoàng (1593), Tịch Chiếu Lôi Phong (1592), Thính Lôi (1646),
--- Đoạn Triều (1600), Cửu Khê Di Yên (1579).
+-- Kỹ năng: Mai Ẩn Hương, Khiếu Nhật, Tuyết Đoạn Kiều,
+-- Vân Phi Ngọc Hoàng, Tịch Chiếu Lôi Phong, Thính Lôi,
+-- Đoạn Triều, Cửu Khê Di Yên.
 local light = [[
-/skill [distance<=8,xmtnobuff:1649] 1649
-/skill [distance<=4] 1600
-/skill [distance<=4] 1646
-/skill [distance<=8] 1579
+/skill [distance<=8,xmtnobuff:Mai Ẩn Hương] Mai Ẩn Hương
+/skill [distance<=4] Đoạn Triều
+/skill [distance<=4] Thính Lôi
+/skill [distance<=8] Cửu Khê Di Yên
 ]]
 local heavy = [[
-/skill [distance<=8,xmtnobuff:1649] 1649
-/skill [distance<=8,rage<20] 1609
-/skill [distance<=4] 1600
-/skill [distance<=8,rage>=20] 1593
-/skill [distance<=8,rage>=20] 1592
-/skill [distance<=4] 1646
+/skill [distance<=8,xmtnobuff:Mai Ẩn Hương] Mai Ẩn Hương
+/skill [distance<=8,rage<20] Tuyết Đoạn Kiều
+/skill [distance<=4] Đoạn Triều
+/skill [distance<=8,rage>=20] Vân Phi Ngọc Hoàng
+/skill [distance<=8,rage>=20] Tịch Chiếu Lôi Phong
+/skill [distance<=4] Thính Lôi
 ]]
 
 local function LightSword(player)
     local energy = player.nCurrentRage or 0
     local maxEnergy = player.nMaxRage or 0
     if maxEnergy > 0 and energy >= maxEnergy * 0.90 then
-        return "/skill [distance<=4] 1656\n" .. light
+        return "/skill [distance<=4] Khiếu Nhật\n" .. light
     end
     return light
 end
 
 local function HeavySword(player)
     if player.nCurrentRage and player.nCurrentRage < 15 then
-        return "/skill [distance<=4] 1656\n" .. heavy
+        return "/skill [distance<=4] Khiếu Nhật\n" .. heavy
     end
     return heavy
 end
@@ -6044,16 +6141,16 @@ end
 do
 local function InitializeModule()
 -- Kinh Vũ Quyết (10224) - Nội công DPS Nỏ Đường Môn v80
--- Kỹ năng: Tập Trung (3100), Truy Mệnh Tiễn (3098), Hóa Huyết Tiêu (3087 - debuff 2237),
--- Bạo Vũ Lê Hoa Châm (3093), Trục Tinh Tiễn (3095), Đoạt Phách Tiễn (3088).
+-- Kỹ năng: Tập Trung, Truy Mệnh Tiễn, Hóa Huyết Tiêu,
+-- Bạo Vũ Lê Hoa Châm, Trục Tinh Tiễn, Đoạt Phách Tiễn.
 xMacro.Schools.RegisterDamageScript("DuongMon", "KinhVu", {[10224] = [[
 #name DuongMon_KinhVu_80
-/skill [energy<35] 3100
-/skill [distance<=25,xmbuff:3317] 3098
-/skill [distance<=25,energy>=20,xmtnobuff:2237] 3087
-/skill [distance<=25,energy>=30] 3093
-/skill [distance<=25,energy<=70] 3095
-/skill [distance<=25,energy>=30] 3088
+/skill [energy<35] Tập Trung
+/skill [distance<=25,xmbuff:Truy Mệnh Vô Thanh] Truy Mệnh Tiễn
+/skill [distance<=25,energy>=20,xmtnobuff:Hóa Huyết Tiêu] Hóa Huyết Tiêu
+/skill [distance<=25,energy>=30] Bạo Vũ Lê Hoa Châm
+/skill [distance<=25,energy<=70] Trục Tinh Tiễn
+/skill [distance<=25,energy>=30] Đoạt Phách Tiễn
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6069,15 +6166,15 @@ end
 do
 local function InitializeModule()
 -- Thiên La Quỹ Đạo (10225) - Nội công DPS Cơ quan Đường Môn v80
--- Kỹ năng: Tập Trung (3100), Hóa Huyết Tiêu (3087 - debuff 2237),
--- Bạo Vũ Lê Hoa Châm (3093), Thực Cơ Đạn (3105), Đoạt Phách Tiễn (3088).
+-- Kỹ năng: Tập Trung, Hóa Huyết Tiêu,
+-- Bạo Vũ Lê Hoa Châm, Thực Cơ Đạn, Đoạt Phách Tiễn.
 xMacro.Schools.RegisterDamageScript("DuongMon", "ThienLa", {[10225] = [[
 #name DuongMon_ThienLa_80
-/skill [energy<40] 3100
-/skill [distance<=25,energy>=20,xmtnobuff:2237] 3087
-/skill [distance<=25,energy>=30] 3093
-/skill [distance<=25,energy>=30] 3105
-/skill [distance<=25,energy>=15] 3088
+/skill [energy<40] Tập Trung
+/skill [distance<=25,energy>=20,xmtnobuff:Hóa Huyết Tiêu] Hóa Huyết Tiêu
+/skill [distance<=25,energy>=30] Bạo Vũ Lê Hoa Châm
+/skill [distance<=25,energy>=30] Thực Cơ Đạn
+/skill [distance<=25,energy>=15] Đoạt Phách Tiễn
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6111,18 +6208,18 @@ end
 do
 local function InitializeModule()
 -- Phần Ảnh Thánh Quyết (10242) - Nội công DPS Minh Giáo v80
--- Kỹ năng: Tham Ma Thể (3965), Tịnh Thế Phá Ma Kích (3967), Khu Dạ Đoạn Sầu (3979),
--- Ngân Nguyệt Trảm (3963), Liệt Nhật Trảm (3960), U Nguyệt Luân (3962), Xích Nhật Luân (3959).
+-- Kỹ năng: Tham Ma Thể, Tịnh Thế Phá Ma Kích, Khu Dạ Đoạn Sầu,
+-- Ngân Nguyệt Trảm, Liệt Nhật Trảm, U Nguyệt Luân, Xích Nhật Luân.
 xMacro.Schools.RegisterDamageScript("MinhGiao", "PhanAnh", {[10242] = [[
 #name MinhGiao_PhanAnh_80
-/skill [life<0.30] 3965
-/skill [distance<=5,fullsun] 3967
-/skill [distance<=5,fullmoon] 3967
-/skill [distance<=5,xmbuff:4052] 3979
-/skill [distance<=5] 3963
-/skill [distance<=5] 3960
-/skill [distance<=5,sun>=moon] 3962
-/skill [distance<=5] 3959
+/skill [life<0.30] Tham Ma Thể
+/skill [distance<=5,fullsun] Tịnh Thế Phá Ma Kích
+/skill [distance<=5,fullmoon] Tịnh Thế Phá Ma Kích
+/skill [distance<=5,xmbuff:Ám Trần Di Sơn] Khu Dạ Đoạn Sầu
+/skill [distance<=5] Ngân Nguyệt Trảm
+/skill [distance<=5] Liệt Nhật Trảm
+/skill [distance<=5,sun>=moon] U Nguyệt Luân
+/skill [distance<=5] Xích Nhật Luân
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6138,22 +6235,22 @@ end
 do
 local function InitializeModule()
 -- Minh Tôn Lưu Hỏa Thể (10243) - Nội công Tank Minh Giáo v80
--- Kỹ năng: Tham Ma Thể (3965), Thánh Minh Hựu (3966), Từ Bi Nguyện (3972 - Taunt cừu hận chính),
--- Giới Hỏa Trảm (3973), Hoàng Nhật Chiếu (3975), Tịnh Thế Phá Ma Kích (3967),
--- Liệt Nhật Trảm (3960), Ngân Nguyệt Trảm (3963), Xích Nhật Luân (3959), U Nguyệt Luân (3962).
+-- Kỹ năng: Tham Ma Thể, Thánh Minh Hựu, Từ Bi Nguyện (Taunt cừu hận chính),
+-- Giới Hỏa Trảm, Hoàng Nhật Chiếu, Tịnh Thế Phá Ma Kích,
+-- Liệt Nhật Trảm, Ngân Nguyệt Trảm, Xích Nhật Luân, U Nguyệt Luân.
 xMacro.Schools.RegisterDamageScript("MinhGiao", "MinhTon", {[10243] = [[
 #name MinhGiao_MinhTon_80
-/skill [life<0.30] 3965
-/skill [life<0.40,fullsun] 3966
-/skill [distance<=5] 3972
-/skill [distance<=8] 3973
-/skill [distance<=5] 3975
-/skill [distance<=5,fullsun] 3967
-/skill [distance<=5,fullmoon] 3967
-/skill [distance<=5,sun>=moon] 3960
-/skill [distance<=5,moon>sun] 3963
-/skill [distance<=5,sun>=moon] 3959
-/skill [distance<=5] 3962
+/skill [life<0.30] Tham Ma Thể
+/skill [life<0.40,fullsun] Thánh Minh Hựu
+/skill [distance<=5] Từ Bi Nguyện
+/skill [distance<=8] Giới Hỏa Trảm
+/skill [distance<=5] Hoàng Nhật Chiếu
+/skill [distance<=5,fullsun] Tịnh Thế Phá Ma Kích
+/skill [distance<=5,fullmoon] Tịnh Thế Phá Ma Kích
+/skill [distance<=5,sun>=moon] Liệt Nhật Trảm
+/skill [distance<=5,moon>sun] Ngân Nguyệt Trảm
+/skill [distance<=5,sun>=moon] Xích Nhật Luân
+/skill [distance<=5] U Nguyệt Luân
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6187,21 +6284,21 @@ end
 do
 local function InitializeModule()
 -- Dịch Cân Kinh (10003) - Nội công DPS Thiếu Lâm v80
--- Kỹ năng: Vô Tướng Quyết (245), Diệc Khô Diệc Vinh (242), Cầm Long Quyết (246),
--- Nã Vân Thức (243), Kim Cương Nộ Mục (239), Vi Đà Hiến Chử (233),
--- Thủ Khuyết Thức (235), Đảo Hư Thức (2572), Hoành Tảo Lục Hợp (234), Phổ Độ Tứ Phương (232).
+-- Kỹ năng: Vô Tướng Quyết, Diệc Khô Diệc Vinh, Cầm Long Quyết,
+-- Nã Vân Thức, Kim Cương Nộ Mục, Vi Đà Hiến Chử,
+-- Thủ Khuyết Thức, Đảo Hư Thức, Hoành Tảo Lục Hợp, Phổ Độ Tứ Phương.
 xMacro.Schools.RegisterDamageScript("ThieuLam", "DichCanKinh", {[10003] = [[
 #name ThieuLam_DichCanKinh_80
-/skill [life<0.35] 245
-/skill [mana<0.40,qidian>=3] 242
-/skill [qidian<1] 246
-/skill [distance<=4,qidian>=3,tlife<0.30] 243
-/skill [distance<=4,qidian>=3] 239
-/skill [distance<=4,qidian>=3] 233
-/skill [distance<=5] 235
-/skill [distance<=8] 2572
-/skill [distance<=5,qidian<3] 234
-/skill [distance<=4] 232
+/skill [life<0.35] Vô Tướng Quyết
+/skill [mana<0.40,qidian>=3] Diệc Khô Diệc Vinh
+/skill [qidian<1] Cầm Long Quyết
+/skill [distance<=4,qidian>=3,tlife<0.30] Nã Vân Thức
+/skill [distance<=4,qidian>=3] Kim Cương Nộ Mục
+/skill [distance<=4,qidian>=3] Vi Đà Hiến Chử
+/skill [distance<=5] Thủ Khuyết Thức
+/skill [distance<=8] Đảo Hư Thức
+/skill [distance<=5,qidian<3] Hoành Tảo Lục Hợp
+/skill [distance<=4] Phổ Độ Tứ Phương
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6217,20 +6314,20 @@ end
 do
 local function InitializeModule()
 -- Tẩy Tủy Kinh (10002) - Nội công Tank Thiếu Lâm v80
--- Kỹ năng: Vô Tướng Quyết (245), Đoán Cốt Quyết (247), Cầm Long Quyết (246),
--- Vạn Phật Triều Tông (236 - Taunt), Lập Địa Thành Phật (241), Vi Đà Hiến Chử (233),
--- Ma Ha Vô Lượng (237), Hoành Tảo Lục Hợp (234), Phổ Độ Tứ Phương (232).
+-- Kỹ năng: Vô Tướng Quyết, Đoán Cốt Quyết, Cầm Long Quyết,
+-- Vạn Phật Triều Tông (Taunt), Lập Địa Thành Phật, Vi Đà Hiến Chử,
+-- Ma Ha Vô Lượng, Hoành Tảo Lục Hợp, Phổ Độ Tứ Phương.
 xMacro.Schools.RegisterDamageScript("ThieuLam", "TayTuyKinh", {[10002] = [[
 #name ThieuLam_TayTuyKinh_80
-/skill [life<0.35] 245
-/skill [life<0.40] 247
-/skill [qidian<1] 246
-/skill [distance<=4] 236
-/skill [distance<=4,qidian>=3] 241
-/skill [distance<=4,qidian>=3] 233
-/skill [distance<=4] 237
-/skill [distance<=5] 234
-/skill [distance<=4] 232
+/skill [life<0.35] Vô Tướng Quyết
+/skill [life<0.40] Đoán Cốt Quyết
+/skill [qidian<1] Cầm Long Quyết
+/skill [distance<=4] Vạn Phật Triều Tông
+/skill [distance<=4,qidian>=3] Lập Địa Thành Phật
+/skill [distance<=4,qidian>=3] Vi Đà Hiến Chử
+/skill [distance<=4] Ma Ha Vô Lượng
+/skill [distance<=5] Hoành Tảo Lục Hợp
+/skill [distance<=4] Phổ Độ Tứ Phương
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6264,20 +6361,20 @@ end
 do
 local function InitializeModule()
 -- Tử Hà Công (10015) - Nội công DPS Khí Thuần Dương v80
--- Kỹ năng: Tọa Vọng Vô Ngã (305), Bão Nguyên Thủ Khuyết (302),
--- Lưỡng Nghi Hóa Hình (301), Tứ Tượng Luân Hồi (367), Thái Cực Vô Cực (306).
--- Duy trì Phá Thương Khung (359, buff 375), Hóa Tam Thanh (357, buff 373) và kẹp Ngưng Thần (300).
+-- Kỹ năng: Tọa Vong Vô Ngã, Bão Nguyên Quy Nhất,
+-- Lưỡng Nghi Hóa Hình, Tứ Tượng Luân Hồi, Thái Cực Vô Cực.
+-- Duy trì Phá Thương Khung, Hóa Tam Thanh và kẹp Ngưng Thần Tụ Khí.
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10015] = [[
 #name ThuanDuong_TuHaCong_80
-/skill [nobuff:305] 305
-/skill [nobuff:375] 359
-/skill [mana<0.40,nobuff:373] 357
-/skill [mana<0.60,qidian>=8] 302
-/skill [distance<=20,qidian>=8] 301
-/skill [distance<=20,qidian<=7] 367
-/skill [distance<=20] 306
-/skill [qidian<8] 300
-/skill [nofight,qidian<10] 300
+/skill [nobuff:Tọa Vong Vô Ngã] Tọa Vong Vô Ngã
+/skill [nobuff:Phá Thương Khung] Phá Thương Khung
+/skill [mana<0.40,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
+/skill [mana<0.60,qidian>=8] Bão Nguyên Quy Nhất
+/skill [distance<=20,qidian>=8] Lưỡng Nghi Hóa Hình
+/skill [distance<=20,qidian<=7] Tứ Tượng Luân Hồi
+/skill [distance<=20] Thái Cực Vô Cực
+/skill [qidian<8] Ngưng Thần Tụ Khí
+/skill [nofight,qidian<10] Ngưng Thần Tụ Khí
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6293,23 +6390,23 @@ end
 do
 local function InitializeModule()
 -- Thái Hư Kiếm Ý (10014) - Nội công DPS Kiếm Thuần Dương v80
--- Tự động duy trì Khí Trường Toái Tinh Thần (362, buff 378) và Hóa Tam Thanh (357, buff 373) khi thiếu mana.
+-- Tự động duy trì Khí Trường Toái Tinh Thần và Hóa Tam Thanh khi thiếu mana.
 -- Kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神) đỉnh cao:
--- Ngưng Thần Tụ Khí (300) không tốn GCD, tự động kích hoạt trong khe hở GCD
+-- Ngưng Thần Tụ Khí không tốn GCD, tự động kích hoạt trong khe hở GCD
 -- để nhận thêm khí điểm miễn phí mà không làm trễ bất kỳ chiêu thức tấn công nào!
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
-/skill [nobuff:305] 305
-/skill [nobuff:378] 362
-/skill [mana<0.40,nobuff:373] 357
-/skill [mana<0.40,qidian>=8] 302
-/skill [distance<=4,tlife<0.40] 2699
-/skill [distance<=4,qidian>=8] 365
-/skill [distance<=4,qidian<=7] 2699
-/skill [distance<=4] 309
-/skill [distance<=4] 364
-/skill [qidian<8] 300
-/skill [nofight,qidian<10] 300
+/skill [nobuff:Tọa Vong Vô Ngã] Tọa Vong Vô Ngã
+/skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
+/skill [mana<0.40,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
+/skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
+/skill [distance<=4,tlife<0.40] Bát Hoang Quy Nguyên
+/skill [distance<=4,qidian>=8] Vô Ngã Vô Kiếm
+/skill [distance<=4,qidian<=7] Bát Hoang Quy Nguyên
+/skill [distance<=4] Tam Hoàn Quy Nguyệt
+/skill [distance<=4] Kiếm Phi Kinh Thiên
+/skill [qidian<8] Ngưng Thần Tụ Khí
+/skill [nofight,qidian<10] Ngưng Thần Tụ Khí
 ]]})
 end
 local ok, result = pcall(InitializeModule)

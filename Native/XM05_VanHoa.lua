@@ -21,57 +21,57 @@ local function InitializeModule()
 -- Verified Van Hoa Hoa Gian rotation; combat policy preserved from the original.
 local DEFAULT_VANHOA_MACRO = [[
 #name VanHoa_HoaGian_80
-#tip Macro Van Hoa Hoa Gian Du v80: No Ngoc Thach dau -> Loan Tuu (2645) danh DMC -> No Ngoc Thach cuoi buff
+#tip Macro Vạn Hoa Hoa Gian Du v80: Nổ Ngọc Thạch đầu -> Loạn Tửu đánh DMC -> Nổ Ngọc Thạch cuối buff
 
--- 1. Tu cuu & Sinh ton
-/skill [life<0.4] Xuan Ne Ho Hoa
-/skill [mana<0.4] Bich Thuy Thao Thien
-/skill [tprepare] Quyet Am Chi
+-- 1. Tự cứu & Sinh tồn
+/skill [life<0.4] Xuân Nê Hộ Hoa
+/skill [mana<0.4] Bích Thủy Thao Thiên
+/skill [tprepare] Quyết Âm Chỉ
 
--- 2. Ngat Duong Minh Chi khi can thiet:
-/skill [ota:Duong Minh Chi,tnobuff:Phe Cot] stopota
-/skill [ota:Duong Minh Chi,tbufftime:Phe Cot<3] stopota
--- Ngat DMC de bat Loan Tuu KHI NGOC THACH VUA NO va da phu lai 2 DOT
-/skill [ota:Duong Minh Chi,nocd:Loan Tuu Thanh Ha,cdtime:Ngoc Thach Cau Phan>0,mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu] stopota
--- Co buff Thuy Nguyet ma chua phu Lan Thoi
-/skill [ota:Duong Minh Chi,buff:Thuy Nguyet Vo Gian,nombuff:Lan Thoi Ngoc Chiet] stopota
--- Dang di chuyen ma bi ket van cong DMC
-/skill [ota:Duong Minh Chi,moving,nobuff:Loan Tuu Thanh Ha|Thuy Nguyet Vo Gian] stopota
+-- 2. Ngắt Dương Minh Chỉ khi cần thiết:
+/skill [ota:Dương Minh Chỉ,tnobuff:Phệ Cốt] stopota
+/skill [ota:Dương Minh Chỉ,tbufftime:Phệ Cốt<3] stopota
+-- Ngắt DMC để bật Loạn Tửu KHI NGỌC THẠCH VỪA NỔ và đã phủ lại 2 DOT
+/skill [ota:Dương Minh Chỉ,nocd:Loạn Tửu Thanh Hà,cdtime:Ngọc Thạch Câu Phần>0,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú] stopota
+-- Có buff Thủy Nguyệt mà chưa phủ Lan Thôi
+/skill [ota:Dương Minh Chỉ,buff:Thủy Nguyệt Vô Gian,nombuff:Lan Thôi Ngọc Chiết] stopota
+-- Đang di chuyển mà bị kẹt vận công DMC
+/skill [ota:Dương Minh Chỉ,moving,nobuff:Loạn Tửu Thanh Hà|Thủy Nguyệt Vô Gian] stopota
 
--- 3. Mo man: Thuy Nguyet (off-GCD)
-/skill [nocd:136,nombuff:Lan Thoi Ngoc Chiet] Thuy Nguyet Vo Gian
+-- 3. Mở màn: Thủy Nguyệt (off-GCD)
+/skill [nocd:Thủy Nguyệt Vô Gian,nombuff:Lan Thôi Ngọc Chiết] Thủy Nguyệt Vô Gian
 
--- 4. Giai doan 1: Mo man phu du 3 DOT va No Ngoc Thach dot dau
-/skill [buff:Thuy Nguyet Vo Gian,nombuff:Lan Thoi Ngoc Chiet] Lan Thoi Ngoc Chiet
-/skill [nombuff:Thuong Duong Chi] Thuong Duong Chi
-/skill [nombuff:Chung Linh Duc Tu] Chung Linh Duc Tu
-/skill [mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu,nocd:Ngoc Thach Cau Phan,nombuff:Lan Thoi Ngoc Chiet] Lan Thoi Ngoc Chiet
-/skill [mbuff:Lan Thoi Ngoc Chiet,mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu,nocd:Loan Tuu Thanh Ha] Ngoc Thach Cau Phan
+-- 4. Giai đoạn 1: Mở màn phủ đủ 3 DOT và Nổ Ngọc Thạch đợt đầu
+/skill [buff:Thủy Nguyệt Vô Gian,nombuff:Lan Thôi Ngọc Chiết] Lan Thôi Ngọc Chiết
+/skill [nombuff:Thương Dương Chỉ] Thương Dương Chỉ
+/skill [nombuff:Chung Linh Dục Tú] Chung Linh Dục Tú
+/skill [mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Ngọc Thạch Câu Phần,nombuff:Lan Thôi Ngọc Chiết] Lan Thôi Ngọc Chiết
+/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Loạn Tửu Thanh Hà] Ngọc Thạch Câu Phần
 
--- 5. Giai doan 2: Kich hoat Loan Tuu Thanh Ha (2645):
--- CHI BAT KHI NGOC THACH VUA NO (dang CD) VA DA PHU DU 2 DOT (Thuong Duong & Chung Linh)
-/skill [mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu,cdtime:Ngoc Thach Cau Phan>0] Loan Tuu Thanh Ha
+-- 5. Giai đoạn 2: Kích hoạt Loạn Tửu Thanh Hà:
+-- CHỈ BẬT KHI NGỌC THẠCH VỪA NỔ (đang CD) VÀ ĐÃ PHỦ ĐỦ 2 DOT (Thương Dương & Chung Linh)
+/skill [mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,cdtime:Ngọc Thạch Câu Phần>0] Loạn Tửu Thanh Hà
 
--- 6. Giai doan 3: TRONG BUFF LOAN TUU (2719/2726):
--- a) Buff lai Thuong Duong & Chung Linh neu bi thieu DOT
-/skill [buff:Loan Tuu Thanh Ha,nombuff:Thuong Duong Chi] Thuong Duong Chi
-/skill [buff:Loan Tuu Thanh Ha,nombuff:Chung Linh Duc Tu] Chung Linh Duc Tu
--- b) Cuoi Loan Tuu <=2s: no truc tiep 2 DOT con >=5s, khong them Lan Thoi
-/skill [buff:Loan Tuu Thanh Ha,bufftime:Loan Tuu Thanh Ha<=2,mbufftime:Thuong Duong Chi>=5,mbufftime:Chung Linh Duc Tu>=5,nocd:Ngoc Thach Cau Phan] Ngoc Thach Cau Phan
--- c) Chi lam moi Phe Cot khi mat / con <=4s; khong chen Thuong Duong de gom tang
--- d) Khi chua can no Ngoc Thach: CHI DANH DUONG MINH CHI!
-/skill [buff:Loan Tuu Thanh Ha] Duong Minh Chi
+-- 6. Giai đoạn 3: TRONG BUFF LOẠN TỬU:
+-- a) Buff lại Thương Dương & Chung Linh nếu bị thiếu DOT
+/skill [buff:Loạn Tửu Thanh Hà,nombuff:Thương Dương Chỉ] Thương Dương Chỉ
+/skill [buff:Loạn Tửu Thanh Hà,nombuff:Chung Linh Dục Tú] Chung Linh Dục Tú
+-- b) Cuối Loạn Tửu <=2s: nổ trực tiếp 2 DOT còn >=5s, không thêm Lan Thôi
+/skill [buff:Loạn Tửu Thanh Hà,bufftime:Loạn Tửu Thanh Hà<=2,mbufftime:Thương Dương Chỉ>=5,mbufftime:Chung Linh Dục Tú>=5,nocd:Ngọc Thạch Câu Phần] Ngọc Thạch Câu Phần
+-- c) Chỉ làm mới Phệ Cốt khi mất / còn <=4s; không chèn Thương Dương để gom tầng
+-- d) Khi chưa cần nổ Ngọc Thạch: CHỈ ĐÁNH DƯƠNG MINH CHỈ!
+/skill [buff:Loạn Tửu Thanh Hà] Dương Minh Chỉ
 
--- 7. Giai doan 4: Vong lap binh on (ngoai Loan Tuu)
-/skill [tnobuff:Phe Cot;tbufftime:Phe Cot<3] Thuong Duong Chi
-/skill [mbuff:Lan Thoi Ngoc Chiet,mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu] Ngoc Thach Cau Phan
-/skill [mbuff:Thuong Duong Chi,mbuff:Chung Linh Duc Tu,nocd:Ngoc Thach Cau Phan,nombuff:Lan Thoi Ngoc Chiet] Lan Thoi Ngoc Chiet
+-- 7. Giai đoạn 4: Vòng lặp bình ổn (ngoài Loạn Tửu)
+/skill [tnobuff:Phệ Cốt;tbufftime:Phệ Cốt<3] Thương Dương Chỉ
+/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú] Ngọc Thạch Câu Phần
+/skill [mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Ngọc Thạch Câu Phần,nombuff:Lan Thôi Ngọc Chiết] Lan Thôi Ngọc Chiết
 
--- 8. Di chuyen (Instant Cast - zero downtime)
-/skill [moving] Thuong Duong Chi
+-- 8. Di chuyển (Instant Cast - zero downtime)
+/skill [moving] Thương Dương Chỉ
 
--- 9. Main DPS Filler khi dung yen
-/skill Duong Minh Chi
+-- 9. Main DPS Filler khi đứng yên
+/skill Dương Minh Chỉ
 ]]
 
 local function Create(deps)

@@ -1,14 +1,14 @@
 ﻿-- Phần Ảnh Thánh Quyết (10242) - Nội công DPS Minh Giáo v80
--- Kỹ năng: Tham Ma Thể (3965), Tịnh Thế Phá Ma Kích (3967), Khu Dạ Đoạn Sầu (3979),
--- Ngân Nguyệt Trảm (3963), Liệt Nhật Trảm (3960), U Nguyệt Luân (3962), Xích Nhật Luân (3959).
+-- Kỹ năng: Tham Ma Thể, Tịnh Thế Phá Ma Kích, Khu Dạ Đoạn Sầu,
+-- Ngân Nguyệt Trảm, Liệt Nhật Trảm, U Nguyệt Luân, Xích Nhật Luân.
 xMacro.Schools.RegisterDamageScript("MinhGiao", "PhanAnh", {[10242] = [[
 #name MinhGiao_PhanAnh_80
-/skill [life<0.30] 3965
-/skill [distance<=5,fullsun] 3967
-/skill [distance<=5,fullmoon] 3967
-/skill [distance<=5,xmbuff:4052] 3979
-/skill [distance<=5] 3963
-/skill [distance<=5] 3960
-/skill [distance<=5,sun>=moon] 3962
-/skill [distance<=5] 3959
+/skill [life<0.30] Tham Ma Thể
+/skill [distance<=5,fullsun] Tịnh Thế Phá Ma Kích
+/skill [distance<=5,fullmoon] Tịnh Thế Phá Ma Kích
+/skill [distance<=5,xmbuff:Ám Trần Di Sơn] Khu Dạ Đoạn Sầu
+/skill [distance<=5] Ngân Nguyệt Trảm
+/skill [distance<=5] Liệt Nhật Trảm
+/skill [distance<=5,sun>=moon] U Nguyệt Luân
+/skill [distance<=5] Xích Nhật Luân
 ]]})

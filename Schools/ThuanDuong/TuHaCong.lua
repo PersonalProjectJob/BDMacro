@@ -1,16 +1,16 @@
 ﻿-- Tử Hà Công (10015) - Nội công DPS Khí Thuần Dương v80
--- Kỹ năng: Tọa Vọng Vô Ngã (305), Bão Nguyên Thủ Khuyết (302),
--- Lưỡng Nghi Hóa Hình (301), Tứ Tượng Luân Hồi (367), Thái Cực Vô Cực (306).
--- Duy trì Phá Thương Khung (359, buff 375), Hóa Tam Thanh (357, buff 373) và kẹp Ngưng Thần (300).
+-- Kỹ năng: Tọa Vong Vô Ngã, Bão Nguyên Quy Nhất,
+-- Lưỡng Nghi Hóa Hình, Tứ Tượng Luân Hồi, Thái Cực Vô Cực.
+-- Duy trì Phá Thương Khung, Hóa Tam Thanh và kẹp Ngưng Thần Tụ Khí.
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10015] = [[
 #name ThuanDuong_TuHaCong_80
-/skill [nobuff:305] 305
-/skill [nobuff:375] 359
-/skill [mana<0.40,nobuff:373] 357
-/skill [mana<0.60,qidian>=8] 302
-/skill [distance<=20,qidian>=8] 301
-/skill [distance<=20,qidian<=7] 367
-/skill [distance<=20] 306
-/skill [qidian<8] 300
-/skill [nofight,qidian<10] 300
+/skill [nobuff:Tọa Vong Vô Ngã] Tọa Vong Vô Ngã
+/skill [nobuff:Phá Thương Khung] Phá Thương Khung
+/skill [mana<0.40,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
+/skill [mana<0.60,qidian>=8] Bão Nguyên Quy Nhất
+/skill [distance<=20,qidian>=8] Lưỡng Nghi Hóa Hình
+/skill [distance<=20,qidian<=7] Tứ Tượng Luân Hồi
+/skill [distance<=20] Thái Cực Vô Cực
+/skill [qidian<8] Ngưng Thần Tụ Khí
+/skill [nofight,qidian<10] Ngưng Thần Tụ Khí
 ]]})

@@ -410,6 +410,79 @@ local function GetPlayerSkillInfo(szName)
 	end
 	-- Static fallback cho Mon phai Van Hoa, That Tu & Ngu Doc (chuan 100% C++ Engine JX3)
 	local tStatic = {
+		-- Thuần Dương
+		["Tọa Vong Vô Ngã"]=305, ["Toa Vong Vo Nga"]=305, ["Tọa Vọng Vô Ngã"]=305, ["Toa Vong"]=305, ["坐忘无我"]=305,
+		["Toái Tinh Thần"]=362, ["Toai Tinh Than"]=362, ["toai tinh than"]=362, ["碎星辰"]=362,
+		["Phá Thương Khung"]=359, ["Pha Thuong Khung"]=359, ["pha thuong khung"]=359, ["破苍穹"]=359,
+		["Hóa Tam Thanh"]=357, ["Hoa Tam Thanh"]=357, ["hoa tam thanh"]=357, ["化三清"]=357,
+		["Bão Nguyên Quy Nhất"]=302, ["Bao Nguyen Quy Nhat"]=302, ["Bão Nguyên Thủ Khuyết"]=302, ["Bao Nguyen Thu Khuyet"]=302, ["抱元守缺"]=302,
+		["Bát Hoang Quy Nguyên"]=2699, ["Bat Hoang Quy Nguyen"]=2699, ["bat hoang quy nguyen"]=2699, ["八荒归元"]=2699,
+		["Vô Ngã Vô Kiếm"]=365, ["Vo Nga Vo Kiem"]=365, ["vo nga vo kiem"]=365, ["无我无剑"]=365,
+		["Tam Hoàn Quy Nguyệt"]=309, ["Tam Hoan Quy Nguyet"]=309, ["Tam Hoàn Sáo Nguyệt"]=309, ["Tam Hoan Sao Nguyet"]=309, ["三环套月"]=309,
+		["Kiếm Phi Kinh Thiên"]=364, ["Kiem Phi Kinh Thien"]=364, ["kiem phi kinh thien"]=364, ["剑飞惊天"]=364,
+		["Lưỡng Nghi Hóa Hình"]=301, ["Luong Nghi Hoa Hinh"]=301, ["luong nghi hoa hinh"]=301, ["两仪化形"]=301,
+		["Tứ Tượng Luân Hồi"]=367, ["Tu Tuong Luan Hoi"]=367, ["tu tuong luan hoi"]=367, ["四象轮回"]=367,
+		["Thái Cực Vô Cực"]=306, ["Thai Cuc Vo Cuc"]=306, ["thai cuc vo cuc"]=306, ["太极无极"]=306,
+		["Ngưng Thần Tụ Khí"]=300, ["Ngung Than Tu Khi"]=300, ["ngung than tu khi"]=300, ["凝神聚气"]=300,
+
+		-- Thiếu Lâm
+		["Vô Tướng Quyết"]=245, ["Vo Tuong Quyet"]=245, ["vo tuong quyet"]=245, ["无相诀"]=245,
+		["Đoán Cốt Quyết"]=247, ["Doan Cot Quyet"]=247, ["doan cot quyet"]=247, ["锻骨诀"]=247,
+		["Cầm Long Quyết"]=246, ["Cam Long Quyet"]=246, ["cam long quyet"]=246, ["擒龙诀"]=246,
+		["Diệc Khô Diệc Vinh"]=242, ["Diec Kho Diec Vinh"]=242, ["diec kho diec vinh"]=242, ["亦枯亦荣"]=242,
+		["Nã Vân Thức"]=243, ["Na Van Thuc"]=243, ["na van thuc"]=243, ["拿云式"]=243,
+		["Kim Cương Nộ Mục"]=239, ["Kim Cuong No Muc"]=239, ["kim cuong no muc"]=239, ["金刚怒目"]=239,
+		["Vi Đà Hiến Chử"]=233, ["Vi Da Hien Chu"]=233, ["vi da hien chu"]=233, ["韦陀献杵"]=233,
+		["Thủ Khuyết Thức"]=235, ["Thu Khuyet Thuc"]=235, ["thu khuyet thuc"]=235, ["守缺式"]=235,
+		["Đảo Hư Thức"]=2572, ["Dao Hu Thuc"]=2572, ["dao hu thuc"]=2572, ["捣虚式"]=2572,
+		["Hoành Tảo Lục Hợp"]=234, ["Hoanh Tao Luc Hop"]=234, ["hoanh tao luc hop"]=234, ["横扫六合"]=234,
+		["Phổ Độ Tứ Phương"]=232, ["Pho Do Tu Phuong"]=232, ["pho do tu phuong"]=232, ["普渡四方"]=232,
+		["Vạn Phật Triều Tông"]=236, ["Van Phat Trieu Tong"]=236, ["van phat trieu tong"]=236, ["万佛朝宗"]=236,
+		["Lập Địa Thành Phật"]=241, ["Lap Dia Thanh Phat"]=241, ["lap dia thanh phat"]=241, ["立地成佛"]=241,
+		["Ma Ha Vô Lượng"]=237, ["Ma Ha Vo Luong"]=237, ["ma ha vo luong"]=237, ["摩诃无量"]=237,
+
+		-- Thiên Sách
+		["Từ Như Lâm"]=405, ["Tu Nhu Lam"]=405, ["tu nhu lam"]=405, ["徐如林"]=405,
+		["Thủ Như Sơn"]=407, ["Thu Nhu Son"]=407, ["thu nhu son"]=407, ["守如山"]=407,
+		["Ngự"]=424, ["Ngu"]=424, ["ngu"]=424, ["御"]=424,
+		["Định Quân"]=402, ["Dinh Quan"]=402, ["dinh quan"]=402, ["定军"]=402,
+		["Phá Phong"]=401, ["Pha Phong"]=401, ["pha phong"]=401, ["破风"]=401,
+		["Long Nha"]=415, ["long nha"]=415, ["龙牙"]=415,
+		["Long Ngâm"]=403, ["Long Ngam"]=403, ["long ngam"]=403, ["龙吟"]=403,
+		["Diệt"]=423, ["Diet"]=423, ["diet"]=423, ["灭"]=423,
+		["Xuyên Vân"]=400, ["Xuyen Van"]=400, ["xuyen van"]=400, ["穿云"]=400,
+
+		-- Tàng Kiếm
+		["Mai Ẩn Hương"]=1649, ["Mai An Huong"]=1649, ["mai an huong"]=1649, ["梅隐香"]=1649,
+		["Khiếu Nhật"]=1656, ["Khieu Nhat"]=1656, ["khieu nhat"]=1656, ["啸日"]=1656,
+		["Tuyết Đoạn Kiều"]=1609, ["Tuyet Doan Kieu"]=1609, ["tuyet doan kieu"]=1609, ["雪断桥"]=1609,
+		["Đoạn Triều"]=1600, ["Doan Trieu"]=1600, ["doan trieu"]=1600, ["断潮"]=1600,
+		["Thính Lôi"]=1646, ["Thinh Loi"]=1646, ["thinh loi"]=1646, ["听雷"]=1646,
+		["Cửu Khê Di Yên"]=1579, ["Cuu Khe Di Yen"]=1579, ["cuu khe di yen"]=1579, ["九溪弥烟"]=1579,
+		["Vân Phi Ngọc Hoàng"]=1593, ["Van Phi Ngoc Hoang"]=1593, ["van phi ngoc hoang"]=1593, ["云飞玉皇"]=1593,
+		["Tịch Chiếu Lôi Phong"]=1592, ["Tich Chieu Loi Phong"]=1592, ["tich chieu loi phong"]=1592, ["夕照雷峰"]=1592,
+
+		-- Đường Môn
+		["Tập Trung"]=3100, ["Tap Trung"]=3100, ["tap trung"]=3100, ["集中"]=3100,
+		["Truy Mệnh Tiễn"]=3098, ["Truy Menh Tien"]=3098, ["truy menh tien"]=3098, ["追命箭"]=3098,
+		["Hóa Huyết Tiêu"]=3087, ["Hoa Huyet Tieu"]=3087, ["hoa huyet tieu"]=3087, ["化血镖"]=3087,
+		["Bạo Vũ Lê Hoa Châm"]=3093, ["Bao Vu Le Hoa Cham"]=3093, ["bao vu le hoa cham"]=3093, ["暴雨梨花针"]=3093,
+		["Trục Tinh Tiễn"]=3095, ["Truc Tinh Tien"]=3095, ["truc tinh tien"]=3095, ["逐星箭"]=3095,
+		["Đoạt Phách Tiễn"]=3088, ["Doat Phach Tien"]=3088, ["doat phach tien"]=3088, ["夺魄箭"]=3088,
+		["Thực Cơ Đạn"]=3105, ["Thuc Co Dan"]=3105, ["thuc co dan"]=3105, ["蚀肌弹"]=3105,
+
+		-- Minh Giáo
+		["Tham Ma Thể"]=3965, ["Tham Ma The"]=3965, ["tham ma the"]=3965, ["贪魔体"]=3965,
+		["Thánh Minh Hựu"]=3966, ["Thanh Minh Huu"]=3966, ["thanh minh huu"]=3966, ["圣明佑"]=3966,
+		["Từ Bi Nguyện"]=3972, ["Tu Bi Nguyen"]=3972, ["tu bi nguyen"]=3972, ["慈悲愿"]=3972,
+		["Giới Hỏa Trảm"]=3973, ["Gioi Hoa Tram"]=3973, ["gioi hoa tram"]=3973, ["戒火斩"]=3973,
+		["Hoàng Nhật Chiếu"]=3975, ["Hoang Nhat Chieu"]=3975, ["hoang nhat chieu"]=3975, ["极乐引"]=3975,
+		["Tịnh Thế Phá Ma Kích"]=3967, ["Tinh The Pha Ma Kich"]=3967, ["tinh the pha ma kich"]=3967, ["净世破魔击"]=3967,
+		["Khu Dạ Đoạn Sầu"]=3979, ["Khu Da Doan Sau"]=3979, ["khu da doan sau"]=3979, ["驱夜断愁"]=3979,
+		["Liệt Nhật Trảm"]=3960, ["Liet Nhat Tram"]=3960, ["liet nhat tram"]=3960, ["烈日斩"]=3960,
+		["Ngân Nguyệt Trảm"]=3963, ["Ngan Nguyet Tram"]=3963, ["ngan nguyet tram"]=3963, ["银月斩"]=3963,
+		["Xích Nhật Luân"]=3959, ["Xich Nhat Luan"]=3959, ["xich nhat luan"]=3959, ["赤日轮"]=3959,
+		["U Nguyệt Luân"]=3962, ["U Nguyet Luan"]=3962, ["u nguyet luan"]=3962, ["幽月轮"]=3962,
 		["Dương Minh Chỉ"]=179, ["Duong Minh Chi"]=179, ["duong minh"]=179, ["阳明指"]=179,
 		["Thương Dương Chỉ"]=180, ["Thuong Duong Chi"]=180, ["thuong duong"]=180, ["商阳指"]=180,
 		["Thiếu Dương Chỉ"]=181, ["Thieu Duong Chi"]=181, ["少阳指"]=181,
@@ -576,6 +649,26 @@ local tCanonicalBuffNames = {
 }
 
 local tStaticBuffNames = {
+	-- Thuần Dương
+	["Tọa Vong Vô Ngã"] = 305, ["Toa Vong Vo Nga"] = 305, ["Tọa Vọng Vô Ngã"] = 305, ["Toa Vong"] = 305, ["坐忘无我"] = 305,
+	["Toái Tinh Thần"] = 378, ["Toai Tinh Than"] = 378, ["toai tinh than"] = 378, ["碎星辰"] = 378,
+	["Phá Thương Khung"] = 375, ["Pha Thuong Khung"] = 375, ["pha thuong khung"] = 375, ["破苍穹"] = 375,
+	["Hóa Tam Thanh"] = 373, ["Hoa Tam Thanh"] = 373, ["hoa tam thanh"] = 373, ["化三清"] = 373,
+
+	-- Thiên Sách
+	["Lưu Huyết"] = 3442, ["Luu Huyet"] = 3442, ["luu huyet"] = 3442, ["流血"] = 3442,
+	["Trí Tàn"] = 540, ["Tri Tan"] = 540, ["tri tan"] = 540, ["致残"] = 540,
+
+	-- Tàng Kiếm
+	["Mai Ẩn Hương"] = 1649, ["Mai An Huong"] = 1649, ["mai an huong"] = 1649, ["梅隐香"] = 1649,
+
+	-- Đường Môn
+	["Truy Mệnh Vô Thanh"] = 3317, ["Truy Menh Vo Thanh"] = 3317, ["truy menh vo thanh"] = 3317, ["追命无声"] = 3317,
+	["Hóa Huyết Tiêu"] = 2237, ["Hoa Huyet Tieu"] = 2237, ["hoa huyet tieu"] = 2237, ["化血镖"] = 2237,
+
+	-- Minh Giáo
+	["Ám Trần Di Sơn"] = 4052, ["Am Tran Di Son"] = 4052, ["am tran di son"] = 4052, ["暗尘弥散"] = 4052,
+
 	["Thương Dương Chỉ"] = 666, ["Thuong Duong Chi"] = 666, ["thuong duong chi"] = 666, ["Thương Dương"] = 666, ["Thuong Duong"] = 666, ["thuong duong"] = 666, ["商阳指"] = 666,
 	["Chung Linh Dục Tú"] = 714, ["Chung Linh Duc Tu"] = 714, ["chung linh duc tu"] = 714, ["Chung Linh"] = 714, ["Chung linh"] = 714, ["chung linh"] = 714, ["钟林毓秀"] = 714,
 	["Lan Thôi Ngọc Chiết"] = 711, ["Lan Thoi Ngoc Chiet"] = 711, ["lan thoi ngoc chiet"] = 711, ["Lan Thôi"] = 711, ["Lan Thoi"] = 711, ["lan thoi"] = 711, ["兰摧玉折"] = 711, ["兰摧"] = 711,
@@ -2747,6 +2840,10 @@ local function XMCore_FindBuff(obj, token, ownOnly)
     local list = MyGetBuffList(obj) or {}
     local myID = UI_GetClientPlayerID and UI_GetClientPlayerID() or nil
 
+    if not id and tStaticBuffNames and token then
+        id = tStaticBuffNames[token] or tStaticBuffNames[string.lower(tostring(token))]
+    end
+
     for _, v in pairs(list) do
         local lv = tonumber(v.nLevel or v.dwLevel or 1) or 1
         local src = tonumber(v.dwSkillSrcID or 0) or 0
@@ -2755,9 +2852,9 @@ local function XMCore_FindBuff(obj, token, ownOnly)
         if sourceOK and (not needLv or lv == needLv) then
             if id and tonumber(v.dwID) == id then
                 return v
-            elseif not id then
-                local name = Table_GetBuffName(v.dwID, lv)
-                if XMCore_SameName(name, raw) then return v end
+            else
+                local name = Table_GetBuffName and Table_GetBuffName(v.dwID, lv)
+                if name and XMCore_SameName(name, raw) then return v end
             end
         end
     end
