@@ -2496,7 +2496,7 @@ local _tXMacroWrapped = {}
 local tCombatGroundSkills = {
 	[2212] = true, [2492] = true, [2496] = true, [5764] = true, -- Bach Tuc (Doc Kinh)
 	[2232] = true, [2233] = true, [2235] = true,                 -- Diep Triet, Dinh Co, Tuy Vu (Ngu Doc)
-	[362] = true, [368] = true, [370] = true, [399] = true,     -- Thuan Duong Khi Truong
+	[357] = true, [358] = true, [359] = true, [360] = true, [361] = true, [362] = true, [363] = true, [368] = true, [370] = true, [399] = true,     -- Thuan Duong Khi Truong
 	[3111] = true, [3114] = true, [3117] = true,                 -- Duong Mon Trap
 }
 
@@ -6286,13 +6286,18 @@ local function InitializeModule()
 -- Tử Hà Công (10015) - Nội công DPS Khí Thuần Dương v80
 -- Kỹ năng: Tọa Vọng Vô Ngã (305), Bão Nguyên Thủ Khuyết (302),
 -- Lưỡng Nghi Hóa Hình (301), Tứ Tượng Luân Hồi (367), Thái Cực Vô Cực (306).
+-- Duy trì Phá Thương Khung (359, buff 375), Hóa Tam Thanh (357, buff 373) và kẹp Ngưng Thần (300).
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10015] = [[
 #name ThuanDuong_TuHaCong_80
 /skill [nobuff:305] 305
+/skill [nobuff:375] 359
+/skill [mana<0.40,nobuff:373] 357
 /skill [mana<0.60,qidian>=8] 302
 /skill [distance<=20,qidian>=8] 301
 /skill [distance<=20,qidian<=7] 367
 /skill [distance<=20] 306
+/skill [qidian<8] 300
+/skill [nofight,qidian<10] 300
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6308,12 +6313,15 @@ end
 do
 local function InitializeModule()
 -- Thái Hư Kiếm Ý (10014) - Nội công DPS Kiếm Thuần Dương v80
+-- Tự động duy trì Khí Trường Toái Tinh Thần (362, buff 378) và Hóa Tam Thanh (357, buff 373) khi thiếu mana.
 -- Kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神) đỉnh cao:
 -- Ngưng Thần Tụ Khí (300) không tốn GCD, tự động kích hoạt trong khe hở GCD
 -- để nhận thêm khí điểm miễn phí mà không làm trễ bất kỳ chiêu thức tấn công nào!
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
 /skill [nobuff:305] 305
+/skill [nobuff:378] 362
+/skill [mana<0.40,nobuff:373] 357
 /skill [mana<0.40,qidian>=8] 302
 /skill [distance<=4,tlife<0.40] 2699
 /skill [distance<=4,qidian>=8] 365

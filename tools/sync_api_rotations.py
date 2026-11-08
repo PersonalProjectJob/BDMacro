@@ -43,6 +43,8 @@ scripts = {
         "name": "ThuanDuong_ThaiHuKiemY_80",
         "script": """#name ThuanDuong_ThaiHuKiemY_80
 /skill [nobuff:305] 305
+/skill [nobuff:378] 362
+/skill [mana<0.40,nobuff:373] 357
 /skill [mana<0.40,qidian>=8] 302
 /skill [distance<=4,tlife<0.40] 2699
 /skill [distance<=4,qidian>=8] 365
@@ -59,10 +61,14 @@ scripts = {
         "name": "ThuanDuong_TuHaCong_80",
         "script": """#name ThuanDuong_TuHaCong_80
 /skill [nobuff:305] 305
+/skill [nobuff:375] 359
+/skill [mana<0.40,nobuff:373] 357
 /skill [mana<0.60,qidian>=8] 302
 /skill [distance<=20,qidian>=8] 301
 /skill [distance<=20,qidian<=7] 367
-/skill [distance<=20] 306"""
+/skill [distance<=20] 306
+/skill [qidian<8] 300
+/skill [nofight,qidian<10] 300"""
     },
     10021: {
         "school": "VanHoa",

@@ -1928,7 +1928,7 @@ local _tXMacroWrapped = {}
 local tCombatGroundSkills = {
 	[2212] = true, [2492] = true, [2496] = true, [5764] = true, -- Bach Tuc (Doc Kinh)
 	[2232] = true, [2233] = true, [2235] = true,                 -- Diep Triet, Dinh Co, Tuy Vu (Ngu Doc)
-	[362] = true, [368] = true, [370] = true, [399] = true,     -- Thuan Duong Khi Truong
+	[357] = true, [358] = true, [359] = true, [360] = true, [361] = true, [362] = true, [363] = true, [368] = true, [370] = true, [399] = true,     -- Thuan Duong Khi Truong
 	[3111] = true, [3114] = true, [3117] = true,                 -- Duong Mon Trap
 }
 
