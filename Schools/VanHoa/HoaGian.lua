@@ -21,12 +21,13 @@ local DEFAULT_VANHOA_MACRO = [[
 -- 3. Mở màn: Thủy Nguyệt (off-GCD)
 /skill [nocd:Thủy Nguyệt Vô Gian,nombuff:Lan Thôi Ngọc Chiết] Thủy Nguyệt Vô Gian
 
--- 4. Giai đoạn 1: Mở màn phủ đủ 3 DOT và Nổ Ngọc Thạch đợt đầu
+-- 4. Giai đoạn 1: Mở màn phủ đủ 3 DOT, cast 1 lần Dương Minh Chỉ trước khi Nổ Ngọc Thạch đợt đầu
 /skill [buff:Thủy Nguyệt Vô Gian,nombuff:Lan Thôi Ngọc Chiết] Lan Thôi Ngọc Chiết
 /skill [nombuff:Thương Dương Chỉ] Thương Dương Chỉ
 /skill [nombuff:Chung Linh Dục Tú] Chung Linh Dục Tú
 /skill [mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Ngọc Thạch Câu Phần,nombuff:Lan Thôi Ngọc Chiết] Lan Thôi Ngọc Chiết
-/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Loạn Tửu Thanh Hà] Ngọc Thạch Câu Phần
+/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Loạn Tửu Thanh Hà,lastcast:Dương Minh Chỉ] Ngọc Thạch Câu Phần
+/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,nocd:Loạn Tửu Thanh Hà] Dương Minh Chỉ
 
 -- 5. Giai đoạn 2: Kích hoạt Loạn Tửu Thanh Hà:
 -- CHỈ BẬT KHI NGỌC THẠCH VỪA NỔ (đang CD) VÀ ĐÃ PHỦ ĐỦ 2 DOT (Thương Dương & Chung Linh)
@@ -88,6 +89,11 @@ if RegisterEvent then
             and tonumber(arg0) == tonumber(me.dwID) and tonumber(arg1) == 189 then
             p.castEvent = (GetLogicFrameCount and GetLogicFrameCount()) or 0
             CLLog(p, "CAST_EVENT", p.dotOK and "game reported skill; DOT already observed" or "game reported skill; waiting for DOT")
+        end
+        if me and tonumber(arg0) == tonumber(me.dwID) and tonumber(arg1) == 179 then
+            if tVanHoaCycle and tVanHoaCycle.firstNTFrame == nil then
+                tVanHoaCycle.openerDMC = true
+            end
         end
     end)
 end
@@ -355,6 +361,7 @@ local function Run(szName)
             cycle.afterNT, cycle.dots, cycle.nt, cycle.pendingDOT = true, {}, nil, nil
             cycle.lateDots = {}
             if p.fullDOTs then cycle.firstNTFrame = cycle.firstNTFrame or nCurFrame end
+            cycle.openerDMC = nil
             cycle.ltDone = HasLoanTuuBuff() or not IsSkillReady(LT_SKILL_ID)
             cycle.ltPhase = nil
             if XMCore_Sys then XMCore_Sys("[xMacro LT] NT_CONFIRMED target="..tostring(dwTargetID)
@@ -566,6 +573,8 @@ local function Run(szName)
         end
     end
 
+    local isOpener = (cycle.firstNTFrame == nil and not cycle.afterNT)
+    local hasOpenerDMC = (cycle.openerDMC == true or lastcast(179))
     local okLTLevel, ltLevel = pcall(function() return me.GetSkillLevel(LT_SKILL_ID) end)
     local diag = {
         version=11,frame=nCurFrame,target=dwTargetID,buffs_known=targetBuffsKnown,
@@ -578,6 +587,7 @@ local function Run(szName)
         phe_urgent=bPheUrgent == true,phe_build=bPheBuild == true,phe_wait=bPheGrace,
         first_nt_frame=cycle.firstNTFrame or 0,lt_gate=CanActivateLT() == true,
         after_nt=cycle.afterNT == true,nt_pending=cycle.nt ~= nil,nt_cd=nNTCD,
+        opener_dmc=hasOpenerDMC == true,
         pending_dot=cycle.pendingDOT and cycle.pendingDOT.skill or 0,
         need_td=NeedReapply(666) == true,need_cl=NeedReapply(714) == true,
         has_td=HasTargetBuff(666),has_cl=HasTargetBuff(714),cl_guard=cycle.clGuard ~= nil,
@@ -756,8 +766,12 @@ local function Run(szName)
     end
 
     -- Stable Lan Thoi -> NT handoff takes priority over another filler cast.
-    if not HasLoanTuuBuff() and lastcast(190) and HasTargetBuff(666)
-        and HasTargetBuff(714) and HasTargetLanThoi() and IsSkillReady(182) then
+    local bHas666 = HasTargetBuff(666, "Thuong Duong")
+    local bHas714 = HasTargetBuff(714, "Chung Linh")
+    local bHasLanThoi = HasTargetLanThoi()
+
+    if not HasLoanTuuBuff() and (not isOpener or hasOpenerDMC) and lastcast(190) and bHas666
+        and bHas714 and bHasLanThoi and IsSkillReady(182) then
         return Cast(182, "Ngoc Thach Cau Phan")
     end
 
@@ -809,9 +823,9 @@ local function Run(szName)
 
     -- 5. Smart Hard-Cast Lan Thoi Ngoc Chiet (ID 190):
     -- Trong giai doan binh on: Chi doc tay khi DUNG YEN (not bMoving), DA CO DU 2 DOT kia va Ngoc Thach sap no (CD <= 2.5s)
-    local bHas666 = HasTargetBuff(666, "Thuong Duong")
-    local bHas714 = HasTargetBuff(714, "Chung Linh")
-    local bHasLanThoi = HasTargetLanThoi()
+    bHas666 = HasTargetBuff(666, "Thuong Duong")
+    bHas714 = HasTargetBuff(714, "Chung Linh")
+    bHasLanThoi = HasTargetLanThoi()
     local nLast190 = tSkillCastFrame[190] or 0
     local bNgocThachReadySoon = false
     if me.GetSkillCDProgress then
@@ -834,9 +848,16 @@ local function Run(szName)
     end
 
     -- J. KÍCH NỔ NGỌC THẠCH CÂU PHẦN (ID 182):
-    if not HasLoanTuuBuff() and bHas666 and bHasLanThoi and bHas714 and IsSkillReady(182) then
-        -- Outside LT, the opener/stable rotation still requires three DOTs.
-        return Cast(182, "Ngoc Thach Cau Phan")
+    -- Opener: Khi đã đủ 3 DOT, phải cast 1 lần Dương Minh Chỉ trước khi nổ Ngọc Thạch.
+    if not HasLoanTuuBuff() and bHas666 and bHasLanThoi and bHas714 then
+        if isOpener and not hasOpenerDMC then
+            if (not bMoving or HasPlayerBuff(2726) or HasThuyNguyetBuff()) and IsSkillReady(179) then
+                return Cast(179, "Duong Minh Chi")
+            end
+        elseif IsSkillReady(182) then
+            -- Outside LT, the opener/stable rotation still requires three DOTs.
+            return Cast(182, "Ngoc Thach Cau Phan")
+        end
     end
 
     -- K. Toi uu hoa khi DI CHUYEN (Moving - zero downtime):
@@ -880,6 +901,8 @@ local function Run(szName)
         elseif cycle.nt or cycle.pendingDOT or not targetBuffsKnown
             or not HasTargetBuff(666) or not HasTargetBuff(714) or not HasTargetLanThoi() then
             diag.decision="NT_REQUIRES_THREE_DOTS";return false
+        elseif isOpener and not hasOpenerDMC then
+            diag.decision="OPENER_NT_REQUIRES_DMC";return false
         end
     end
     -- Bich Lac may use the pendant only when the normal combo chooses NT.
@@ -998,6 +1021,7 @@ local function Run(szName)
     if not okSend or result == false then
         if id == 182 then cycle.nt = nil end
         if id == 180 then cycle.phePending = nil end
+        if id == 179 then cycle.openerDMC = nil end
         return false
     end
     if id ~= 189 and XMCore_Sys then XMCore_Sys("[xMacro] -> " .. tostring(name)) end

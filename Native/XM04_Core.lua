@@ -207,9 +207,34 @@ local tMoonSkill = {[4024] = 1,[4025] = 2,[4026] = 3}
 local tSunSkill =  {[4028] = 1,[4029] = 2,[4030] = 3}
 
 local tChannelSkill = {[3110] = true, [5268] = true, [2235] = true, [2209] = true, [2231] = true, [2232] = true}
-local tOffGCDSkill = {[2214] = true, [2215] = true, [2216] = true, [2226] = true, [2227] = true, [2230] = true, [2236] = true, [2472] = true, [2477] = true}
+local tOffGCDSkill = {[2214] = true, [2215] = true, [2216] = true, [2226] = true, [2227] = true, [2230] = true, [2236] = true, [2472] = true, [2477] = true, [300] = true}
 local tGroundTargetSkill = {[2212] = 3}
 local nGlobalCastLockUntil = 0
+local dwCurrentChannelSkillID = 0
+
+local function IsChannelingNgungThan(me)
+	if not me then return false end
+	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
+	if not okOT or tonumber(nOT or 0) ~= 2 then
+		dwCurrentChannelSkillID = 0
+		return false
+	end
+	if dwCurrentChannelSkillID == 300 then
+		return true
+	end
+	if me.GetSkillPrepareState then
+		local okP, bPrep, dwID = pcall(function() return me.GetSkillPrepareState() end)
+		if okP and (bPrep or tonumber(dwID or 0) == 300) and tonumber(dwID or 0) == 300 then
+			dwCurrentChannelSkillID = 300
+			return true
+		end
+	end
+	if szLastOTA == "Ngưng Thần Tụ Khí" or szLastOTA == "Ngung Than Tu Khi" or szLastOTA == "凝神聚气" then
+		dwCurrentChannelSkillID = 300
+		return true
+	end
+	return false
+end
 
 local tPet = {
 	[9956] = "Thánh Hạt",
@@ -494,7 +519,14 @@ local function GetPlayerSkillInfo(szName)
 
 		-- Minh Giáo
 		["Tham Ma Thể"]=3965, ["Tham Ma The"]=3965, ["tham ma the"]=3965, ["贪魔体"]=3965,
+		["Tính Mệnh Hải"]=3965, ["Tinh Menh Hai"]=3965, ["tinh menh hai"]=3965,
 		["Thánh Minh Hựu"]=3966, ["Thanh Minh Huu"]=3966, ["thanh minh huu"]=3966, ["圣明佑"]=3966,
+		["Quang Minh Tướng"]=3968, ["Quang Minh Tuong"]=3968, ["quang minh tuong"]=3968, ["光明相"]=3968,
+		["Quy Tịch Đạo"]=3970, ["Quy Tich Dao"]=3970, ["quy tich dao"]=3970, ["归寂道"]=3970,
+		["Cực Lạc Dẫn"]=3975, ["Cuc Lac Dan"]=3975, ["cuc lac dan"]=3975,
+		["Hàn Nguyệt Diệu"]=3980, ["Han Nguyet Dieu"]=3980, ["han nguyet dieu"]=3980, ["寒月耀"]=3980,
+		["Sinh Tử Kiếp"]=3969, ["Sinh Tu Kiep"]=3969, ["sinh tu kiep"]=3969, ["生死劫"]=3969,
+		["Triêu Thánh Ngôn"]=3971, ["Trieu Thanh Ngon"]=3971, ["trieu thanh ngon"]=3971, ["朝圣言"]=3971,
 		["Từ Bi Nguyện"]=3972, ["Tu Bi Nguyen"]=3972, ["tu bi nguyen"]=3972, ["慈悲愿"]=3972,
 		["Giới Hỏa Trảm"]=3973, ["Gioi Hoa Tram"]=3973, ["gioi hoa tram"]=3973, ["戒火斩"]=3973,
 		["Hoàng Nhật Chiếu"]=3975, ["Hoang Nhat Chieu"]=3975, ["hoang nhat chieu"]=3975, ["极乐引"]=3975,
@@ -1391,6 +1423,40 @@ local tOptions = {
 		return me.nMoonPowerValue ~= 1
 	end,
 
+	["sun_power"] = function(szCmp, szVal, me, tar)
+		return me.nSunPowerValue == 1
+	end,
+
+	["moon_power"] = function(szCmp, szVal, me, tar)
+		return me.nMoonPowerValue == 1
+	end,
+
+	["nosun_power"] = function(szCmp, szVal, me, tar)
+		return me.nSunPowerValue ~= 1
+	end,
+
+	["nomoon_power"] = function(szCmp, szVal, me, tar)
+		return me.nMoonPowerValue ~= 1
+	end,
+
+	["nearby_enemy"] = function(szCmp, szVal, me, tar)
+		local nNum = 0
+		local nRange = 6
+		local a, b, c = string.match(szVal or "", "(%d+)([<>=]+)(%d+)")
+		if a and b and c then
+			nRange = tonumber(a)
+			szCmp = b
+			szVal = c
+		end
+		for k, v in pairs(tNpcList) do
+			local npc = GetNpc(k)
+			if npc and IsEnemy(me.dwID, k) and GetDistanceByTarget(me, npc) <= nRange then
+				nNum = nNum + 1
+			end
+		end
+		return Compare(szCmp, nNum, szVal)
+	end,
+
 	["sunhit"] = function(szCmp, szVal, me, tar)
 		return Compare(szCmp, nNextSunLevel, szVal)
 	end,
@@ -1807,15 +1873,26 @@ local function UITestCast(dwSkillID, dwLevel, index)
 	end
 
 	-- 1. Khong duoc cast neu dang thi trien chieu (prepare / channel)
-	if me.GetSkillPrepareState then
-		local okP, bPrep = pcall(function() return me.GetSkillPrepareState() end)
-		if okP and bPrep then
+	local bChanNgungThan = IsChannelingNgungThan(me)
+	if bChanNgungThan then
+		-- Dang doc thanh dan dao Ngung Than Tu Khi trong GCD (卡凝神):
+		-- Neu dang channel chinh Ngung Than (300) thi khong cast lap lai
+		if dwSkillID == 300 then
 			return false
 		end
-	end
-	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
-	if okOT and tonumber(nOT or 0) ~= 0 then
-		return false
+		-- Cac skill khac (dwSkillID ~= 300):
+		-- Bo qua chan nOT == 2 de kiem tra tiep xem da het GCD hay chua!
+	else
+		if me.GetSkillPrepareState then
+			local okP, bPrep = pcall(function() return me.GetSkillPrepareState() end)
+			if okP and bPrep then
+				return false
+			end
+		end
+		local okOT, nOT = pcall(function() return me.GetOTActionState() end)
+		if okOT and tonumber(nOT or 0) ~= 0 then
+			return false
+		end
 	end
 	if not tOffGCDSkill[dwSkillID] and GetTime and nGlobalCastLockUntil > 0 and GetTime() < nGlobalCastLockUntil then
 		return false
@@ -2283,13 +2360,25 @@ end
 HookUserSelectPoint()
 
 local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
-	if not (me and me.GetOTActionState and me.GetOTActionState() == 2 and bProtectChannelSkill) then
+	local bChanNgungThan = IsChannelingNgungThan(me)
+	if bChanNgungThan and dwSkillID ~= 300 then
+		-- Tu dong ngat thanh dan dao Ngung Than Tu Khi de tung chieu moi ngay khi het GCD!
+		if me.StopCurrentAction then
+			pcall(function() me.StopCurrentAction() end)
+		end
+		dwCurrentChannelSkillID = 0
+	end
+
+	if not (me and me.GetOTActionState and me.GetOTActionState() == 2 and bProtectChannelSkill and not bChanNgungThan) then
 		local nCur = (GetLogicFrameCount and GetLogicFrameCount()) or 0
 		if tSkillCastFrame then
 			tSkillCastFrame[dwSkillID] = nCur
 		end
 		PrepareGroundSkillOnTarget(dwSkillID)
 		OnAddOnUseSkill(dwSkillID, dwLevel)
+		if dwSkillID == 300 then
+			dwCurrentChannelSkillID = 300
+		end
 		if tGroundTargetSkill[dwSkillID] or dwSkillID == 2212 or (tCombatGroundSkills and tCombatGroundSkills[dwSkillID]) then
 			DoSmartSelectPoint()
 		end
@@ -2307,7 +2396,7 @@ local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 		if XMCore_Sys then
 			XMCore_Sys("[xMacro] -> " .. tostring(szName))
 		end
-		if bIsChan and bProtectChannelSkill then
+		if bIsChan and bProtectChannelSkill and dwSkillID ~= 300 then
 			return false
 		end
 		return true
@@ -2342,6 +2431,7 @@ RegisterEvent("DO_SKILL_CAST", function()
 	local caster = tonumber(arg0)
 	if id and id > 0 then
 		if (me and caster == tonumber(me.dwID)) or id == 2477 or id == 2472 then
+			if id ~= 300 and dwCurrentChannelSkillID == 300 then dwCurrentChannelSkillID = 0 end
 			tLastCast.skill = id
 			tLastCast.player = caster
 			tLastCast.frame = GetLogicFrameCount()
@@ -2385,15 +2475,23 @@ end)
 do
 	for k, v in ipairs({"DO_SKILL_PREPARE_PROGRESS", "DO_SKILL_CHANNEL_PROGRESS"}) do
 		RegisterEvent(v, function()
-			szLastOTA = Table_GetSkillName(arg1, arg2)
+			local me = (GetClientPlayer and GetClientPlayer()) or (MeCache and MeCache.Get and MeCache:Get())
+			if not arg0 or (me and tonumber(arg0) == tonumber(me.dwID)) or (UI_GetClientPlayerID and tonumber(arg0) == tonumber(UI_GetClientPlayerID())) then
+				if v == "DO_SKILL_CHANNEL_PROGRESS" and tonumber(arg1 or 0) == 300 then
+					dwCurrentChannelSkillID = 300
+				end
+				szLastOTA = Table_GetSkillName(arg1, arg2)
+			end
 		end)
 	end
 end
 
 
 RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
-	if arg0 == UI_GetClientPlayerID() then
+	local me = (GetClientPlayer and GetClientPlayer()) or (MeCache and MeCache.Get and MeCache:Get())
+	if not arg0 or (me and tonumber(arg0) == tonumber(me.dwID)) or (UI_GetClientPlayerID and tonumber(arg0) == tonumber(UI_GetClientPlayerID())) then
 		nGlobalCastLockUntil = 0
+		dwCurrentChannelSkillID = 0
 		if szLastOTA then
 			szLastOTA = nil
 		end
