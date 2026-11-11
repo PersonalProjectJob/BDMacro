@@ -3,12 +3,11 @@
 -- Ngân Nguyệt Trảm, Liệt Nhật Trảm, U Nguyệt Luân, Xích Nhật Luân.
 xMacro.Schools.RegisterDamageScript("MinhGiao", "PhanAnh", {[10242] = [[
 #name MinhGiao_PhanAnh_80
-/skill [life<0.30] Tham Ma Thể
-/skill [distance<=5,fullsun] Tịnh Thế Phá Ma Kích
-/skill [distance<=5,fullmoon] Tịnh Thế Phá Ma Kích
-/skill [distance<=5,xmbuff:Ám Trần Di Sơn] Khu Dạ Đoạn Sầu
-/skill [distance<=5] Ngân Nguyệt Trảm
-/skill [distance<=5] Liệt Nhật Trảm
-/skill [distance<=5,sun>=moon] U Nguyệt Luân
-/skill [distance<=5] Xích Nhật Luân
+/skill [life<0.3] Tham Ma Thể
+/skill Khu Dạ Đoạn Sầu
+/skill [fullsun;fullmoon] Tịnh Thế Phá Ma Kích
+/skill Ngân Nguyệt Trảm
+/skill Liệt Nhật Trảm
+/skill [sun>=moon] U Nguyệt Luân
+/skill Xích Nhật Luân
 ]]})

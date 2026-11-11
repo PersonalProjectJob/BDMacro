@@ -1,18 +1,17 @@
 ﻿-- Minh Tôn Lưu Hỏa Thể (10243) - Nội công Tank Minh Giáo v80
--- Kỹ năng: Tính Mệnh Hải / Tham Ma Thể, Quang Minh Tướng, Thánh Minh Hựu,
--- Tịnh Thế Phá Ma Kích, Hoàng Nhật Chiếu, Liệt Nhật Trảm, Ngân Nguyệt Trảm,
--- Giới Hỏa Trảm, Quy Tịch Đạo, Xích Nhật Luân.
+-- Kỹ năng: Tham Ma Thể, Thánh Minh Hựu, Từ Bi Nguyện (Taunt cừu hận chính),
+-- Giới Hỏa Trảm, Hoàng Nhật Chiếu, Tịnh Thế Phá Ma Kích,
+-- Liệt Nhật Trảm, Ngân Nguyệt Trảm, Xích Nhật Luân, U Nguyệt Luân.
 xMacro.Schools.RegisterDamageScript("MinhGiao", "MinhTon", {[10243] = [[
 #name MinhGiao_MinhTon_80
-/skill [life<=0.3] Tính Mệnh Hải
-/skill [life<=0.3] Tham Ma Thể
-/skill [life<=0.5,sun_power] Quang Minh Tướng
-/skill [life<=0.5,sun_power|moon_power] Thánh Minh Hựu
-/skill Tịnh Thế Phá Ma Kích
-/skill [nearby_enemy>3] Hoàng Nhật Chiếu
-/skill Liệt Nhật Trảm
-/skill Ngân Nguyệt Trảm
+/skill [life<0.3,nombuff:Xuân Nê Hộ Hoa] Tham Ma Thể
+/skill [life<0.4,fullsun] Thánh Minh Hựu
 /skill Giới Hỏa Trảm
 /skill Quy Tịch Đạo
-/skill Xích Nhật Luân
+-- /skill [nearby_enemy>=3] Hoàng Nhật Chiếu
+/skill [fullsun;fullmoon] Tịnh Thế Phá Ma Kích
+/skill [sun>=moon] Liệt Nhật Trảm
+/skill [moon>sun] Ngân Nguyệt Trảm
+/skill [sun>=moon] Xích Nhật Luân
+/skill U Nguyệt Luân
 ]]})
