@@ -206,7 +206,7 @@ local nNextSunLevel = 1
 local tMoonSkill = {[4024] = 1,[4025] = 2,[4026] = 3}
 local tSunSkill =  {[4028] = 1,[4029] = 2,[4030] = 3}
 
-local tChannelSkill = {[3110] = true, [5268] = true, [2235] = true, [2209] = true, [2231] = true, [2232] = true}
+local tChannelSkill = {[3110] = true, [5268] = true, [2235] = true, [2209] = true, [2231] = true, [2232] = true, [300] = true, [368] = true, [567] = true}
 local tOffGCDSkill = {[2214] = true, [2215] = true, [2216] = true, [2226] = true, [2227] = true, [2230] = true, [2236] = true, [2472] = true, [2477] = true, [300] = true}
 local tGroundTargetSkill = {[2212] = 3}
 local nGlobalCastLockUntil = 0
@@ -238,21 +238,35 @@ local function IsChannelingNgungThan(me)
 	if dwCurrentChannelSkillID == 300 then
 		return true
 	end
+	if dwCurrentChannelSkillID == 368 then
+		return false
+	end
 	if me.GetSkillPrepareState then
 		local okP, bPrep, dwID = pcall(function() return me.GetSkillPrepareState() end)
 		if okP and tonumber(dwID or 0) == 300 then
 			dwCurrentChannelSkillID = 300
 			return true
 		end
+		if okP and tonumber(dwID or 0) == 368 then
+			dwCurrentChannelSkillID = 368
+			return false
+		end
 	end
-	if szLastOTA and (szLastOTA == "Ngưng Thần Tụ Khí" or szLastOTA == "Ngung Than Tu Khi" or szLastOTA == "凝神聚气" or string.find(szLastOTA, "Ngưng Thần") or string.find(szLastOTA, "Ngung Than")) then
+	if szLastOTA and (szLastOTA == "Ngưng Thần Tụ Khí" or szLastOTA == "Ngung Than Tu Khi" or szLastOTA == "凝神聚气" or string.find(szLastOTA, "Ngưng Thần") or string.find(szLastOTA, "Ngung Than") or string.find(szLastOTA, "凝神")) then
 		dwCurrentChannelSkillID = 300
 		return true
 	end
-	-- Thai Hu Kiem Y (dwForceID == 5) hoan toan khong co chieu channel nao khac ngoai Ngung Than Tu Khi
+	if szLastOTA and (szLastOTA == "Lục Hợp Độc Tôn" or szLastOTA == "Luc Hop Doc Ton" or szLastOTA == "六合独尊" or string.find(szLastOTA, "Lục Hợp") or string.find(szLastOTA, "Luc Hop") or string.find(szLastOTA, "六合")) then
+		dwCurrentChannelSkillID = 368
+		return false
+	end
+	-- Thuan Duong (dwForceID == 5): Chi co 2 chieu channel la Ngung Than (300) va Luc Hop (368).
+	-- Neu khong phai Luc Hop (368) thi chac chan la Ngung Than Tu Khi (dung cho ca Kiem 10014 lan Khi 10015)!
 	if me.dwForceID == 5 then
-		dwCurrentChannelSkillID = 300
-		return true
+		if dwCurrentChannelSkillID ~= 368 then
+			dwCurrentChannelSkillID = 300
+			return true
+		end
 	end
 	return false
 end
@@ -449,6 +463,61 @@ local tCanonicalSkillNames = {
 	["Dinh Co Tien Vuong"] = "Đỉnh Cổ Tiên Vương", ["dinh co tien vuong"] = "Đỉnh Cổ Tiên Vương", ["仙王蛊鼎"] = "Đỉnh Cổ Tiên Vương",
 	["Thien Diep Tho Thuy"] = "Thiên Điệp Thổ Thụy", ["thien diep tho thuy"] = "Thiên Điệp Thổ Thụy", ["千蝶吐瑞"] = "Thiên Điệp Thổ Thụy",
 	["Co Hoac Chung Sinh"] = "Cổ Hoặc Chúng Sinh", ["co hoac chung sinh"] = "Cổ Hoặc Chúng Sinh", ["蛊惑众生"] = "Cổ Hoặc Chúng Sinh",
+
+	-- Thuần Dương
+	["Tu Tuong Luan Hoi"] = "Tứ Tượng Luân Hồi", ["tu tuong luan hoi"] = "Tứ Tượng Luân Hồi", ["四象轮回"] = "Tứ Tượng Luân Hồi",
+	["Luong Nghi Hoa Hinh"] = "Lưỡng Nghi Hóa Hình", ["luong nghi hoa hinh"] = "Lưỡng Nghi Hóa Hình", ["两仪化形"] = "Lưỡng Nghi Hóa Hình",
+	["Luong Nghi"] = "Lưỡng Nghi Hóa Hình", ["luong nghi"] = "Lưỡng Nghi Hóa Hình",
+	["Thai Cuc Vo Cuc"] = "Thái Cực Vô Cực", ["thai cuc vo cuc"] = "Thái Cực Vô Cực", ["太极无极"] = "Thái Cực Vô Cực",
+	["Pha Thuong Khung"] = "Phá Thương Khung", ["pha thuong khung"] = "Phá Thương Khung", ["破苍穹"] = "Phá Thương Khung",
+	["Bat Quai Dong Huyen"] = "Bát Quái Động Huyền", ["bat quai dong huyen"] = "Bát Quái Động Huyền", ["八卦洞玄"] = "Bát Quái Động Huyền",
+	["Bat Quai"] = "Bát Quái Động Huyền", ["bat quai"] = "Bát Quái Động Huyền",
+	["Luc Hop Doc Ton"] = "Lục Hợp Độc Tôn", ["luc hop doc ton"] = "Lục Hợp Độc Tôn", ["六合独尊"] = "Lục Hợp Độc Tôn",
+	["Luc Hop"] = "Lục Hợp Độc Tôn", ["luc hop"] = "Lục Hợp Độc Tôn",
+	["Chuyen Can Khon"] = "Chuyển Càn Khôn", ["chuyen can khon"] = "Chuyển Càn Khôn", ["转乾坤"] = "Chuyển Càn Khôn",
+	["Tu Khi Dong Lai"] = "Tử Khí Đông Lai", ["tu khi dong lai"] = "Tử Khí Đông Lai", ["紫气东来"] = "Tử Khí Đông Lai",
+	["Tu Khi"] = "Tử Khí Đông Lai", ["tu khi"] = "Tử Khí Đông Lai",
+	["Ngung Than Tu Khi"] = "Ngưng Thần Tụ Khí", ["ngung than tu khi"] = "Ngưng Thần Tụ Khí", ["凝神聚气"] = "Ngưng Thần Tụ Khí",
+	["Ngung Than"] = "Ngưng Thần Tụ Khí", ["ngung than"] = "Ngưng Thần Tụ Khí",
+	["Toa Vong Vo Nga"] = "Tọa Vọng Vô Ngã", ["toa vong vo nga"] = "Tọa Vọng Vô Ngã", ["坐忘无我"] = "Tọa Vọng Vô Ngã",
+	["Toa Vong"] = "Tọa Vọng Vô Ngã", ["toa vong"] = "Tọa Vọng Vô Ngã",
+	["Bao Nguyen Thu Khuyet"] = "Bão Nguyên Thủ Khuyết", ["bao nguyen thu khuyet"] = "Bão Nguyên Thủ Khuyết", ["抱元守缺"] = "Bão Nguyên Thủ Khuyết",
+	["Bao Nguyen Quy Nhat"] = "Bão Nguyên Quy Nhất", ["bao nguyen quy nhat"] = "Bão Nguyên Quy Nhất",
+	["Bao Nguyen"] = "Bão Nguyên Thủ Khuyết", ["bao nguyen"] = "Bão Nguyên Thủ Khuyết",
+	["Sinh Thai Cuc"] = "Sinh Thái Cực", ["sinh thai cuc"] = "Sinh Thái Cực", ["生太极"] = "Sinh Thái Cực",
+	["Toai Tinh Than"] = "Toái Tinh Thần", ["toai tinh than"] = "Toái Tinh Thần", ["碎星辰"] = "Toái Tinh Thần",
+	["Hoa Tam Thanh"] = "Hóa Tam Thanh", ["hoa tam thanh"] = "Hóa Tam Thanh", ["化三清"] = "Hóa Tam Thanh",
+	["Lang Thai Hu"] = "Lăng Thái Hư", ["lang thai hu"] = "Lăng Thái Hư", ["凌太虚"] = "Lăng Thái Hư",
+	["Thon Nhat Nguyet"] = "Thôn Nhật Nguyệt", ["thon nhat nguyet"] = "Thôn Nhật Nguyệt", ["吞日月"] = "Thôn Nhật Nguyệt",
+	["Tran Son Ha"] = "Trấn Sơn Hà", ["tran son ha"] = "Trấn Sơn Hà", ["镇山河"] = "Trấn Sơn Hà",
+	["Xung Am Duong"] = "Xung Âm Dương", ["xung am duong"] = "Xung Âm Dương", ["冲阴阳"] = "Xung Âm Dương",
+	["Vo Nga Vo Kiem"] = "Vô Ngã Vô Kiếm", ["vo nga vo kiem"] = "Vô Ngã Vô Kiếm", ["无我无剑"] = "Vô Ngã Vô Kiếm",
+	["Tam Hoan Sao Nguyet"] = "Tam Hoàn Sáo Nguyệt", ["tam hoan sao nguyet"] = "Tam Hoàn Sáo Nguyệt", ["三环套月"] = "Tam Hoàn Sáo Nguyệt",
+	["Bat Hoang Quy Nguyen"] = "Bát Hoang Quy Nguyên", ["bat hoang quy nguyen"] = "Bát Hoang Quy Nguyên", ["八荒归元"] = "Bát Hoang Quy Nguyên",
+	["Thien Dia Vo Cuc"] = "Thiên Địa Vô Cực", ["thien dia vo cuc"] = "Thiên Địa Vô Cực", ["天地无极"] = "Thiên Địa Vô Cực",
+	["Kiem Phi Kinh Thien"] = "Kiếm Phi Kinh Thiên", ["kiem phi kinh thien"] = "Kiếm Phi Kinh Thiên", ["剑飞惊天"] = "Kiếm Phi Kinh Thiên",
+	["Kiem Phi"] = "Kiếm Phi Kinh Thiên", ["kiem phi"] = "Kiếm Phi Kinh Thiên",
+	["Nhan Kiem Hop Nhat"] = "Nhân Kiếm Hợp Nhất", ["nhan kiem hop nhat"] = "Nhân Kiếm Hợp Nhất", ["人剑合一"] = "Nhân Kiếm Hợp Nhất",
+	["Nhan Kiem"] = "Nhân Kiếm Hợp Nhất", ["nhan kiem"] = "Nhân Kiếm Hợp Nhất",
+	["Kiem Xung Am Duong"] = "Kiếm Xung Âm Dương", ["kiem xung am duong"] = "Kiếm Xung Âm Dương", ["剑冲阴阳"] = "Kiếm Xung Âm Dương",
+	["Kiem Xung"] = "Kiếm Xung Âm Dương", ["kiem xung"] = "Kiếm Xung Âm Dương",
+	["Bang Hu Ngu Phong"] = "Bằng Hư Ngự Phong", ["bang hu ngu phong"] = "Bằng Hư Ngự Phong", ["凭虚御风"] = "Bằng Hư Ngự Phong",
+	["Bang Hu"] = "Bằng Hư Ngự Phong", ["bang hu"] = "Bằng Hư Ngự Phong",
+	["The Van Tung"] = "Thê Vân Tung", ["the van tung"] = "Thê Vân Tung", ["梯云纵"] = "Thê Vân Tung",
+	["Thao Quang Duong Hoi"] = "Thao Quang Dưỡng Hối", ["thao quang duong hoi"] = "Thao Quang Dưỡng Hối", ["韬光养晦"] = "Thao Quang Dưỡng Hối",
+	["Thao Quang"] = "Thao Quang Dưỡng Hối", ["thao quang"] = "Thao Quang Dưỡng Hối",
+	["Dai Dao Vo Thuat"] = "Đại Đạo Vô Thuật", ["dai dao vo thuat"] = "Đại Đạo Vô Thuật", ["大道无术"] = "Đại Đạo Vô Thuật",
+	["Dai Dao"] = "Đại Đạo Vô Thuật", ["dai dao"] = "Đại Đạo Vô Thuật",
+	["Tam Tai Hoa Sinh"] = "Tam Tài Hóa Sinh", ["tam tai hoa sinh"] = "Tam Tài Hóa Sinh", ["三才化生"] = "Tam Tài Hóa Sinh",
+	["That Tinh Cung Thuy"] = "Thất Tinh Củng Thụy", ["that tinh cung thuy"] = "Thất Tinh Củng Thụy", ["七星拱瑞"] = "Thất Tinh Củng Thụy",
+	["Cuu Chuyen Quy Nhat"] = "Cửu Chuyển Quy Nhất", ["cuu chuyen quy nhat"] = "Cửu Chuyển Quy Nhất", ["九转归一"] = "Cửu Chuyển Quy Nhất",
+
+	-- Minh Giáo
+	["Ngan Nguyet Tram"] = "Ngân Nguyệt Trảm", ["ngan nguyet tram"] = "Ngân Nguyệt Trảm", ["银月斩"] = "Ngân Nguyệt Trảm",
+	["Ngan Nguyet"] = "Ngân Nguyệt Trảm", ["ngan nguyet"] = "Ngân Nguyệt Trảm", ["银月"] = "Ngân Nguyệt Trảm",
+	["Liet Nhat Tram"] = "Liệt Nhật Trảm", ["liet nhat tram"] = "Liệt Nhật Trảm", ["烈日斩"] = "Liệt Nhật Trảm",
+	["Liet Nhat"] = "Liệt Nhật", ["liet nhat"] = "Liệt Nhật", ["烈日"] = "Liệt Nhật",
+	["Am Tran Di Son"] = "Ám Trần Di Sơn", ["am tran di son"] = "Ám Trần Di Sơn", ["暗尘弥散"] = "Ám Trần Di Sơn",
 	["Niet Ban Trung Sinh"] = "Niết Bàn Trùng Sinh", ["niet ban trung sinh"] = "Niết Bàn Trùng Sinh", ["涅槃重生"] = "Niết Bàn Trùng Sinh",
 }
 
@@ -478,24 +547,39 @@ local function GetPlayerSkillInfo(szName)
 	-- Static fallback cho Mon phai Van Hoa, That Tu & Ngu Doc (chuan 100% C++ Engine JX3)
 	local tStatic = {
 		-- Thuần Dương
-		["Tọa Vong Vô Ngã"]=305, ["Toa Vong Vo Nga"]=305, ["Tọa Vọng Vô Ngã"]=305, ["Toa Vong"]=305, ["坐忘无我"]=305,
+		["Tọa Vọng Vô Ngã"]=305, ["Toa Vong Vo Nga"]=305, ["Tọa Vong Vô Ngã"]=305, ["Toa Vong"]=305, ["坐忘无我"]=305,
 		["Sinh Thái Cực"]=358, ["Sinh Thai Cuc"]=358, ["sinh thai cuc"]=358, ["生太极"]=358,
 		["Toái Tinh Thần"]=362, ["Toai Tinh Than"]=362, ["toai tinh than"]=362, ["碎星辰"]=362,
 		["Thôn Nhật Nguyệt"]=363, ["Thon Nhat Nguyet"]=363, ["thon nhat nguyet"]=363, ["吞日月"]=363,
-		["Trấn Sơn Hà"]=370, ["Tran Son Ha"]=370, ["tran son ha"]=370, ["镇山河"]=370,
-		["Lăng Thái Hư"]=561, ["Lang Thai Hu"]=561, ["lang thai hu"]=561, ["凌太虚"]=561,
+		["Trấn Sơn Hà"]=371, ["Tran Son Ha"]=371, ["tran son ha"]=371, ["镇山河"]=371,
+		["Lăng Thái Hư"]=361, ["Lang Thai Hu"]=361, ["lang thai hu"]=361, ["凌太虚"]=361,
 		["Phá Thương Khung"]=359, ["Pha Thuong Khung"]=359, ["pha thuong khung"]=359, ["破苍穹"]=359,
 		["Hóa Tam Thanh"]=357, ["Hoa Tam Thanh"]=357, ["hoa tam thanh"]=357, ["化三清"]=357,
-		["Bão Nguyên Quy Nhất"]=302, ["Bao Nguyen Quy Nhat"]=302, ["Bão Nguyên Thủ Khuyết"]=302, ["Bao Nguyen Thu Khuyet"]=302, ["抱元守缺"]=302,
-		["Bát Hoang Quy Nguyên"]=2699, ["Bat Hoang Quy Nguyen"]=2699, ["bat hoang quy nguyen"]=2699, ["八荒归元"]=2699,
-		["Vô Ngã Vô Kiếm"]=365, ["Vo Nga Vo Kiem"]=365, ["vo nga vo kiem"]=365, ["无我无剑"]=365,
-		["Thiên Địa Vô Cực"]=308, ["Thien Dia Vo Cuc"]=308, ["thien dia vo cuc"]=308, ["天地无极"]=308,
-		["Tam Hoàn Quy Nguyệt"]=309, ["Tam Hoan Quy Nguyet"]=309,
-		["Tam Hoàn Sáo Nguyệt"]=364, ["Tam Hoan Sao Nguyet"]=364,
+		["Xung Âm Dương"]=360, ["Xung Am Duong"]=360, ["xung am duong"]=360, ["冲阴阳"]=360,
+		["Bão Nguyên Thủ Khuyết"]=302, ["Bao Nguyen Thu Khuyet"]=302, ["Bão Nguyên Quy Nhất"]=302, ["Bao Nguyen Quy Nhat"]=302, ["Bão Nguyên"]=302, ["Bao Nguyen"]=302, ["抱元守缺"]=302,
 		["Lưỡng Nghi Hóa Hình"]=301, ["Luong Nghi Hoa Hinh"]=301, ["luong nghi hoa hinh"]=301, ["两仪化形"]=301,
 		["Tứ Tượng Luân Hồi"]=367, ["Tu Tuong Luan Hoi"]=367, ["tu tuong luan hoi"]=367, ["四象轮回"]=367,
 		["Thái Cực Vô Cực"]=306, ["Thai Cuc Vo Cuc"]=306, ["thai cuc vo cuc"]=306, ["太极无极"]=306,
 		["Ngưng Thần Tụ Khí"]=300, ["Ngung Than Tu Khi"]=300, ["ngung than tu khi"]=300, ["凝神聚气"]=300,
+		["Bát Quái Động Huyền"]=370, ["Bat Quai Dong Huyen"]=370, ["bat quai dong huyen"]=370, ["Bát Quái"]=370, ["Bat Quai"]=370, ["八卦洞玄"]=370,
+		["Lục Hợp Độc Tôn"]=368, ["Luc Hop Doc Ton"]=368, ["luc hop doc ton"]=368, ["Lục Hợp"]=368, ["Luc Hop"]=368, ["六合独尊"]=368,
+		["Chuyển Càn Khôn"]=372, ["Chuyen Can Khon"]=372, ["chuyen can khon"]=372, ["转乾坤"]=372,
+		["Tử Khí Đông Lai"]=307, ["Tu Khi Dong Lai"]=307, ["tu khi dong lai"]=307, ["Tử Khí"]=307, ["Tu Khi"]=307, ["紫气东来"]=307,
+		["Thao Quang Dưỡng Hối"]=313, ["Thao Quang Duong Hoi"]=313, ["thao quang duong hoi"]=313, ["韬光养晦"]=313,
+		["Bằng Hư Ngự Phong"]=311, ["Bang Hu Ngu Phong"]=311, ["bang hu ngu phong"]=311, ["凭虚御风"]=311,
+		["Thê Vân Tung"]=346, ["The Van Tung"]=346, ["the van tung"]=346, ["梯云纵"]=346,
+		["Cửu Chuyển Quy Nhất"]=303, ["Cuu Chuyen Quy Nhat"]=303, ["cuu chuyen quy nhat"]=303, ["九转归一"]=303,
+		["Đại Đạo Vô Thuật"]=366, ["Dai Dao Vo Thuat"]=366, ["dai dao vo thuat"]=366, ["大道无术"]=366,
+		["Tam Tài Hóa Sinh"]=304, ["Tam Tai Hoa Sinh"]=304, ["tam tai hoa sinh"]=304, ["三才化生"]=304,
+		["Thất Tinh Củng Thụy"]=312, ["That Tinh Cung Thuy"]=312, ["that tinh cung thuy"]=312, ["七星拱瑞"]=312,
+		["Bát Hoang Quy Nguyên"]=2699, ["Bat Hoang Quy Nguyen"]=2699, ["bat hoang quy nguyen"]=2699, ["八荒归元"]=2699,
+		["Vô Ngã Vô Kiếm"]=365, ["Vo Nga Vo Kiem"]=365, ["vo nga vo kiem"]=365, ["无我无剑"]=365,
+		["Thiên Địa Vô Cực"]=308, ["Thien Dia Vo Cuc"]=308, ["thien dia vo cuc"]=308, ["天地无极"]=308,
+		["Tam Hoàn Sáo Nguyệt"]=364, ["Tam Hoan Sao Nguyet"]=364, ["tam hoan sao nguyet"]=364, ["三环套月"]=364,
+		["Tam Hoàn Quy Nguyệt"]=309, ["Tam Hoan Quy Nguyet"]=309,
+		["Kiếm Phi Kinh Thiên"]=310, ["Kiem Phi Kinh Thien"]=310, ["kiem phi kinh thien"]=310, ["剑飞惊天"]=310,
+		["Nhân Kiếm Hợp Nhất"]=588, ["Nhan Kiem Hop Nhat"]=588, ["nhan kiem hop nhat"]=588, ["人剑合一"]=588,
+		["Kiếm Xung Âm Dương"]=369, ["Kiem Xung Am Duong"]=369, ["kiem xung am duong"]=369, ["剑冲阴阳"]=369,
 
 		-- Thiếu Lâm
 		["Vô Tướng Quyết"]=245, ["Vo Tuong Quyet"]=245, ["vo tuong quyet"]=245, ["无相诀"]=245,
@@ -735,6 +819,18 @@ local tStaticBuffNames = {
 	["Toái Tinh Thần"] = 378, ["Toai Tinh Than"] = 378, ["toai tinh than"] = 378, ["碎星辰"] = 378,
 	["Phá Thương Khung"] = 375, ["Pha Thuong Khung"] = 375, ["pha thuong khung"] = 375, ["破苍穹"] = 375,
 	["Hóa Tam Thanh"] = 373, ["Hoa Tam Thanh"] = 373, ["hoa tam thanh"] = 373, ["化三清"] = 373,
+	["Sinh Thái Cực"] = 374, ["Sinh Thai Cuc"] = 374, ["sinh thai cuc"] = 374, ["生太极"] = 374,
+	["Xung Âm Dương"] = 376, ["Xung Am Duong"] = 376, ["xung am duong"] = 376, ["冲阴阳"] = 376,
+	["Lăng Thái Hư"] = 561, ["Lang Thai Hu"] = 561, ["lang thai hu"] = 561, ["凌太虚"] = 561,
+	["Thôn Nhật Nguyệt"] = 6292, ["Thon Nhat Nguyet"] = 6292, ["thon nhat nguyet"] = 6292, ["吞日月"] = 6292,
+	["Trấn Sơn Hà"] = 377, ["Tran Son Ha"] = 377, ["tran son ha"] = 377, ["镇山河"] = 377,
+	["Tử Khí Đông Lai"] = 2757, ["Tu Khi Dong Lai"] = 2757, ["tu khi dong lai"] = 2757, ["Tử Khí"] = 2757, ["Tu Khi"] = 2757, ["紫气东来"] = 2757,
+	["Chuyển Càn Khôn"] = 2781, ["Chuyen Can Khon"] = 2781, ["chuyen can khon"] = 2781, ["转乾坤"] = 2781,
+	["Bát Quái Động Huyền"] = 2182, ["Bat Quai Dong Huyen"] = 2182, ["bat quai dong huyen"] = 2182, ["八卦洞玄"] = 2182,
+	["Đại Đạo Vô Thuật"] = 554, ["Dai Dao Vo Thuat"] = 554, ["dai dao vo thuat"] = 554, ["大道无术"] = 554,
+	["Thất Tinh Củng Thụy"] = 556, ["That Tinh Cung Thuy"] = 556, ["that tinh cung thuy"] = 556, ["七星拱瑞"] = 556,
+	["Tam Tài Hóa Sinh"] = 1937, ["Tam Tai Hoa Sinh"] = 1937, ["tam tai hoa sinh"] = 1937, ["三才化生"] = 1937,
+	["Kiếm Xung Âm Dương"] = 2780, ["Kiem Xung Am Duong"] = 2780, ["kiem xung am duong"] = 2780, ["剑冲阴阳"] = 2780,
 
 	-- Thiên Sách
 	["Lưu Huyết"] = 3442, ["Luu Huyet"] = 3442, ["luu huyet"] = 3442, ["流血"] = 3442,
@@ -834,6 +930,10 @@ local function IsBuffExist(tCache, szText, bSrc)
 				return v
 			-- Ho tro ma Buff cua Me Tam Co (2215, 2489, 6247)
 			elseif nID == 2215 and (v.dwID == 2215 or v.dwID == 2489 or v.dwID == 6247) then
+				return v
+			-- Ho tro ca 2 ten/ma Buff cua Ngan Nguyet Tram (DOT)
+			elseif (szText == "Ngân Nguyệt Trảm" or szText == "Ngân Nguyệt" or szText == "银月斩" or szText == "银月" or (szCanonical and szCanonical == "Ngân Nguyệt Trảm"))
+				and szBuffName and (szBuffName == "Ngân Nguyệt Trảm" or szBuffName == "Ngân Nguyệt" or szBuffName == "银月斩" or szBuffName == "银月") then
 				return v
 			elseif nID and v.dwID == nID then
 				return v
@@ -1408,10 +1508,18 @@ local tOptions = {
 	end,
 
 	["qidian"] = function(szCmp, szVal, me, tar)
-		local nAte = me.nAccumulateValue
+		if not me then return false end
+		local nAte = me.nAccumulateValue or 0
 		if me.dwForceID == 1 then
 			if nAte > 3 then
 				nAte = 3
+			end
+		elseif me.dwForceID == 5 then
+			local vNum = tonumber(szVal)
+			if vNum and vNum <= 5 and vNum > 0 then
+				local nBeads = math.floor(nAte / 2)
+				-- Ho tro ca thang do 5 o khi (beads: 1..5) lan thang do 10 diem (points: 1..10)
+				return Compare(szCmp, nBeads, szVal)
 			end
 		end
 		return Compare(szCmp, nAte, szVal)
@@ -1967,6 +2075,53 @@ local function UITestCast(dwSkillID, dwLevel, index)
 		end
 	end
 
+	-- 2b. Kiem tra trang thai Active ("sang") cho cac chieu dac thu khong co Cooldown (CD = 0)
+	-- hoac chi co the thi trien khi dat dieu kien dac biet (tranh stall toan bo macro khi chua sang):
+	-- A. Minh Giao: Tinh The Pha Ma Kich (3967) va Sinh Tu Kiep (3969)
+	-- Chi sang va su dung duoc khi Man Nhat (nSunPowerValue == 1) hoac Man Nguyet (nMoonPowerValue == 1).
+	if dwSkillID == 3967 or dwSkillID == 3969 then
+		local bSun = (me.nSunPowerValue == 1 or me.nSunPowerValue == true)
+			or (me.nCurrentSunEnergy and me.nCurrentSunEnergy >= 100)
+		local bMoon = (me.nMoonPowerValue == 1 or me.nMoonPowerValue == true)
+			or (me.nCurrentMoonEnergy and me.nCurrentMoonEnergy >= 100)
+		if not bSun and not bMoon then
+			return false
+		end
+	end
+
+	-- B. Minh Giao: Khu Da Doan Sau (3979)
+	-- Chi sang va su dung duoc khi dang o trang thai An Than (Stealth) hoac co buff Am Tran Di Son (4052).
+	if dwSkillID == 3979 then
+		local bActive = false
+		if me.bStealth or me.bInStealth then
+			bActive = true
+		end
+		if not bActive then
+			local aBuff = MyGetBuffList and MyGetBuffList(me)
+			if aBuff then
+				if IsBuffExist(aBuff, 4052) or IsBuffExist(aBuff, "Ám Trần Di Sơn") or IsBuffExist(aBuff, "暗尘弥散") then
+					bActive = true
+				end
+			end
+		end
+		if not bActive then
+			return false
+		end
+	end
+
+	-- Fallback: Engine CanUseSkill (neu client co ho tro ham nay)
+	if me.CanUseSkill then
+		local okU, bCan = pcall(function() return me.CanUseSkill(dwSkillID, dwLevel or 1) end)
+		if okU and bCan == false then
+			-- Neu dang van khi Ngung Than Tu Khi (300), client C++ co the tra ve false vi dang OTState channeling.
+			-- Cho phep vuot qua kiem tra nay de OnCastPlayerSkill ngat Ngung Than thi trien skill moi (nhu Luong Nghi Hoa Hinh).
+			local bIsChanNT = (nOTState == 2 and IsChannelingNgungThan(me) and dwSkillID ~= 300)
+			if not bIsChanNT then
+				return false
+			end
+		end
+	end
+
 	-- 3. Kiem tra Cooldown qua Engine Player truc tiep (chinh xac 100%, khong phu thuoc UI)
 	if me.GetSkillCDProgress then
 		local bCool, nLeft = me.GetSkillCDProgress(dwSkillID, dwLevel or 1)
@@ -2145,42 +2300,44 @@ local _tXMacroWrapped = {}
 local tTargetQiFields = {
 	[358] = true,  -- Sinh Thai Cuc (生太极)
 	[362] = true,  -- Toai Tinh Than (碎星辰)
-	[378] = true,  -- Toai Tinh Than aura
-	[4976] = true, -- Sinh Thai Cuc aura ID
-	[4980] = true, -- Toai Tinh Than aura ID
+	[374] = true,  -- Sinh Thai Cuc buff ID
+	[378] = true,  -- Toai Tinh Than buff ID
+	[4976] = true, -- Sinh Thai Cuc aura template ID
+	[4980] = true, -- Toai Tinh Than aura template ID
 }
 
--- Danh sach toan bo cac Khi Truong Thuan Duong
+-- Danh sach toan bo cac Khi Truong Thuan Duong (tu dong tha duoi chan, tru Sinh Thai Cuc & Toai Tinh Than)
 local tThuanDuongQiFields = {
-	[357] = true,  -- Hoa Tam Thanh
-	[358] = true,  -- Sinh Thai Cuc
-	[359] = true,  -- Pha Thuong Khung
-	[360] = true,  -- Tran Son Ha
-	[361] = true,  -- Tran Son Ha
-	[362] = true,  -- Toai Tinh Than
-	[363] = true,  -- Thon Nhat Nguyet
-	[368] = true,  -- Thon Nhat Nguyet
-	[370] = true,  -- Tran Son Ha
-	[371] = true,  -- Tran Son Ha
-	[373] = true,  -- Hoa Tam Thanh
-	[375] = true,  -- Pha Thuong Khung
-	[378] = true,  -- Toai Tinh Than
-	[399] = true,  -- Khi truong khac
-	[561] = true,  -- Lang Thai Hu
-	[3080] = true, -- Hoa Tam Thanh aura
-	[4976] = true, -- Sinh Thai Cuc aura
-	[4977] = true, -- Pha Thuong Khung aura
-	[4978] = true, -- Trung Am Duong aura
-	[4979] = true, -- Lang Thai Hu aura
-	[4980] = true, -- Toai Tinh Than aura
-	[4981] = true, -- Thon Nhat Nguyet aura
-	[4982] = true, -- Tran Son Ha aura
+	[357] = true,  -- Hoa Tam Thanh (Skill 357)
+	[358] = true,  -- Sinh Thai Cuc (Skill 358 - tha Target)
+	[359] = true,  -- Pha Thuong Khung (Skill 359)
+	[360] = true,  -- Xung Am Duong (Skill 360)
+	[361] = true,  -- Lang Thai Hu (Skill 361)
+	[362] = true,  -- Toai Tinh Than (Skill 362 - tha Target)
+	[363] = true,  -- Thon Nhat Nguyet (Skill 363)
+	[371] = true,  -- Tran Son Ha (Skill 371)
+	[373] = true,  -- Hoa Tam Thanh buff
+	[374] = true,  -- Sinh Thai Cuc buff
+	[375] = true,  -- Pha Thuong Khung buff
+	[376] = true,  -- Xung Am Duong buff
+	[377] = true,  -- Tran Son Ha buff
+	[378] = true,  -- Toai Tinh Than buff
+	[561] = true,  -- Lang Thai Hu buff
+	[3080] = true, -- Hoa Tam Thanh aura template
+	[4976] = true, -- Sinh Thai Cuc aura template
+	[4977] = true, -- Pha Thuong Khung aura template
+	[4978] = true, -- Xung Am Duong aura template
+	[4979] = true, -- Lang Thai Hu aura template
+	[4980] = true, -- Toai Tinh Than aura template
+	[4981] = true, -- Thon Nhat Nguyet aura template
+	[4982] = true, -- Tran Son Ha aura template
 }
 
 local tCombatGroundSkills = {
 	[2212] = true, [2492] = true, [2496] = true, [5764] = true, -- Bach Tuc (Doc Kinh)
 	[2232] = true, [2233] = true, [2235] = true,                 -- Diep Triet, Dinh Co, Tuy Vu (Ngu Doc)
-	[357] = true, [358] = true, [359] = true, [360] = true, [361] = true, [362] = true, [363] = true, [368] = true, [370] = true, [371] = true, [399] = true, [561] = true, -- Thuan Duong Khi Truong
+	[357] = true, [358] = true, [359] = true, [360] = true, [361] = true, [362] = true, [363] = true, [371] = true, -- Thuan Duong Khi Truong
+	[368] = true,                                                 -- Luc Hop Doc Ton (AoE attack dat vung - danh Target)
 	[3111] = true, [3114] = true, [3117] = true,                 -- Duong Mon Trap
 }
 
@@ -2292,6 +2449,15 @@ local function SyncAIOTLHelperBachTuc()
 		end
 		if tlMode > 0 then
 			AIO_TLHelper.bAutoTrap = true
+		end
+	end
+	if HM_Force and type(HM_Force.tSelfQC) == "table" then
+		for qid, _ in pairs(tThuanDuongQiFields or {}) do
+			if tTargetQiFields and tTargetQiFields[qid] then
+				HM_Force.tSelfQC[qid] = false -- Sinh Thai Cuc & Toai Tinh Than tha vao Target
+			else
+				HM_Force.tSelfQC[qid] = true  -- Cac khi truong con lai (Pha Thuong Khung, Hoa Tam Thanh...) tha duoi chan
+			end
 		end
 	end
 end
@@ -2410,21 +2576,48 @@ local function MakeSelectPointInterceptor(origFn)
 			if type(fnCallback) == "function" then
 				local ok = pcall(fnCallback, x, y, z)
 				if ok then
+					_lastGroundSkillID = nil
+					_lastGroundSkillTime = 0
 					return
 				end
 			end
-			-- 2. Mo vung bang origFn roi snap ngay lap tuc bang DoSelectPoint (nhu HM)
-			if origFn then
-				pcall(origFn, fnCallback, ...)
-			end
+			-- 2. Snap ngay lap tuc bang DoSelectPoint truc tiep
+			-- TUYET DOI KHONG goi origFn(fnCallback, ...) o day vi cac addon khac (nhu HM_Force)
+			-- co hook UserSelect.SelectPoint se lap tuc chen DoSelectPoint(tar.nX, tar.nY, tar.nZ) vao Target!
 			if UserSelect and UserSelect.DoSelectPoint then
 				pcall(UserSelect.DoSelectPoint, x, y, z)
 			end
+			_lastGroundSkillID = nil
+			_lastGroundSkillTime = 0
 			return
 		end
 
+		_lastGroundSkillID = nil
+		_lastGroundSkillTime = 0
+
 		if origFn then
 			return origFn(fnCallback, ...)
+		end
+	end
+end
+
+local function MakeDoSelectPointInterceptor(origFn)
+	return function(x, y, z, ...)
+		local mode = (xMacro and xMacro.GroundTargetMode) or "target"
+		if mode ~= "manual" then
+			local skillID = GetCurrentGroundSkillID()
+			if skillID and tThuanDuongQiFields and tThuanDuongQiFields[skillID] then
+				if not (tTargetQiFields and tTargetQiFields[skillID]) then
+					-- Day la khi truong dat duoi chan (Pha Thuong Khung, Hoa Tam Thanh, Thon Nhat Nguyet, Tran Son Ha...)
+					local me = (MeCache and MeCache.Get and MeCache:Get()) or (GetClientPlayer and GetClientPlayer())
+					if me and me.nX and me.nY and me.nZ then
+						x, y, z = me.nX, me.nY, me.nZ
+					end
+				end
+			end
+		end
+		if origFn then
+			return origFn(x, y, z, ...)
 		end
 	end
 end
@@ -2446,8 +2639,10 @@ local function HookUserSelectPoint()
 	local tSlots = {
 		{ tbl = UserSelect, name = "SelectPoint", key = "UserSelect.SelectPoint", maker = MakeSelectPointInterceptor },
 		{ tbl = UserSelect, name = "SelectArea", key = "UserSelect.SelectArea", maker = MakeSelectPointInterceptor },
+		{ tbl = UserSelect, name = "DoSelectPoint", key = "UserSelect.DoSelectPoint", maker = MakeDoSelectPointInterceptor },
 		{ tbl = _G, name = "SelectPoint", key = "_G.SelectPoint", maker = MakeSelectPointInterceptor },
 		{ tbl = _G, name = "UserSelectPoint", key = "_G.UserSelectPoint", maker = MakeSelectPointInterceptor },
+		{ tbl = _G, name = "DoSelectPoint", key = "_G.DoSelectPoint", maker = MakeDoSelectPointInterceptor },
 		{ tbl = _G, name = "OnUseSkill", key = "_G.OnUseSkill", maker = MakeSkillUseInterceptor },
 		{ tbl = _G, name = "OnCastPlayerSkill", key = "_G.OnCastPlayerSkill", maker = MakeSkillUseInterceptor },
 		{ tbl = _G, name = "OnAddOnUseSkill", key = "_G.OnAddOnUseSkill", maker = MakeSkillUseInterceptor },
@@ -2472,14 +2667,21 @@ local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
 	local bIsChanneling = okOT and tonumber(nOT or 0) == 2
 
-	-- Khong can nhan dien: cu dang dan dao (nOT == 2) ma danh skill (dwSkillID ~= 300) la tu dong ngat dan dao!
+	-- Dan dao: neu dang kep Ngung Than Tu Khi (300) hoac khong bat bao ve thi ngat dan dao de danh skill moi
+	local bIsNgungThan = IsChannelingNgungThan(me) or (dwCurrentChannelSkillID == 300) or (me.dwForceID == 5 and dwCurrentChannelSkillID ~= 368)
 	if bIsChanneling and dwSkillID ~= 300 then
-		if me.StopCurrentAction then
-			pcall(function() me.StopCurrentAction() end)
+		if bIsNgungThan or not bProtectChannelSkill then
+			if me.StopCurrentAction then
+				pcall(function() me.StopCurrentAction() end)
+			end
+			dwCurrentChannelSkillID = 0
+			szLastOTA = nil
+			nNgungThanCooldownUntilFrame = nCur + 8
+			bIsChanneling = false
+		else
+			-- Dang dan dao chieu tan cong / ho tro (nhu Luc Hop Doc Ton 368, Tuy Vu 2235...) va co bao ve dan dao
+			return false
 		end
-		dwCurrentChannelSkillID = 0
-		szLastOTA = nil
-		nNgungThanCooldownUntilFrame = nCur + 8
 	end
 
 	if not (bIsChanneling and bProtectChannelSkill and dwSkillID == 300) then
@@ -2589,8 +2791,11 @@ do
 		RegisterEvent(v, function()
 			local me = (GetClientPlayer and GetClientPlayer()) or (MeCache and MeCache.Get and MeCache:Get())
 			if not arg0 or (me and tonumber(arg0) == tonumber(me.dwID)) or (UI_GetClientPlayerID and tonumber(arg0) == tonumber(UI_GetClientPlayerID())) then
-				if v == "DO_SKILL_CHANNEL_PROGRESS" and tonumber(arg1 or 0) == 300 then
-					dwCurrentChannelSkillID = 300
+				if v == "DO_SKILL_CHANNEL_PROGRESS" then
+					local nChanID = tonumber(arg1 or 0)
+					if nChanID == 300 or nChanID == 368 or (tChannelSkill and tChannelSkill[nChanID]) then
+						dwCurrentChannelSkillID = nChanID
+					end
 				end
 				szLastOTA = Table_GetSkillName(arg1, arg2)
 			end

@@ -64,13 +64,13 @@
             name = "ThuanDuong_TuHaCong_80",
             script = [[
 #name ThuanDuong_TuHaCong_80
-/skill [nobuff:Tọa Vong Vô Ngã] Tọa Vong Vô Ngã
+/skill [nobuff:Tọa Vọng Vô Ngã] Tọa Vọng Vô Ngã
 /skill [nobuff:Phá Thương Khung] Phá Thương Khung
 /skill [mana<0.40,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
-/skill [mana<0.60,qidian>=8] Bão Nguyên Quy Nhất
-/skill [distance<=20,qidian>=8] Lưỡng Nghi Hóa Hình
-/skill [distance<=20,qidian<=7] Tứ Tượng Luân Hồi
-/skill [distance<=20] Thái Cực Vô Cực
+/skill [mana<0.60,qidian>=8] Bão Nguyên Thủ Khuyết
+/skill [qidian>=8] Lưỡng Nghi Hóa Hình
+/skill Tứ Tượng Luân Hồi
+/skill Thái Cực Vô Cực
 /skill [qidian<8] Ngưng Thần Tụ Khí
 /skill [nofight,qidian<10] Ngưng Thần Tụ Khí
 ]]
@@ -257,14 +257,12 @@
             name = "MinhGiao_PhanAnh_80",
             script = [[
 #name MinhGiao_PhanAnh_80
-/skill [life<0.30] Tham Ma Thể
-/skill [distance<=5,fullsun] Tịnh Thế Phá Ma Kích
-/skill [distance<=5,fullmoon] Tịnh Thế Phá Ma Kích
-/skill [distance<=5,xmbuff:Ám Trần Di Sơn] Khu Dạ Đoạn Sầu
-/skill [distance<=5] Ngân Nguyệt Trảm
-/skill [distance<=5] Liệt Nhật Trảm
-/skill [distance<=5,sun>=moon] U Nguyệt Luân
-/skill [distance<=5] Xích Nhật Luân
+/skill [life<0.3] Tham Ma Thể
+/skill Tịnh Thế Phá Ma Kích
+/skill Khu Dạ Đoạn Sầu
+/skill Liệt Nhật Trảm
+/skill [nombuff:Ngân Nguyệt Trảm] Ngân Nguyệt Trảm
+/skill Xích Nhật Luân
 ]]
         },
         [10243] = {
