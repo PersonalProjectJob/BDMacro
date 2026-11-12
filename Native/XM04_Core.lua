@@ -2667,13 +2667,11 @@ local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
 	local bIsChanneling = okOT and tonumber(nOT or 0) == 2
 
-	-- Dan dao: neu dang kep Ngung Than Tu Khi (300) hoac khong bat bao ve thi ngat dan dao de danh skill moi
+	-- Dan dao: neu dang kep Ngung Than Tu Khi (300) hoac khong bat bao ve thi danh skill moi se tu dong ngat dan dao
 	local bIsNgungThan = IsChannelingNgungThan(me) or (dwCurrentChannelSkillID == 300) or (me.dwForceID == 5 and dwCurrentChannelSkillID ~= 368)
 	if bIsChanneling and dwSkillID ~= 300 then
 		if bIsNgungThan or not bProtectChannelSkill then
-			if me.StopCurrentAction then
-				pcall(function() me.StopCurrentAction() end)
-			end
+			-- Khong can goi me.StopCurrentAction(), don gian chi can danh skill moi se tu dong ngat dan dao
 			dwCurrentChannelSkillID = 0
 			szLastOTA = nil
 			nNgungThanCooldownUntilFrame = nCur + 8
