@@ -1027,7 +1027,11 @@ local function GetPlayerSkillInfo(szName)
 	local tStatic = {
 		-- Thuần Dương
 		["Tọa Vong Vô Ngã"]=305, ["Toa Vong Vo Nga"]=305, ["Tọa Vọng Vô Ngã"]=305, ["Toa Vong"]=305, ["坐忘无我"]=305,
+		["Sinh Thái Cực"]=358, ["Sinh Thai Cuc"]=358, ["sinh thai cuc"]=358, ["生太极"]=358,
 		["Toái Tinh Thần"]=362, ["Toai Tinh Than"]=362, ["toai tinh than"]=362, ["碎星辰"]=362,
+		["Thôn Nhật Nguyệt"]=363, ["Thon Nhat Nguyet"]=363, ["thon nhat nguyet"]=363, ["吞日月"]=363,
+		["Trấn Sơn Hà"]=370, ["Tran Son Ha"]=370, ["tran son ha"]=370, ["镇山河"]=370,
+		["Lăng Thái Hư"]=561, ["Lang Thai Hu"]=561, ["lang thai hu"]=561, ["凌太虚"]=561,
 		["Phá Thương Khung"]=359, ["Pha Thuong Khung"]=359, ["pha thuong khung"]=359, ["破苍穹"]=359,
 		["Hóa Tam Thanh"]=357, ["Hoa Tam Thanh"]=357, ["hoa tam thanh"]=357, ["化三清"]=357,
 		["Bão Nguyên Quy Nhất"]=302, ["Bao Nguyen Quy Nhat"]=302, ["Bão Nguyên Thủ Khuyết"]=302, ["Bao Nguyen Thu Khuyet"]=302, ["抱元守缺"]=302,
@@ -2685,16 +2689,69 @@ local _lastGroundSkillTime = 0
 local _tXMacroOrig = {}
 local _tXMacroWrapped = {}
 
+-- Khi truong Thuan Duong tha vao muc tieu (Target): Sinh Thai Cuc & Toai Tinh Than
+local tTargetQiFields = {
+	[358] = true,  -- Sinh Thai Cuc (生太极)
+	[362] = true,  -- Toai Tinh Than (碎星辰)
+	[378] = true,  -- Toai Tinh Than aura
+	[4976] = true, -- Sinh Thai Cuc aura ID
+	[4980] = true, -- Toai Tinh Than aura ID
+}
+
+-- Danh sach toan bo cac Khi Truong Thuan Duong
+local tThuanDuongQiFields = {
+	[357] = true,  -- Hoa Tam Thanh
+	[358] = true,  -- Sinh Thai Cuc
+	[359] = true,  -- Pha Thuong Khung
+	[360] = true,  -- Tran Son Ha
+	[361] = true,  -- Tran Son Ha
+	[362] = true,  -- Toai Tinh Than
+	[363] = true,  -- Thon Nhat Nguyet
+	[368] = true,  -- Thon Nhat Nguyet
+	[370] = true,  -- Tran Son Ha
+	[371] = true,  -- Tran Son Ha
+	[373] = true,  -- Hoa Tam Thanh
+	[375] = true,  -- Pha Thuong Khung
+	[378] = true,  -- Toai Tinh Than
+	[399] = true,  -- Khi truong khac
+	[561] = true,  -- Lang Thai Hu
+	[3080] = true, -- Hoa Tam Thanh aura
+	[4976] = true, -- Sinh Thai Cuc aura
+	[4977] = true, -- Pha Thuong Khung aura
+	[4978] = true, -- Trung Am Duong aura
+	[4979] = true, -- Lang Thai Hu aura
+	[4980] = true, -- Toai Tinh Than aura
+	[4981] = true, -- Thon Nhat Nguyet aura
+	[4982] = true, -- Tran Son Ha aura
+}
+
 local tCombatGroundSkills = {
 	[2212] = true, [2492] = true, [2496] = true, [5764] = true, -- Bach Tuc (Doc Kinh)
 	[2232] = true, [2233] = true, [2235] = true,                 -- Diep Triet, Dinh Co, Tuy Vu (Ngu Doc)
-	[357] = true, [358] = true, [359] = true, [360] = true, [361] = true, [362] = true, [363] = true, [368] = true, [370] = true, [399] = true,     -- Thuan Duong Khi Truong
+	[357] = true, [358] = true, [359] = true, [360] = true, [361] = true, [362] = true, [363] = true, [368] = true, [370] = true, [371] = true, [399] = true, [561] = true, -- Thuan Duong Khi Truong
 	[3111] = true, [3114] = true, [3117] = true,                 -- Duong Mon Trap
 }
 
-local function GetSmartTargetXYZ()
+local function GetSmartTargetXYZ(skillID)
 	local me = (MeCache and MeCache.Get and MeCache:Get()) or (GetClientPlayer and GetClientPlayer())
 	if not me then return nil, nil, nil end
+
+	local nSkillID = tonumber(skillID) or _lastGroundSkillID
+
+	-- Neu la Khi Truong Thuan Duong:
+	-- "cac khi truong se tu tha duoi chan, tru Sinh thai cuc va toai tinh than la tha vao muc tieu"
+	if nSkillID and tThuanDuongQiFields and tThuanDuongQiFields[nSkillID] then
+		if not (tTargetQiFields and tTargetQiFields[nSkillID]) then
+			-- Cac khi truong con lai (Pha Thuong Khung, Hoa Tam Thanh, Thon Nhat Nguyet, Tran Son Ha...):
+			-- Tu dong tha duoi chan nhan vat (Self)!
+			if me.nX and me.nY and me.nZ then
+				return me.nX, me.nY, me.nZ
+			end
+		end
+	end
+
+	-- Sinh Thai Cuc (358), Toai Tinh Than (362) hoac ky nang dat vung cua phai khac:
+	-- Uu tien tha vao muc tieu (Target)
 	local tar = (GetCurrentTargetObject and GetCurrentTargetObject()) or (TarCache and TarCache.Get and TarCache:Get())
 	if not tar and me.GetTarget then
 		local ok, dwType, dwID = pcall(function() return me.GetTarget() end)
@@ -2767,6 +2824,13 @@ local function SyncAIOTLHelperBachTuc()
 			AIO_TLHelper.tTrapList[2492] = tlMode
 			AIO_TLHelper.tTrapList[2496] = tlMode
 			AIO_TLHelper.tTrapList[5764] = tlMode
+			for qid, _ in pairs(tThuanDuongQiFields or {}) do
+				if tTargetQiFields and tTargetQiFields[qid] then
+					AIO_TLHelper.tTrapList[qid] = (mode == "mouse") and 2 or (mode == "manual" and 0 or 3)
+				else
+					AIO_TLHelper.tTrapList[qid] = (mode == "manual") and 0 or 1
+				end
+			end
 		end
 		if type(AIO_TLHelper.tTrapMode) == "table" then
 			AIO_TLHelper.tTrapMode[2212] = tlMode
@@ -2798,19 +2862,22 @@ local function PrepareGroundSkillOnTarget(dwSkillID)
 	_lastGroundSkillTime = now
 	if AIO_TLHelper and type(AIO_TLHelper.ForcePlace) == "function" then
 		local tlMode = (mode == "mouse") and 2 or 3
+		if tThuanDuongQiFields and tThuanDuongQiFields[nID] and not (tTargetQiFields and tTargetQiFields[nID]) then
+			tlMode = 1 -- Mode 1 trong AIO_TLHelper la duoi chan (Self)
+		end
 		pcall(AIO_TLHelper.ForcePlace, nID, tlMode)
 	end
 end
 _G.PrepareGroundSkillOnTarget = PrepareGroundSkillOnTarget
 
-local function DoSmartSelectPoint()
+local function DoSmartSelectPoint(dwSkillID)
 	local mode = (xMacro and xMacro.GroundTargetMode) or "target"
 	if mode == "manual" then return false end
 	local x, y, z
 	if mode == "mouse" then
-		x, y, z = GetMouseTargetXYZ()
+		x, y, z = GetMouseTargetXYZ(dwSkillID)
 	else
-		x, y, z = GetSmartTargetXYZ()
+		x, y, z = GetSmartTargetXYZ(dwSkillID)
 	end
 	if x and y and z and UserSelect and UserSelect.DoSelectPoint then
 		pcall(UserSelect.DoSelectPoint, x, y, z)
@@ -2875,16 +2942,16 @@ local function MakeSelectPointInterceptor(origFn)
 			return
 		end
 
-		-- Day la ky nang chien dau dat vung (Bach Tuc 2212, v.v.)
-		_lastGroundSkillID = nil
-		_lastGroundSkillTime = 0
-
+		-- Day la ky nang chien dau dat vung (Bach Tuc 2212, Khi Truong, v.v.)
 		local x, y, z
 		if mode == "mouse" then
-			x, y, z = GetMouseTargetXYZ()
+			x, y, z = GetMouseTargetXYZ(skillID)
 		else
-			x, y, z = GetSmartTargetXYZ()
+			x, y, z = GetSmartTargetXYZ(skillID)
 		end
+
+		_lastGroundSkillID = nil
+		_lastGroundSkillTime = 0
 
 		if x and y and z then
 			-- 1. Uu tien goi callback truc tiep neu engine truyen vao
@@ -2973,7 +3040,7 @@ local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 			dwCurrentChannelSkillID = 300
 		end
 		if tGroundTargetSkill[dwSkillID] or dwSkillID == 2212 or (tCombatGroundSkills and tCombatGroundSkills[dwSkillID]) then
-			DoSmartSelectPoint()
+			DoSmartSelectPoint(dwSkillID)
 		end
 		local now = (GetTime and GetTime()) or 0
 		local skill = (GetSkill and GetSkill(dwSkillID, dwLevel)) or nil
