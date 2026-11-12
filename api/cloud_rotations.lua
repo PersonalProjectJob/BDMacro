@@ -1,6 +1,6 @@
 ﻿return {
-    version = "20261110.1",
-    timestamp = "2026-11-10 21:05:00",
+    version = "20261108.2",
+    timestamp = "2026-11-08 14:30:00",
     client = "JX3-v80",
     rotations = {
         [10002] = {
@@ -49,13 +49,11 @@
 #name ThuanDuong_ThaiHuKiemY_80
 /skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
 /skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
-/skill [distance<=4,tlife<0.40] Bát Hoang Quy Nguyên
-/skill [distance<=4,qidian>=8] Vô Ngã Vô Kiếm
-/skill [distance<=4] Bát Hoang Quy Nguyên
-/skill [distance<=4] Thiên Địa Vô Cực
-/skill [distance<=4,qidian<8] Tam Hoàn Sáo Nguyệt
-/skill [distance<=4,qidian<8] Tam Hoàn Quy Nguyệt
-/skill [distance<=4] Tam Hoàn Sáo Nguyệt
+/skill [tlife<0.40] Bát Hoang Quy Nguyên
+/skill [qidian>=8] Vô Ngã Vô Kiếm
+/skill Bát Hoang Quy Nguyên
+/skill Thiên Địa Vô Cực
+/skill Tam Hoàn Sáo Nguyệt
 /skill [qidian<10] Ngưng Thần Tụ Khí
 ]]
         },
@@ -93,8 +91,7 @@
 /skill [nombuff:Chung Linh Dục Tú] Chung Linh Dục Tú
 /skill [mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,cdtime:Ngọc Thạch Câu Phần>0] Loạn Tửu Thanh Hà
 /skill [buff:Loạn Tửu Thanh Hà] Dương Minh Chỉ
-/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú,lastcast:Dương Minh Chỉ] Ngọc Thạch Câu Phần
-/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú] Dương Minh Chỉ
+/skill [mbuff:Lan Thôi Ngọc Chiết,mbuff:Thương Dương Chỉ,mbuff:Chung Linh Dục Tú] Ngọc Thạch Câu Phần
 /skill [distance<=20] Dương Minh Chỉ
 ]]
         },
@@ -277,17 +274,17 @@
             name = "MinhGiao_MinhTon_80",
             script = [[
 #name MinhGiao_MinhTon_80
-/skill [life<=0.3] Tính Mệnh Hải
-/skill [life<=0.3] Tham Ma Thể
-/skill [life<=0.5,sun_power] Quang Minh Tướng
-/skill [life<=0.5,sun_power|moon_power] Thánh Minh Hựu
-/skill Tịnh Thế Phá Ma Kích
-/skill [nearby_enemy>3] Hoàng Nhật Chiếu
-/skill Liệt Nhật Trảm
-/skill Ngân Nguyệt Trảm
-/skill Giới Hỏa Trảm
-/skill Quy Tịch Đạo
-/skill Xích Nhật Luân
+/skill [life<0.30] Tham Ma Thể
+/skill [life<0.40,fullsun] Thánh Minh Hựu
+/skill [distance<=5] Từ Bi Nguyện
+/skill [distance<=8] Giới Hỏa Trảm
+/skill [distance<=5] Hoàng Nhật Chiếu
+/skill [distance<=5,fullsun] Tịnh Thế Phá Ma Kích
+/skill [distance<=5,fullmoon] Tịnh Thế Phá Ma Kích
+/skill [distance<=5,sun>=moon] Liệt Nhật Trảm
+/skill [distance<=5,moon>sun] Ngân Nguyệt Trảm
+/skill [distance<=5,sun>=moon] Xích Nhật Luân
+/skill [distance<=5] U Nguyệt Luân
 ]]
         },
     }

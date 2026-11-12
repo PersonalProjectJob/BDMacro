@@ -760,6 +760,22 @@ local tGroundTargetSkill = {[2212] = 3}
 local nGlobalCastLockUntil = 0
 local dwCurrentChannelSkillID = 0
 
+-- Watchdog: neu trang thai OT (cast/channel) ket > 3s thi coi nhu treo, cho macro chay tiep.
+local nOTBusySince = 0
+local function IsOTStuck(me)
+	if not me or not GetTime then return false end
+	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
+	if not okOT or tonumber(nOT or 0) == 0 then
+		nOTBusySince = 0
+		return false
+	end
+	local now = GetTime()
+	if nOTBusySince == 0 then nOTBusySince = now end
+	return now - nOTBusySince > 3000
+end
+
+local nNgungThanCooldownUntilFrame = 0
+
 local function IsChannelingNgungThan(me)
 	if not me then return false end
 	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
@@ -772,12 +788,17 @@ local function IsChannelingNgungThan(me)
 	end
 	if me.GetSkillPrepareState then
 		local okP, bPrep, dwID = pcall(function() return me.GetSkillPrepareState() end)
-		if okP and (bPrep or tonumber(dwID or 0) == 300) and tonumber(dwID or 0) == 300 then
+		if okP and tonumber(dwID or 0) == 300 then
 			dwCurrentChannelSkillID = 300
 			return true
 		end
 	end
-	if szLastOTA == "Ngưng Thần Tụ Khí" or szLastOTA == "Ngung Than Tu Khi" or szLastOTA == "凝神聚气" then
+	if szLastOTA and (szLastOTA == "Ngưng Thần Tụ Khí" or szLastOTA == "Ngung Than Tu Khi" or szLastOTA == "凝神聚气" or string.find(szLastOTA, "Ngưng Thần") or string.find(szLastOTA, "Ngung Than")) then
+		dwCurrentChannelSkillID = 300
+		return true
+	end
+	-- Thai Hu Kiem Y (dwForceID == 5) hoan toan khong co chieu channel nao khac ngoai Ngung Than Tu Khi
+	if me.dwForceID == 5 then
 		dwCurrentChannelSkillID = 300
 		return true
 	end
@@ -998,6 +1019,7 @@ local function GetPlayerSkillInfo(szName)
 	for k, v in pairs(tAllSkill) do
 		local szSkillName = Table_GetSkillName(k, v)
 		if szSkillName == szName or (szCanonical and szSkillName == szCanonical) then
+			if k == 364 and (tonumber(v) or 0) < 12 then v = 12 end
 			return k, v
 		end
 	end
@@ -1012,8 +1034,8 @@ local function GetPlayerSkillInfo(szName)
 		["Bát Hoang Quy Nguyên"]=2699, ["Bat Hoang Quy Nguyen"]=2699, ["bat hoang quy nguyen"]=2699, ["八荒归元"]=2699,
 		["Vô Ngã Vô Kiếm"]=365, ["Vo Nga Vo Kiem"]=365, ["vo nga vo kiem"]=365, ["无我无剑"]=365,
 		["Thiên Địa Vô Cực"]=308, ["Thien Dia Vo Cuc"]=308, ["thien dia vo cuc"]=308, ["天地无极"]=308,
-		["Tam Hoàn Quy Nguyệt"]=309, ["Tam Hoan Quy Nguyet"]=309, ["Tam Hoàn Sáo Nguyệt"]=309, ["Tam Hoan Sao Nguyet"]=309, ["三环套月"]=309,
-		["Kiếm Phi Kinh Thiên"]=364, ["Kiem Phi Kinh Thien"]=364, ["kiem phi kinh thien"]=364, ["剑飞惊天"]=364,
+		["Tam Hoàn Quy Nguyệt"]=309, ["Tam Hoan Quy Nguyet"]=309,
+		["Tam Hoàn Sáo Nguyệt"]=364, ["Tam Hoan Sao Nguyet"]=364,
 		["Lưỡng Nghi Hóa Hình"]=301, ["Luong Nghi Hoa Hinh"]=301, ["luong nghi hoa hinh"]=301, ["两仪化形"]=301,
 		["Tứ Tượng Luân Hồi"]=367, ["Tu Tuong Luan Hoi"]=367, ["tu tuong luan hoi"]=367, ["四象轮回"]=367,
 		["Thái Cực Vô Cực"]=306, ["Thai Cuc Vo Cuc"]=306, ["thai cuc vo cuc"]=306, ["太极无极"]=306,
@@ -1140,6 +1162,8 @@ local function GetPlayerSkillInfo(szName)
 		local me = GetClientPlayer()
 		local dwLvl = (me and me.GetSkillLevel and me.GetSkillLevel(id)) or 1
 		if dwLvl <= 0 then dwLvl = 1 end
+		-- Tam Hoan Sao Nguyet (364) luon cast o cap 12
+		if id == 364 and dwLvl < 12 then dwLvl = 12 end
 		return id, dwLvl
 	end
 	return nil
@@ -2420,26 +2444,43 @@ local function UITestCast(dwSkillID, dwLevel, index)
 		return true
 	end
 
-	-- 1. Khong duoc cast neu dang thi trien chieu (prepare / channel)
-	local bChanNgungThan = IsChannelingNgungThan(me)
-	if bChanNgungThan then
-		-- Dang doc thanh dan dao Ngung Than Tu Khi trong GCD (卡凝神):
-		-- Neu dang channel chinh Ngung Than (300) thi khong cast lap lai
-		if dwSkillID == 300 then
+	local nCurFrame = (GetLogicFrameCount and GetLogicFrameCount()) or 0
+	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
+	local nOTState = okOT and tonumber(nOT or 0) or 0
+
+	-- Chan Ngung Than Tu Khi (300) neu dang dan dao hoac vua bi ngat de danh chieu khac
+	if dwSkillID == 300 then
+		if nOTState == 2 then
 			return false
 		end
-		-- Cac skill khac (dwSkillID ~= 300):
-		-- Bo qua chan nOT == 2 de kiem tra tiep xem da het GCD hay chua!
-	else
+		if nNgungThanCooldownUntilFrame > 0 and nCurFrame < nNgungThanCooldownUntilFrame then
+			return false
+		end
+	end
+
+	-- 1. Kiem tra trang thai thi trien:
+	if not IsOTStuck(me) then
 		if me.GetSkillPrepareState then
 			local okP, bPrep = pcall(function() return me.GetSkillPrepareState() end)
 			if okP and bPrep then
 				return false
 			end
 		end
-		local okOT, nOT = pcall(function() return me.GetOTActionState() end)
-		if okOT and tonumber(nOT or 0) ~= 0 then
+		if nOTState == 1 then
 			return false
+		elseif nOTState == 2 then
+			-- Dang dan dao (channel):
+			-- Khong cast lap lai chinh chieu dan dao
+			if dwSkillID == 300 then
+				return false
+			end
+			-- Cac skill khac: kiem tra xem da het GCD cua chieu truoc chua
+			if me.GetSkillCDProgress then
+				local okG, bGCD, nGCDLeft = pcall(function() return me.GetSkillCDProgress(53, 1) end)
+				if okG and bGCD and tonumber(nGCDLeft or 0) > 0 then
+					return false
+				end
+			end
 		end
 	end
 	if not tOffGCDSkill[dwSkillID] and GetTime and nGlobalCastLockUntil > 0 and GetTime() < nGlobalCastLockUntil then
@@ -2908,17 +2949,21 @@ end
 HookUserSelectPoint()
 
 local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
-	local bChanNgungThan = IsChannelingNgungThan(me)
-	if bChanNgungThan and dwSkillID ~= 300 then
-		-- Tu dong ngat thanh dan dao Ngung Than Tu Khi de tung chieu moi ngay khi het GCD!
+	local nCur = (GetLogicFrameCount and GetLogicFrameCount()) or 0
+	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
+	local bIsChanneling = okOT and tonumber(nOT or 0) == 2
+
+	-- Khong can nhan dien: cu dang dan dao (nOT == 2) ma danh skill (dwSkillID ~= 300) la tu dong ngat dan dao!
+	if bIsChanneling and dwSkillID ~= 300 then
 		if me.StopCurrentAction then
 			pcall(function() me.StopCurrentAction() end)
 		end
 		dwCurrentChannelSkillID = 0
+		szLastOTA = nil
+		nNgungThanCooldownUntilFrame = nCur + 8
 	end
 
-	if not (me and me.GetOTActionState and me.GetOTActionState() == 2 and bProtectChannelSkill and not bChanNgungThan) then
-		local nCur = (GetLogicFrameCount and GetLogicFrameCount()) or 0
+	if not (bIsChanneling and bProtectChannelSkill and dwSkillID == 300) then
 		if tSkillCastFrame then
 			tSkillCastFrame[dwSkillID] = nCur
 		end
@@ -2934,7 +2979,7 @@ local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 		local skill = (GetSkill and GetSkill(dwSkillID, dwLevel)) or nil
 		local bIsChan = (skill and skill.bIsChannelSkill) or tChannelSkill[dwSkillID]
 		local bIsGround = (tGroundTargetSkill and tGroundTargetSkill[dwSkillID]) or dwSkillID == 2212 or (tCombatGroundSkills and tCombatGroundSkills[dwSkillID])
-		if now > 0 and not tOffGCDSkill[dwSkillID] then
+		if now > 0 and not tOffGCDSkill[dwSkillID] and not bIsChanneling then
 			local nLock = bIsGround and 650 or (bIsChan and 500 or 260)
 			if now + nLock > nGlobalCastLockUntil then
 				nGlobalCastLockUntil = now + nLock
@@ -4241,13 +4286,16 @@ function ExecuteMacroCommand(szMacroText)
     local me = GetClientPlayer() or MeCache:Get()
     if not me then return false end
 
-    -- Bao ve van khi / channel: neu dang thi trien hoac dan dao thi khong ngat chieu
-    if me.GetSkillPrepareState and me.GetSkillPrepareState() then
-        return false
-    end
-    local okOT, nOT = pcall(function() return me.GetOTActionState() end)
-    if okOT and tonumber(nOT or 0) ~= 0 then
-        return false
+    -- Chi chan khi dang thi trien chuan bi (prepare = 1).
+    -- Dang dan dao (channel = 2) thi khong chan de macro quet skill va tu dong ngat dan dao khi danh chieu!
+    if not IsOTStuck(me) then
+        if me.GetSkillPrepareState and me.GetSkillPrepareState() then
+            return false
+        end
+        local okOT, nOT = pcall(function() return me.GetOTActionState() end)
+        if okOT and tonumber(nOT or 0) == 1 then
+            return false
+        end
     end
 
     local szPattern = "[^" .. string.char(10, 13) .. "]+"
@@ -6514,19 +6562,17 @@ local function InitializeModule()
 -- Khí trường: Toái Tinh Thần (tăng bạo kích ngoại công và sát thương bạo kích).
 -- Tự hồi mana bằng Bão Nguyên Quy Nhất khi mana < 40% và Khí Điểm >= 8.
 -- Chuỗi dồn sát thương: Bát Hoang Quy Nguyên + Vô Ngã Vô Kiếm (khi Khí Điểm >= 8).
--- Tích khí điểm: Tam Hoàn Sáo Nguyệt / Tam Hoàn Quy Nguyệt + Thiên Địa Vô Cực.
+-- Hồi khí điểm: Tam Hoàn Sáo Nguyệt (ID 364) chỉ đánh khi các chiêu khác không khả dụng.
 -- Kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神) đỉnh cao để tích thêm khí điểm.
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
 /skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
 /skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
-/skill [distance<=4,tlife<0.40] Bát Hoang Quy Nguyên
-/skill [distance<=4,qidian>=8] Vô Ngã Vô Kiếm
-/skill [distance<=4] Bát Hoang Quy Nguyên
-/skill [distance<=4] Thiên Địa Vô Cực
-/skill [distance<=4,qidian<8] Tam Hoàn Sáo Nguyệt
-/skill [distance<=4,qidian<8] Tam Hoàn Quy Nguyệt
-/skill [distance<=4] Tam Hoàn Sáo Nguyệt
+/skill [tlife<0.40] Bát Hoang Quy Nguyên
+/skill [qidian>=8] Vô Ngã Vô Kiếm
+/skill Bát Hoang Quy Nguyên
+/skill Thiên Địa Vô Cực
+/skill Tam Hoàn Sáo Nguyệt
 /skill [qidian<10] Ngưng Thần Tụ Khí
 ]]})
 end

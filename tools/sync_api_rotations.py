@@ -42,17 +42,14 @@ scripts = {
         "alias": "TDTK",
         "name": "ThuanDuong_ThaiHuKiemY_80",
         "script": """#name ThuanDuong_ThaiHuKiemY_80
-/skill [nobuff:Tọa Vong Vô Ngã] Tọa Vong Vô Ngã
 /skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
-/skill [mana<0.40,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
 /skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
-/skill [distance<=4,tlife<0.40] Bát Hoang Quy Nguyên
-/skill [distance<=4,qidian>=8] Vô Ngã Vô Kiếm
-/skill [distance<=4,qidian<=7] Bát Hoang Quy Nguyên
-/skill [distance<=4] Tam Hoàn Quy Nguyệt
-/skill [distance<=4] Kiếm Phi Kinh Thiên
-/skill [qidian<8] Ngưng Thần Tụ Khí
-/skill [nofight,qidian<10] Ngưng Thần Tụ Khí"""
+/skill [tlife<0.40] Bát Hoang Quy Nguyên
+/skill [qidian>=8] Vô Ngã Vô Kiếm
+/skill Bát Hoang Quy Nguyên
+/skill Thiên Địa Vô Cực
+/skill Tam Hoàn Sáo Nguyệt
+/skill [qidian<10] Ngưng Thần Tụ Khí"""
     },
     10015: {
         "school": "ThuanDuong",
@@ -296,9 +293,9 @@ html_content = f'''<!DOCTYPE html>
 '''
 
 # Write to all destinations
-for target_dir in ["BDMacro-export", "interface/xMacro", "xMacro-v80-HCNC-0.9.7-addon/interface/xMacro", ""]:
-    base = Path(target_dir) if target_dir else Path(".")
-    api_dir = base / "api"
+ROOT = Path(__file__).resolve().parent.parent.parent
+for target_dir in [ROOT / "BDMacro-export", ROOT / "interface/xMacro", ROOT / "xMacro-v80-HCNC-0.9.7-addon/interface/xMacro"]:
+    api_dir = target_dir / "api"
     api_dir.mkdir(parents=True, exist_ok=True)
     (api_dir / "cloud_rotations.lua").write_text(lua_content, encoding="utf-8-sig")
     (api_dir / "cloud_rotations.html").write_text(html_content, encoding="utf-8")
