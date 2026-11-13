@@ -16,7 +16,7 @@
       "sha256": "5c111ad68e6b9198e8aaafaef947438e44b7d3f671d7018b9760b18005650fac"
     },
     "Native/XM04_Core.lua": {
-      "sha256": "e734e44294cf64c1cf5327d2f359629007b6048b4b07b4112d04c1fe0a093219"
+      "sha256": "ad1e115e9017ece78f937e8afbaf87e6f0b7276094b1411fd787c1d3df7441c6"
     },
     "Native/XM05_VanHoa.lua": {
       "sha256": "66259bfe2ab4c4859b732c9ec6fc7ad710773fb6e5a16f852b707f65a52d662c"
@@ -37,7 +37,7 @@
       "sha256": "8162779fc615d18b6af242946d5509c80fbc60d82e48f88aa88f371986faa704"
     },
     "Native/XM11_MinhGiao.lua": {
-      "sha256": "1d6a53334c4d437d0ec2b00dee63ac6276b24222fdef840cf5f21b9414161c00"
+      "sha256": "2a7de1762a8deeaf8abe28fa1090c12b4689092cef5e4e6aef3be30fa61d720d"
     },
     "Native/XM12_ThieuLam.lua": {
       "sha256": "947f8007751bb531170d7a28df61dee388b11ecc1f0d2deaf181868ad5f87628"
@@ -159,6 +159,14 @@
       "kungfuIds": [
         10242
       ],
+      "sourcePath": "Schools/MinhGiao/PhanAnh.lua"
+    },
+    "MinhGiao/PhanAnhQN": {
+      "path": "Native/XM11_MinhGiao.lua",
+      "aliases": [
+        "MGPB"
+      ],
+      "kungfuIds": [],
       "sourcePath": "Schools/MinhGiao/PhanAnh.lua"
     },
     "MinhGiao/MinhTon": {

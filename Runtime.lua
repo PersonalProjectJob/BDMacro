@@ -4757,6 +4757,7 @@ xMacro.Core.SchoolAliases = {
     ["DMTL"] = {school = "DuongMon", profile = "ThienLa"},
     ["MG"] = {school = "MinhGiao", profile = "PhanAnh"},
     ["MGPA"] = {school = "MinhGiao", profile = "PhanAnh"},
+    ["MGPB"] = {school = "MinhGiao", profile = "PhanAnhQN"},
     ["MGMT"] = {school = "MinhGiao", profile = "MinhTon"},
     ["MGTANK"] = {school = "MinhGiao", profile = "MinhTon"},
     ["TL"] = {school = "ThieuLam", profile = "DichCanKinh"},
@@ -6721,13 +6722,24 @@ local function InitializeModule()
 -- Kỹ năng: Tham Ma Thể, Tịnh Thế Phá Ma Kích, Khu Dạ Đoạn Sầu,
 -- Chỉ đánh Nhật: Tịnh Thế > Khu Dạ > Liệt Nhật > Ngân Nguyệt (khi chưa có DOT) > Xích Nhật Luân (cuối).
 xMacro.Schools.RegisterDamageScript("MinhGiao", "PhanAnh", {[10242] = [[
-#name MinhGiao_PhanAnh_80
-/skill [life<0.3] Tham Ma Thể
-/skill Tịnh Thế Phá Ma Kích
-/skill Khu Dạ Đoạn Sầu
-/skill Liệt Nhật Trảm
-/skill [nombuff:Ngân Nguyệt Trảm] Ngân Nguyệt Trảm
-/skill Xích Nhật Luân
+#name MinhGiao_PhanAnh_Boss
+/cast Khu Dạ Đoạn Sầu
+/cast Tịnh Thế Phá Ma Kích
+/cast Liệt Nhật Trảm
+/cast Ngân Nguyệt Trảm
+/cast [sun>=moon] U Nguyệt Luân
+/cast Xích Nhật Luân
+]]})
+-- MGPB: Phần Ảnh làm Q ngày (đứng đâu cũng được), AOE Hoàng Nhật Chiếu khi >3 địch.
+xMacro.Schools.RegisterDamageScript("MinhGiao", "PhanAnhQN", {[10242] = [[
+#name MinhGiao_PhanAnh_QNgay
+/cast Khu Dạ Đoạn Sầu
+/cast Tịnh Thế Phá Ma Kích
+/cast [nearby_enemy>3&sun>moon] Hoàng Nhật Chiếu
+/cast Liệt Nhật Trảm
+/cast Ngân Nguyệt Trảm
+/cast [moon>=sun] U Nguyệt Luân
+/cast Xích Nhật Luân
 ]]})
 end
 local ok, result = pcall(InitializeModule)
@@ -6743,21 +6755,22 @@ end
 do
 local function InitializeModule()
 -- Minh Tôn Lưu Hỏa Thể (10243) - Nội công Tank Minh Giáo v80
--- Kỹ năng: Tham Ma Thể, Thánh Minh Hựu, Từ Bi Nguyện (Taunt cừu hận chính),
--- Giới Hỏa Trảm, Hoàng Nhật Chiếu, Tịnh Thế Phá Ma Kích,
--- Liệt Nhật Trảm, Ngân Nguyệt Trảm, Xích Nhật Luân, U Nguyệt Luân.
+-- Kỹ năng: Tính Mệnh Hải / Tham Ma Thể, Quang Minh Tướng, Thánh Minh Hựu,
+-- Tịnh Thế Phá Ma Kích, Hoàng Nhật Chiếu, Liệt Nhật Trảm, Ngân Nguyệt Trảm,
+-- Giới Hỏa Trảm, Quy Tịch Đạo, Xích Nhật Luân.
 xMacro.Schools.RegisterDamageScript("MinhGiao", "MinhTon", {[10243] = [[
 #name MinhGiao_MinhTon_80
-/skill [life<0.3,nombuff:Xuân Nê Hộ Hoa] Tham Ma Thể
-/skill [life<0.4,fullsun] Thánh Minh Hựu
+/skill [life<=0.3] Tính Mệnh Hải
+/skill [life<=0.3] Tham Ma Thể
+/skill [life<=0.5,sun_power] Quang Minh Tướng
+/skill [life<=0.5,sun_power|moon_power] Thánh Minh Hựu
+/skill Tịnh Thế Phá Ma Kích
+/skill [nearby_enemy>3] Hoàng Nhật Chiếu
+/skill Liệt Nhật Trảm
+/skill Ngân Nguyệt Trảm
 /skill Giới Hỏa Trảm
 /skill Quy Tịch Đạo
--- /skill [nearby_enemy>=3] Hoàng Nhật Chiếu
-/skill [fullsun;fullmoon] Tịnh Thế Phá Ma Kích
-/skill [sun>=moon] Liệt Nhật Trảm
-/skill [moon>sun] Ngân Nguyệt Trảm
-/skill [sun>=moon] Xích Nhật Luân
-/skill U Nguyệt Luân
+/skill Xích Nhật Luân
 ]]})
 end
 local ok, result = pcall(InitializeModule)

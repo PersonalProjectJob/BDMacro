@@ -43,7 +43,7 @@ def profile_sources(profiles):
         sources = schools.setdefault(school, [])
         if source not in sources:
             sources.append(source)
-        if not entry["aliases"] or not entry["kungfuIds"]:
+        if not entry["aliases"] or ("kungfuIds" not in entry):
             raise ValueError(f"{profile}: missing alias or kungfu ID")
         for alias in entry["aliases"]:
             if not re.fullmatch(r"[A-Z0-9]+", alias) or alias in aliases:

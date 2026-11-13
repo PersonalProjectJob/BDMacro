@@ -4209,6 +4209,7 @@ xMacro.Core.SchoolAliases = {
     ["DMTL"] = {school = "DuongMon", profile = "ThienLa"},
     ["MG"] = {school = "MinhGiao", profile = "PhanAnh"},
     ["MGPA"] = {school = "MinhGiao", profile = "PhanAnh"},
+    ["MGPB"] = {school = "MinhGiao", profile = "PhanAnhQN"},
     ["MGMT"] = {school = "MinhGiao", profile = "MinhTon"},
     ["MGTANK"] = {school = "MinhGiao", profile = "MinhTon"},
     ["TL"] = {school = "ThieuLam", profile = "DichCanKinh"},
