@@ -146,6 +146,7 @@ xmacro = xMacro.Run
 xMacro.Cloud = xMacro.Cloud or {}
 local Cloud = xMacro.Cloud
 Cloud.version = "built-in"
+Cloud.builtinVersion = "20261113.1"
 Cloud.lastSyncTime = 0
 Cloud.rotationsCount = 0
 Cloud.status = "IDLE"
@@ -188,6 +189,10 @@ local function ApplyCloudPayload(payloadOrString)
 
     if type(payload.rotations) ~= "table" then
         return false, "missing_rotations_table"
+    end
+
+    if Cloud.builtinVersion and tostring(payload.version or "") < Cloud.builtinVersion then
+        return false, "older_than_builtin"
     end
 
     local nLoaded = 0

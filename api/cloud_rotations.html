@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -7,8 +7,8 @@
 <body>
 <pre id="data">
 return {
-    version = "20261108.2",
-    timestamp = "2026-11-08 14:30:00",
+    version = "20261113.1",
+    timestamp = "2026-11-13 15:25:00",
     client = "JX3-v80",
     rotations = {
         [10002] = {
@@ -72,15 +72,14 @@ return {
             name = "ThuanDuong_TuHaCong_80",
             script = [[
 #name ThuanDuong_TuHaCong_80
-/skill [nobuff:Tọa Vong Vô Ngã] Tọa Vong Vô Ngã
+/skill [nobuff:Tọa Vọng Vô Ngã] Tọa Vọng Vô Ngã
 /skill [nobuff:Phá Thương Khung] Phá Thương Khung
 /skill [mana<0.40,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
-/skill [mana<0.60,qidian>=8] Bão Nguyên Quy Nhất
-/skill [distance<=20,qidian>=8] Lưỡng Nghi Hóa Hình
-/skill [distance<=20,qidian<=7] Tứ Tượng Luân Hồi
-/skill [distance<=20] Thái Cực Vô Cực
+/skill [mana<0.60,qidian>=8] Bão Nguyên Thủ Khuyết
+/skill [qidian>=8] Lưỡng Nghi Hóa Hình
+/skill Tứ Tượng Luân Hồi
 /skill [qidian<8] Ngưng Thần Tụ Khí
-/skill [nofight,qidian<10] Ngưng Thần Tụ Khí
+/skill Thái Cực Vô Cực
 ]]
         },
         [10021] = {

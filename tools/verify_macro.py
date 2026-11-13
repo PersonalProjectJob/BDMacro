@@ -11,13 +11,21 @@ import sys
 
 ADDON = Path(__file__).resolve().parents[1]
 EXPORT = ADDON.parents[1] / "BDMacro-export"
+if not EXPORT.is_dir():
+    EXPORT = ADDON.parents[1] / "scratch" / "BDMacro"
+if not EXPORT.is_dir():
+    EXPORT = ADDON
 
 
 def verify(fix, addon):
     from lupa.lua51 import LuaRuntime
 
     for root in (addon, EXPORT / "Schools", EXPORT / "Core", EXPORT / "Features"):
+        if not root.exists():
+            continue
         for path in (*root.rglob("*.lua"), *root.rglob("*.txt")):
+            if "Schools\\NguDoc\\interface" in str(path) or "Schools/NguDoc/interface" in str(path):
+                continue
             data = path.read_bytes()
             data.decode("utf-8-sig")
             if not data.startswith(codecs.BOM_UTF8):

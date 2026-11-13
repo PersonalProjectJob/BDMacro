@@ -30,9 +30,8 @@ xMacro.Schools.RegisterDamageScript("ThuanDuong", "TuHaCong", {[10015] = [[
 /skill [mana<0.60,qidian>=8] Bão Nguyên Thủ Khuyết
 /skill [qidian>=8] Lưỡng Nghi Hóa Hình
 /skill Tứ Tượng Luân Hồi
-/skill Thái Cực Vô Cực
 /skill [qidian<8] Ngưng Thần Tụ Khí
-/skill [nofight,qidian<10] Ngưng Thần Tụ Khí
+/skill Thái Cực Vô Cực
 ]]})
 end
 local ok, result = pcall(InitializeModule)

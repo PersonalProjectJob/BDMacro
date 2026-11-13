@@ -2011,10 +2011,62 @@ local function UITestCast(dwSkillID, dwLevel, index)
 	local nCurFrame = (GetLogicFrameCount and GetLogicFrameCount()) or 0
 	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
 	local nOTState = okOT and tonumber(nOT or 0) or 0
+	local nStand = (MOVE_STATE and MOVE_STATE.ON_STAND) or 0
+	local bStanding = (me.nMoveState or nStand) == nStand
 
-	-- Chan Ngung Than Tu Khi (300) neu dang dan dao hoac vua bi ngat de danh chieu khac
+	-- Ngung Than Tu Khi (300): khong tin GCD nen co the cast ngay trong GCD khi qidian < 8 va dang dung yen
 	if dwSkillID == 300 then
-		if nOTState == 2 then
+		if nOTState ~= 0 then
+			return false
+		end
+		if me.GetSkillPrepareState then
+			local okP, bPrep = pcall(function() return me.GetSkillPrepareState() end)
+			if okP and bPrep then
+				return false
+			end
+		end
+		if not bStanding then
+			return false
+		end
+		if nNgungThanCooldownUntilFrame > 0 and nCurFrame < nNgungThanCooldownUntilFrame then
+			return false
+		end
+		if tSkillCastFrame and tSkillCastFrame[300] then
+			local diff = nCurFrame - tSkillCastFrame[300]
+			if diff >= 0 and diff < 2 then
+				return false
+			end
+		end
+		return true
+	end
+
+	-- Kiem tra buff Vu Tap (cho phep danh Tu Tuong Luan Hoi 367 tuc thoi khi di chuyen)
+	local bVuTap = false
+	if not bStanding and (dwSkillID == 367 or dwSkillID == 306) then
+		local aBuff = MyGetBuffList and MyGetBuffList(me)
+		if aBuff and (IsBuffExist(aBuff, "Vũ Tập") or IsBuffExist(aBuff, "Vu Tap") or IsBuffExist(aBuff, "雨集")) then
+			bVuTap = true
+		end
+	end
+
+	-- Cac chieu van cong / dan dao cua Thuan Duong yeu cau dung yen (khi di chuyen se roi xuong Thai Cuc Vo Cuc 306)
+	if not bStanding then
+		if dwSkillID == 367 and not bVuTap then
+			return false
+		elseif dwSkillID == 359 or dwSkillID == 357 or dwSkillID == 358 or dwSkillID == 362 or dwSkillID == 368 then
+			return false
+		end
+	end
+
+	-- Thai Cuc Vo Cuc (306): CHI danh khi TAT CA cac skill khac khong the danh (tuc la dang di chuyen, qidian < 8, khong co Vu Tap)
+	if dwSkillID == 306 then
+		if bStanding then
+			return false
+		end
+		if (me.nAccumulateValue or 0) >= 8 then
+			return false
+		end
+		if bVuTap then
 			return false
 		end
 		if nNgungThanCooldownUntilFrame > 0 and nCurFrame < nNgungThanCooldownUntilFrame then
@@ -2024,24 +2076,20 @@ local function UITestCast(dwSkillID, dwLevel, index)
 
 	-- 1. Kiem tra trang thai thi trien:
 	if not IsOTStuck(me) then
-		if me.GetSkillPrepareState then
-			local okP, bPrep = pcall(function() return me.GetSkillPrepareState() end)
-			if okP and bPrep then
-				return false
-			end
-		end
 		if nOTState == 1 then
 			return false
 		elseif nOTState == 2 then
 			-- Dang dan dao (channel):
-			-- Khong cast lap lai chinh chieu dan dao
-			if dwSkillID == 300 then
+			-- Neu dang dan dao Ngung Than Tu Khi (300) hoac khong bat bao ve channel:
+			-- Cho phep kiem tra CD/GCD thuc te cua skill (nhu Luong Nghi Hoa Hinh 301, Tu Tuong Luan Hoi 367) o buoc 3 & 4
+			local bIsNgungThan = IsChannelingNgungThan(me) or (dwCurrentChannelSkillID == 300) or (me.dwForceID == 5 and dwCurrentChannelSkillID ~= 368)
+			if not bIsNgungThan and bProtectChannelSkill then
 				return false
 			end
-			-- Cac skill khac: kiem tra xem da het GCD cua chieu truoc chua
-			if me.GetSkillCDProgress then
-				local okG, bGCD, nGCDLeft = pcall(function() return me.GetSkillCDProgress(53, 1) end)
-				if okG and bGCD and tonumber(nGCDLeft or 0) > 0 then
+		else
+			if me.GetSkillPrepareState then
+				local okP, bPrep, dwPrepID = pcall(function() return me.GetSkillPrepareState() end)
+				if okP and bPrep and tonumber(dwPrepID or 0) ~= 300 then
 					return false
 				end
 			end
@@ -2666,15 +2714,19 @@ local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 	local nCur = (GetLogicFrameCount and GetLogicFrameCount()) or 0
 	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
 	local bIsChanneling = okOT and tonumber(nOT or 0) == 2
+	local bWasChanneling = false
 
-	-- Dan dao: neu dang kep Ngung Than Tu Khi (300) hoac khong bat bao ve thi danh skill moi se tu dong ngat dan dao
+	-- Dan dao: neu dang kep Ngung Than Tu Khi (300) hoac khong bat bao ve thi ngat dan dao de danh skill moi
 	local bIsNgungThan = IsChannelingNgungThan(me) or (dwCurrentChannelSkillID == 300) or (me.dwForceID == 5 and dwCurrentChannelSkillID ~= 368)
 	if bIsChanneling and dwSkillID ~= 300 then
 		if bIsNgungThan or not bProtectChannelSkill then
-			-- Khong can goi me.StopCurrentAction(), don gian chi can danh skill moi se tu dong ngat dan dao
+			if me.StopCurrentAction then
+				pcall(function() me.StopCurrentAction() end)
+			end
 			dwCurrentChannelSkillID = 0
 			szLastOTA = nil
-			nNgungThanCooldownUntilFrame = nCur + 8
+			nNgungThanCooldownUntilFrame = nCur + 6
+			bWasChanneling = true
 			bIsChanneling = false
 		else
 			-- Dang dan dao chieu tan cong / ho tro (nhu Luc Hop Doc Ton 368, Tuy Vu 2235...) va co bao ve dan dao
@@ -2683,8 +2735,11 @@ local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 	end
 
 	if not (bIsChanneling and bProtectChannelSkill and dwSkillID == 300) then
-		if tSkillCastFrame then
+		if tSkillCastFrame and (not bWasChanneling or dwSkillID == 300) then
 			tSkillCastFrame[dwSkillID] = nCur
+		end
+		if dwSkillID ~= 300 and nCur + 6 > nNgungThanCooldownUntilFrame then
+			nNgungThanCooldownUntilFrame = nCur + 6
 		end
 		PrepareGroundSkillOnTarget(dwSkillID)
 		OnAddOnUseSkill(dwSkillID, dwLevel)
@@ -2698,7 +2753,7 @@ local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 		local skill = (GetSkill and GetSkill(dwSkillID, dwLevel)) or nil
 		local bIsChan = (skill and skill.bIsChannelSkill) or tChannelSkill[dwSkillID]
 		local bIsGround = (tGroundTargetSkill and tGroundTargetSkill[dwSkillID]) or dwSkillID == 2212 or (tCombatGroundSkills and tCombatGroundSkills[dwSkillID])
-		if now > 0 and not tOffGCDSkill[dwSkillID] and not bIsChanneling then
+		if now > 0 and not tOffGCDSkill[dwSkillID] and not bIsChanneling and not bWasChanneling then
 			local nLock = bIsGround and 650 or (bIsChan and 500 or 260)
 			if now + nLock > nGlobalCastLockUntil then
 				nGlobalCastLockUntil = now + nLock
@@ -2744,10 +2799,15 @@ RegisterEvent("DO_SKILL_CAST", function()
 	if id and id > 0 then
 		if (me and caster == tonumber(me.dwID)) or id == 2477 or id == 2472 then
 			if id ~= 300 and dwCurrentChannelSkillID == 300 then dwCurrentChannelSkillID = 0 end
+			if id ~= 300 then
+				nNgungThanCooldownUntilFrame = 0
+			end
 			tLastCast.skill = id
 			tLastCast.player = caster
 			tLastCast.frame = GetLogicFrameCount()
-			if tSkillCastFrame then tSkillCastFrame[id] = GetLogicFrameCount() end
+			if tSkillCastFrame and id ~= 367 then
+				tSkillCastFrame[id] = GetLogicFrameCount()
+			end
 		end
 	end
 	if me and tonumber(arg0) == tonumber(me.dwID) then
@@ -2805,7 +2865,10 @@ end
 RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
 	local me = (GetClientPlayer and GetClientPlayer()) or (MeCache and MeCache.Get and MeCache:Get())
 	if not arg0 or (me and tonumber(arg0) == tonumber(me.dwID)) or (UI_GetClientPlayerID and tonumber(arg0) == tonumber(UI_GetClientPlayerID())) then
-		nGlobalCastLockUntil = 0
+		local nCur = (GetLogicFrameCount and GetLogicFrameCount()) or 0
+		if nNgungThanCooldownUntilFrame <= 0 or nCur >= nNgungThanCooldownUntilFrame then
+			nGlobalCastLockUntil = 0
+		end
 		dwCurrentChannelSkillID = 0
 		if szLastOTA then
 			szLastOTA = nil
@@ -2901,6 +2964,8 @@ local function ExecuteSkillCommand(szText)
 				if dwSkillID then
 					if UITestCast(dwSkillID, dwLevel, 1) then
 						return OnCastPlayerSkill(me, dwSkillID, dwLevel)
+					elseif dwSkillID == 300 and me.GetOTActionState and me.GetOTActionState() == 2 and IsChannelingNgungThan(me) then
+						return true
 					end
 				else
 					local dwForceID = me.dwForceID
@@ -4011,12 +4076,16 @@ function ExecuteMacroCommand(szMacroText)
     -- Chi chan khi dang thi trien chuan bi (prepare = 1).
     -- Dang dan dao (channel = 2) thi khong chan de macro quet skill va tu dong ngat dan dao khi danh chieu!
     if not IsOTStuck(me) then
-        if me.GetSkillPrepareState and me.GetSkillPrepareState() then
+        local okOT, nOT = pcall(function() return me.GetOTActionState() end)
+        local nOTState = okOT and tonumber(nOT or 0) or 0
+        if nOTState == 1 then
             return false
         end
-        local okOT, nOT = pcall(function() return me.GetOTActionState() end)
-        if okOT and tonumber(nOT or 0) == 1 then
-            return false
+        if nOTState ~= 2 and me.GetSkillPrepareState then
+            local okP, bPrep, dwPrepID = pcall(function() return me.GetSkillPrepareState() end)
+            if okP and bPrep and tonumber(dwPrepID or 0) ~= 300 then
+                return false
+            end
         end
     end
 

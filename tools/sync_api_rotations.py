@@ -57,15 +57,14 @@ scripts = {
         "alias": "TDTH",
         "name": "ThuanDuong_TuHaCong_80",
         "script": """#name ThuanDuong_TuHaCong_80
-/skill [nobuff:Tọa Vong Vô Ngã] Tọa Vong Vô Ngã
+/skill [nobuff:Tọa Vọng Vô Ngã] Tọa Vọng Vô Ngã
 /skill [nobuff:Phá Thương Khung] Phá Thương Khung
 /skill [mana<0.40,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
-/skill [mana<0.60,qidian>=8] Bão Nguyên Quy Nhất
-/skill [distance<=20,qidian>=8] Lưỡng Nghi Hóa Hình
-/skill [distance<=20,qidian<=7] Tứ Tượng Luân Hồi
-/skill [distance<=20] Thái Cực Vô Cực
+/skill [mana<0.60,qidian>=8] Bão Nguyên Thủ Khuyết
+/skill [qidian>=8] Lưỡng Nghi Hóa Hình
+/skill Tứ Tượng Luân Hồi
 /skill [qidian<8] Ngưng Thần Tụ Khí
-/skill [nofight,qidian<10] Ngưng Thần Tụ Khí"""
+/skill Thái Cực Vô Cực"""
     },
     10021: {
         "school": "VanHoa",
@@ -258,8 +257,8 @@ scripts = {
 }
 lua_lines = [
     'return {',
-    '    version = "20261108.2",',
-    '    timestamp = "2026-11-08 14:30:00",',
+    '    version = "20261113.1",',
+    '    timestamp = "2026-11-13 15:25:00",',
     '    client = "JX3-v80",',
     '    rotations = {'
 ]
@@ -293,11 +292,13 @@ html_content = f'''<!DOCTYPE html>
 '''
 
 # Write to all destinations
-ROOT = Path(__file__).resolve().parent.parent.parent
-for target_dir in [ROOT / "BDMacro-export", ROOT / "interface/xMacro", ROOT / "xMacro-v80-HCNC-0.9.7-addon/interface/xMacro"]:
-    api_dir = target_dir / "api"
-    api_dir.mkdir(parents=True, exist_ok=True)
-    (api_dir / "cloud_rotations.lua").write_text(lua_content, encoding="utf-8-sig")
-    (api_dir / "cloud_rotations.html").write_text(html_content, encoding="utf-8")
+BDMACRO_DIR = Path(__file__).resolve().parent.parent
+WORKSPACE_ROOT = BDMACRO_DIR.parent.parent
+for target_dir in [BDMACRO_DIR, WORKSPACE_ROOT / "interface/xMacro"]:
+    if target_dir.exists():
+        api_dir = target_dir / "api"
+        api_dir.mkdir(parents=True, exist_ok=True)
+        (api_dir / "cloud_rotations.lua").write_text(lua_content, encoding="utf-8-sig")
+        (api_dir / "cloud_rotations.html").write_text(html_content, encoding="utf-8-sig")
 
-print(f"Successfully synced all 16 rotations into cloud_rotations.lua and cloud_rotations.html (v20261108.2)!")
+print("Successfully synced all 16 rotations into cloud_rotations.lua and cloud_rotations.html (v20261113.1)!")
