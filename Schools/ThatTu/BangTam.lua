@@ -5,35 +5,25 @@ local DEFAULT_THATTU_BANGTAM_MACRO = [[
 #tip Macro That Tu Bang Tam v80: Dai Huyen Cap Khuc tu no Cap Khuc (Khong dung Giang Hai Ngung Quang)
 
 /config channel-on
-/wpwatch U Nguyệt-Loạn Hoa|Phất Khởi Long Y|Thủy Thông Thiết|10|1.5|U Nguyệt-Loạn Hoa|4
-/procwatch U Nguyệt-Loạn Hoa|Kiếm Khí Trường Giang|Đại Huyền Cấp Khúc
-
-/config before:[xmnobuff:U Nguyệt-Loạn Hoa]
 /usependant [xmtbuffstack:Cấp Khúc>=3]
 /skill [xmtbuffstack:Cấp Khúc>=3] Phồn Âm Cấp Tiết
 
 /skill [mana<0.85] Long Trì Nhạc
 /skill [qidian<=2] Mãn Đường Thế
-/skill [qidian>0,mana>0.15,distance<10] Kiếm Thần Vô Ngã
+/skill [distance<10,nobuff:Kiếm Thần Vô Ngã] Kiếm Thần Vô Ngã
 
 /skill [qidian>=7] Kiếm Phá Hư Không
 /skill [qidian>=4,xmtbuffstack:Cấp Khúc>=3] Kiếm Khí Trường Giang
-
-/skill [xmnobuff:Thủy Thông Thiết] Đại Huyền Cấp Khúc
-/skill [xmbufftime:Thủy Thông Thiết>1.5] Đại Huyền Cấp Khúc
-/config before:null
+/skill Đại Huyền Cấp Khúc
 ]]
 
 local function CreateBangTam(deps)
     local H = xMacro.Schools.BuildCombatHelpers(deps)
     local ExecuteMacroCommand = _G.ExecuteMacroCommand
-    local XMCore_UseEquipSlot = deps.XMCore_UseEquipSlot
-    local XMCore_Sys = deps.XMCore_Sys
-    local tSkillCastFrame = deps.tSkillCastFrame
 
     local ID_CAP_KHUC = {[2920] = true}
     local NAME_CAP_KHUC = {"Cấp Khúc", "Cap Khuc", "急曲"}
-    local ID_KIEM_THAN = {[559] = true}
+    local ID_KIEM_THAN = {[547] = true, [559] = true, [622] = true}
     local NAME_KIEM_THAN = {"Kiếm Thần Vô Ngã", "Kiem Than Vo Nga", "剑神无我"}
 
     local function Run(szName)
@@ -49,7 +39,20 @@ local function CreateBangTam(deps)
         end
 
         -- 2. Kiem tra bao ve channeling Dai Huyen Cap Khuc: khong ngat chieu
-        if me.GetOTActionState and me.GetOTActionState() ~= 0 then
+        local nCurFrame = (GetLogicFrameCount and GetLogicFrameCount()) or 0
+        local nStand = (MOVE_STATE and MOVE_STATE.ON_STAND) or 0
+        local bMoving = (me.nMoveState or 0) ~= nStand
+        if bMoving then
+            H.ClearChannelLock()
+        end
+        local bIsPreparing = false
+        if me.GetSkillPrepareState then
+            local okP, prep = pcall(function() return me.GetSkillPrepareState() end)
+            if okP and prep then bIsPreparing = true end
+        end
+        local okOT, nOT = pcall(function() return me.GetOTActionState() end)
+        local bIsOT = okOT and tonumber(nOT or 0) ~= 0
+        if bIsPreparing or bIsOT or (not bMoving and H.IsChannelLocked(nCurFrame)) then
             return false
         end
 
@@ -100,13 +103,11 @@ local function CreateBangTam(deps)
             return H.SendSkill(me, skPhonAm, "Phồn Âm Cấp Tiết", true)
         end
 
-        -- C. Kiem Than Vo Nga (ID 559): duy tri xung quanh khi khoang cach <= 10m
-        if nQiDian > 0 and nMana > 0.15 and nDist <= 10 and H.IsSkillReady(me, skKiemThan, 16) then
-            local bHasKiemThan = H.FindBuff(me, me, ID_KIEM_THAN, NAME_KIEM_THAN, true)
-            local nRemain = bHasKiemThan and H.BuffRemainingSec(bHasKiemThan) or 0
-            if not bHasKiemThan or nRemain <= 1.0 then
-                return H.SendSkill(me, skKiemThan, "Kiếm Thần Vô Ngã", false)
-            end
+        if H.IsGCD(me) then return false end
+
+        -- C. Kiem Than Vo Nga: distance < 10m va khong co buff Kiem Than Vo Nga
+        if nDist < 10 and not H.FindBuff(me, me, ID_KIEM_THAN, NAME_KIEM_THAN, false) and H.IsSkillReady(me, skKiemThan, 16) then
+            return H.SendSkill(me, skKiemThan, "Kiếm Thần Vô Ngã", false)
         end
 
         -- D. Chieu sat thuong chinh: Kiem Pha Hu Khong (qidian >= 7)
@@ -120,13 +121,8 @@ local function CreateBangTam(deps)
         end
 
         -- F. Dai Huyen Cap Khuc: Giu stack & tu kich no (khong dung Giang Hai Ngung Quang)
-        if H.IsSkillReady(me, skDaiHuyen, 4) then
+        if not bMoving and H.IsSkillReady(me, skDaiHuyen, 4) then
             return H.SendSkill(me, skDaiHuyen, "Đại Huyền Cấp Khúc", false)
-        end
-
-        -- G. Fallback text macro neu can
-        if ExecuteMacroCommand then
-            return ExecuteMacroCommand(DEFAULT_THATTU_BANGTAM_MACRO)
         end
 
         return false

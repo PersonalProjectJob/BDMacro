@@ -14,11 +14,12 @@ function xMacro.Schools.BuildCombatHelpers(deps)
     local GetMouseTargetXYZ = deps.GetMouseTargetXYZ or _G.GetMouseTargetXYZ
     local SyncAIOTLHelperBachTuc = deps.SyncAIOTLHelperBachTuc or _G.SyncAIOTLHelperBachTuc
     local tOffGCDSkills = {
+        [551] = true, [552] = true, [553] = true,
         [2214] = true, [2215] = true, [2216] = true, [2226] = true, [2227] = true,
         [2230] = true, [2236] = true, [2472] = true, [2477] = true,
     }
     local tChannelSkills = {
-        [2209] = true, [2231] = true, [2232] = true, [2235] = true,
+        [545] = true, [2209] = true, [2231] = true, [2232] = true, [2235] = true,
     }
     local nLastGCDSkillFrame = -999
     local nChannelLockUntilFrame = -999
@@ -98,7 +99,7 @@ function xMacro.Schools.BuildCombatHelpers(deps)
             local ok, list = pcall(function() return obj.GetBuffList() end)
             if ok and type(list) == "table" then
                 for _, b in pairs(list) do
-                    if type(b) == "table" and b.dwID then
+                    if (type(b) == "table" or type(b) == "userdata") and b.dwID then
                         table.insert(buffs, b)
                     end
                 end
@@ -129,12 +130,12 @@ function xMacro.Schools.BuildCombatHelpers(deps)
     local function FindBuff(obj, me, tIDs, tNames, bOwnOnly)
         local list = ReadBuffList(obj)
         local nCurFrame = (GetLogicFrameCount and GetLogicFrameCount()) or 0
-        local myID = me and tonumber(me.dwID) or nil
+        local myID = (me and tonumber(me.dwID)) or (UI_GetClientPlayerID and tonumber(UI_GetClientPlayerID())) or nil
         for _, b in ipairs(list) do
             if b.bValid ~= false then
                 local bNotExpired = (not b.nEndFrame) or b.nEndFrame <= 0 or nCurFrame <= 0 or b.nEndFrame > nCurFrame
-                local src = tonumber(b.dwSkillSrcID or 0) or 0
-                local bOwn = (not bOwnOnly) or src == 0 or (not myID) or src == myID
+                local src = tonumber(b.dwSkillSrcID or b.dwSrcID or b.dwSourceID or b.dwCasterID or b.dwSkillSrcId or 0) or 0
+                local bOwn = (not bOwnOnly) or (myID ~= nil and src > 0 and src == myID)
                 if bNotExpired and bOwn then
                     if tIDs and tIDs[b.dwID] then
                         return b

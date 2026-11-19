@@ -186,7 +186,7 @@ local nNextSunLevel = 1
 local tMoonSkill = {[4024] = 1,[4025] = 2,[4026] = 3}
 local tSunSkill =  {[4028] = 1,[4029] = 2,[4030] = 3}
 
-local tChannelSkill = {[3110] = true, [5268] = true, [2235] = true, [2209] = true, [2231] = true, [2232] = true, [300] = true, [368] = true, [567] = true}
+local tChannelSkill = {[545] = true, [3110] = true, [5268] = true, [2235] = true, [2209] = true, [2231] = true, [2232] = true, [300] = true, [368] = true, [567] = true}
 local tOffGCDSkill = {[2214] = true, [2215] = true, [2216] = true, [2226] = true, [2227] = true, [2230] = true, [2236] = true, [2472] = true, [2477] = true, [300] = true}
 local tGroundTargetSkill = {[2212] = 3}
 local nGlobalCastLockUntil = 0
@@ -791,6 +791,7 @@ local tCanonicalBuffNames = {
 	["Nu Oa Va Troi"] = "Nữ Oa Vá Trời", ["nu oa va troi"] = "Nữ Oa Vá Trời", ["女娲补天"] = "Nữ Oa Vá Trời",
 	["Thanh Thu Chuc Thien"] = "Thánh Thủ Chức Thiên", ["thanh thu chuc thien"] = "Thánh Thủ Chức Thiên", ["圣手织天"] = "Thánh Thủ Chức Thiên",
 	["Co Hoac Chung Sinh"] = "Cổ Hoặc Chúng Sinh", ["co hoac chung sinh"] = "Cổ Hoặc Chúng Sinh", ["蛊惑众生"] = "Cổ Hoặc Chúng Sinh",
+	["Kiem Than Vo Nga"] = "Kiếm Thần Vô Ngã", ["kiem than vo nga"] = "Kiếm Thần Vô Ngã", ["剑神无我"] = "Kiếm Thần Vô Ngã",
 }
 
 local tStaticBuffNames = {
@@ -880,12 +881,10 @@ local function IsBuffExist(tCache, szText, bSrc)
 	local myID = (me and me.dwID) or (UI_GetClientPlayerID and UI_GetClientPlayerID()) or nil
 	for k, v in pairs(tCache) do
 		local szBuffName = Table_GetBuffName and Table_GetBuffName(v.dwID, v.nLevel)
-		-- Client 80 cu co the khong tra dwSkillSrcID. Neu source bi thieu/0,
-		-- chap nhan buff thay vi lam mbuff/nombuff luon sai.
+		-- Chi tinh buff cua ban than khi bSrc=true (mbuff/nombuff/mbufftime)
+		local src = tonumber(v.dwSkillSrcID or v.dwSrcID or v.dwSourceID or v.dwCasterID or v.dwSkillSrcId or 0) or 0
 		local bOwn = (not bSrc)
-			or (v.dwSkillSrcID == nil)
-			or (tonumber(v.dwSkillSrcID or 0) == 0)
-			or (myID and tonumber(v.dwSkillSrcID or 0) == tonumber(myID))
+			or (myID ~= nil and src > 0 and src == tonumber(myID))
 		if bOwn then
 			-- Ho tro ca 2 ma Buff cua Lan Thoi Ngoc Chiet (711 va 715)
 			if (nID == 711 or nID == 715) and (v.dwID == 711 or v.dwID == 715) then
@@ -908,8 +907,8 @@ local function IsBuffExist(tCache, szText, bSrc)
 			-- Ho tro ma Buff cua Thiem Khieu (2211, 2490)
 			elseif nID == 2211 and (v.dwID == 2211 or v.dwID == 2490) then
 				return v
-			-- Ho tro ma Buff cua Me Tam Co (2215, 2489, 6247)
-			elseif nID == 2215 and (v.dwID == 2215 or v.dwID == 2489 or v.dwID == 6247) then
+			-- Ho tro ma Buff cua Me Tam Co (2215, 6247)
+			elseif nID == 2215 and (v.dwID == 2215 or v.dwID == 6247) then
 				return v
 			-- Ho tro ca 2 ten/ma Buff cua Ngan Nguyet Tram (DOT)
 			elseif (szText == "Ngân Nguyệt Trảm" or szText == "Ngân Nguyệt" or szText == "银月斩" or szText == "银月" or (szCanonical and szCanonical == "Ngân Nguyệt Trảm"))
@@ -1372,7 +1371,8 @@ local function CheckPrepare(tar, szText)
 						or ((szSkill == "Hạt Tâm" or szSkill == "Hat Tam") and dwID == 2209)
 						or ((szSkill == "Băng Tàm Khiên Ti" or szSkill == "Bang Tam Khien Ti") and dwID == 2231)
 						or ((szSkill == "Túy Vũ Cửu Thiên" or szSkill == "Tuy Vu Cuu Thien") and dwID == 2232)
-						or ((szSkill == "Thiên Điệp Thổ Thụy" or szSkill == "Thien Diep Tho Thuy") and dwID == 2235) then
+						or ((szSkill == "Thiên Điệp Thổ Thụy" or szSkill == "Thien Diep Tho Thuy") and dwID == 2235)
+						or ((szSkill == "Đại Huyền Cấp Khúc" or szSkill == "Dai Huyen Cap Khuc" or szSkill == "玳弦急曲") and dwID == 545) then
 						return true
 					end
 				end
@@ -2835,6 +2835,7 @@ do
 						dwCurrentChannelSkillID = nChanID
 					end
 				end
+				nOTBusySince = (GetTime and GetTime()) or 0
 				szLastOTA = Table_GetSkillName(arg1, arg2)
 			end
 		end)
@@ -2849,6 +2850,7 @@ RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
 		if nNgungThanCooldownUntilFrame <= 0 or nCur >= nNgungThanCooldownUntilFrame then
 			nGlobalCastLockUntil = 0
 		end
+		nOTBusySince = 0
 		dwCurrentChannelSkillID = 0
 		if szLastOTA then
 			szLastOTA = nil
@@ -3325,8 +3327,8 @@ local function XMCore_FindBuff(obj, token, ownOnly)
 
     for _, v in pairs(list) do
         local lv = tonumber(v.nLevel or v.dwLevel or 1) or 1
-        local src = tonumber(v.dwSkillSrcID or 0) or 0
-        local sourceOK = (not ownOnly) or src == 0 or not myID or src == myID
+        local src = tonumber(v.dwSkillSrcID or v.dwSrcID or v.dwSourceID or v.dwCasterID or v.dwSkillSrcId or 0) or 0
+        local sourceOK = (not ownOnly) or (myID ~= nil and src > 0 and src == tonumber(myID))
 
         if sourceOK and (not needLv or lv == needLv) then
             if id and tonumber(v.dwID) == id then

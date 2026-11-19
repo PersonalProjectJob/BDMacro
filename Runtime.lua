@@ -154,11 +154,12 @@ function xMacro.Schools.BuildCombatHelpers(deps)
     local GetMouseTargetXYZ = deps.GetMouseTargetXYZ or _G.GetMouseTargetXYZ
     local SyncAIOTLHelperBachTuc = deps.SyncAIOTLHelperBachTuc or _G.SyncAIOTLHelperBachTuc
     local tOffGCDSkills = {
+        [551] = true, [552] = true, [553] = true,
         [2214] = true, [2215] = true, [2216] = true, [2226] = true, [2227] = true,
         [2230] = true, [2236] = true, [2472] = true, [2477] = true,
     }
     local tChannelSkills = {
-        [2209] = true, [2231] = true, [2232] = true, [2235] = true,
+        [545] = true, [2209] = true, [2231] = true, [2232] = true, [2235] = true,
     }
     local nLastGCDSkillFrame = -999
     local nChannelLockUntilFrame = -999
@@ -238,7 +239,7 @@ function xMacro.Schools.BuildCombatHelpers(deps)
             local ok, list = pcall(function() return obj.GetBuffList() end)
             if ok and type(list) == "table" then
                 for _, b in pairs(list) do
-                    if type(b) == "table" and b.dwID then
+                    if (type(b) == "table" or type(b) == "userdata") and b.dwID then
                         table.insert(buffs, b)
                     end
                 end
@@ -269,12 +270,12 @@ function xMacro.Schools.BuildCombatHelpers(deps)
     local function FindBuff(obj, me, tIDs, tNames, bOwnOnly)
         local list = ReadBuffList(obj)
         local nCurFrame = (GetLogicFrameCount and GetLogicFrameCount()) or 0
-        local myID = me and tonumber(me.dwID) or nil
+        local myID = (me and tonumber(me.dwID)) or (UI_GetClientPlayerID and tonumber(UI_GetClientPlayerID())) or nil
         for _, b in ipairs(list) do
             if b.bValid ~= false then
                 local bNotExpired = (not b.nEndFrame) or b.nEndFrame <= 0 or nCurFrame <= 0 or b.nEndFrame > nCurFrame
-                local src = tonumber(b.dwSkillSrcID or 0) or 0
-                local bOwn = (not bOwnOnly) or src == 0 or (not myID) or src == myID
+                local src = tonumber(b.dwSkillSrcID or b.dwSrcID or b.dwSourceID or b.dwCasterID or b.dwSkillSrcId or 0) or 0
+                local bOwn = (not bOwnOnly) or (myID ~= nil and src > 0 and src == myID)
                 if bNotExpired and bOwn then
                     if tIDs and tIDs[b.dwID] then
                         return b
@@ -754,7 +755,7 @@ local nNextSunLevel = 1
 local tMoonSkill = {[4024] = 1,[4025] = 2,[4026] = 3}
 local tSunSkill =  {[4028] = 1,[4029] = 2,[4030] = 3}
 
-local tChannelSkill = {[3110] = true, [5268] = true, [2235] = true, [2209] = true, [2231] = true, [2232] = true, [300] = true, [368] = true, [567] = true}
+local tChannelSkill = {[545] = true, [3110] = true, [5268] = true, [2235] = true, [2209] = true, [2231] = true, [2232] = true, [300] = true, [368] = true, [567] = true}
 local tOffGCDSkill = {[2214] = true, [2215] = true, [2216] = true, [2226] = true, [2227] = true, [2230] = true, [2236] = true, [2472] = true, [2477] = true, [300] = true}
 local tGroundTargetSkill = {[2212] = 3}
 local nGlobalCastLockUntil = 0
@@ -1359,6 +1360,7 @@ local tCanonicalBuffNames = {
 	["Nu Oa Va Troi"] = "Nữ Oa Vá Trời", ["nu oa va troi"] = "Nữ Oa Vá Trời", ["女娲补天"] = "Nữ Oa Vá Trời",
 	["Thanh Thu Chuc Thien"] = "Thánh Thủ Chức Thiên", ["thanh thu chuc thien"] = "Thánh Thủ Chức Thiên", ["圣手织天"] = "Thánh Thủ Chức Thiên",
 	["Co Hoac Chung Sinh"] = "Cổ Hoặc Chúng Sinh", ["co hoac chung sinh"] = "Cổ Hoặc Chúng Sinh", ["蛊惑众生"] = "Cổ Hoặc Chúng Sinh",
+	["Kiem Than Vo Nga"] = "Kiếm Thần Vô Ngã", ["kiem than vo nga"] = "Kiếm Thần Vô Ngã", ["剑神无我"] = "Kiếm Thần Vô Ngã",
 }
 
 local tStaticBuffNames = {
@@ -1448,12 +1450,10 @@ local function IsBuffExist(tCache, szText, bSrc)
 	local myID = (me and me.dwID) or (UI_GetClientPlayerID and UI_GetClientPlayerID()) or nil
 	for k, v in pairs(tCache) do
 		local szBuffName = Table_GetBuffName and Table_GetBuffName(v.dwID, v.nLevel)
-		-- Client 80 cu co the khong tra dwSkillSrcID. Neu source bi thieu/0,
-		-- chap nhan buff thay vi lam mbuff/nombuff luon sai.
+		-- Chi tinh buff cua ban than khi bSrc=true (mbuff/nombuff/mbufftime)
+		local src = tonumber(v.dwSkillSrcID or v.dwSrcID or v.dwSourceID or v.dwCasterID or v.dwSkillSrcId or 0) or 0
 		local bOwn = (not bSrc)
-			or (v.dwSkillSrcID == nil)
-			or (tonumber(v.dwSkillSrcID or 0) == 0)
-			or (myID and tonumber(v.dwSkillSrcID or 0) == tonumber(myID))
+			or (myID ~= nil and src > 0 and src == tonumber(myID))
 		if bOwn then
 			-- Ho tro ca 2 ma Buff cua Lan Thoi Ngoc Chiet (711 va 715)
 			if (nID == 711 or nID == 715) and (v.dwID == 711 or v.dwID == 715) then
@@ -1476,8 +1476,8 @@ local function IsBuffExist(tCache, szText, bSrc)
 			-- Ho tro ma Buff cua Thiem Khieu (2211, 2490)
 			elseif nID == 2211 and (v.dwID == 2211 or v.dwID == 2490) then
 				return v
-			-- Ho tro ma Buff cua Me Tam Co (2215, 2489, 6247)
-			elseif nID == 2215 and (v.dwID == 2215 or v.dwID == 2489 or v.dwID == 6247) then
+			-- Ho tro ma Buff cua Me Tam Co (2215, 6247)
+			elseif nID == 2215 and (v.dwID == 2215 or v.dwID == 6247) then
 				return v
 			-- Ho tro ca 2 ten/ma Buff cua Ngan Nguyet Tram (DOT)
 			elseif (szText == "Ngân Nguyệt Trảm" or szText == "Ngân Nguyệt" or szText == "银月斩" or szText == "银月" or (szCanonical and szCanonical == "Ngân Nguyệt Trảm"))
@@ -1940,7 +1940,8 @@ local function CheckPrepare(tar, szText)
 						or ((szSkill == "Hạt Tâm" or szSkill == "Hat Tam") and dwID == 2209)
 						or ((szSkill == "Băng Tàm Khiên Ti" or szSkill == "Bang Tam Khien Ti") and dwID == 2231)
 						or ((szSkill == "Túy Vũ Cửu Thiên" or szSkill == "Tuy Vu Cuu Thien") and dwID == 2232)
-						or ((szSkill == "Thiên Điệp Thổ Thụy" or szSkill == "Thien Diep Tho Thuy") and dwID == 2235) then
+						or ((szSkill == "Thiên Điệp Thổ Thụy" or szSkill == "Thien Diep Tho Thuy") and dwID == 2235)
+						or ((szSkill == "Đại Huyền Cấp Khúc" or szSkill == "Dai Huyen Cap Khuc" or szSkill == "玳弦急曲") and dwID == 545) then
 						return true
 					end
 				end
@@ -3403,6 +3404,7 @@ do
 						dwCurrentChannelSkillID = nChanID
 					end
 				end
+				nOTBusySince = (GetTime and GetTime()) or 0
 				szLastOTA = Table_GetSkillName(arg1, arg2)
 			end
 		end)
@@ -3417,6 +3419,7 @@ RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
 		if nNgungThanCooldownUntilFrame <= 0 or nCur >= nNgungThanCooldownUntilFrame then
 			nGlobalCastLockUntil = 0
 		end
+		nOTBusySince = 0
 		dwCurrentChannelSkillID = 0
 		if szLastOTA then
 			szLastOTA = nil
@@ -3893,8 +3896,8 @@ local function XMCore_FindBuff(obj, token, ownOnly)
 
     for _, v in pairs(list) do
         local lv = tonumber(v.nLevel or v.dwLevel or 1) or 1
-        local src = tonumber(v.dwSkillSrcID or 0) or 0
-        local sourceOK = (not ownOnly) or src == 0 or not myID or src == myID
+        local src = tonumber(v.dwSkillSrcID or v.dwSrcID or v.dwSourceID or v.dwCasterID or v.dwSkillSrcId or 0) or 0
+        local sourceOK = (not ownOnly) or (myID ~= nil and src > 0 and src == tonumber(myID))
 
         if sourceOK and (not needLv or lv == needLv) then
             if id and tonumber(v.dwID) == id then
@@ -5900,10 +5903,9 @@ local DEFAULT_NGUDOC_DOCKINH_MACRO = [[
 
 -- 0. Bao ve ky nang dan dao & chi ngat Hat Tam khi di chuyen
 /config channel-on
-/skill [ota:Hạt Tâm,moving] stopota
 
 -- 1. Tu cuu & Sinh ton khi nguy cap
-/skill [life<0.5,pet] Cổ Trùng Cuồng Bạo
+/skill [life<0.3,pet] Cổ Trùng Cuồng Bạo
 
 -- 2. Dieu khien Pet Linh Xa tan cong & Ao Kich (off-GCD)
 /skill [pet:Linh Xà] Ảo Kích
@@ -5913,30 +5915,31 @@ local DEFAULT_NGUDOC_DOCKINH_MACRO = [[
 /skill [nopet,nocd:Linh Xà Dẫn] Linh Xà Dẫn
 /skill [nopet,nocd:Ngọc Thiềm Dẫn] Ngọc Thiềm Dẫn
 /skill [nopet,nocd:Thánh Hạt Dẫn] Thánh Hạt Dẫn
-/skill [pet] Cổ Trùng Hiến Tế
+/skill [pet,nopet:Linh Xà] Cổ Trùng Hiến Tế
 /usependant [buff:Linh Xà Hiến Tế]
 
 -- 4. Co Trung & Ngat chieu Boss (off-GCD)
-/skill [tprepare,tnobuff:Mê Tâm Cổ,tnobuff:Đoạt Mệnh Cổ,tnobuff:Khô Tàn Cổ] Mê Tâm Cổ
-/skill [tprepare,tbuff:Khô Tàn Cổ] Hạt Tâm
-/skill [mana<0.35,nombuff:Khô Tàn Cổ,nombuff:Đoạt Mệnh Cổ] Khô Tàn Cổ
+/skill [tprepare,mbuff:Khô Tàn Cổ] Khô Tàn Cổ
+/skill [mbufftime:Khô Tàn Cổ<10] Khô Tàn Cổ
+/skill [tprepare,mbuff:Đoạt Mệnh Cổ] Đoạt Mệnh Cổ
+/skill [mbufftime:Đoạt Mệnh Cổ<10] Đoạt Mệnh Cổ
+/skill [tprepare,mbuff:Khô Tàn Cổ] Hạt Tâm
 /skill [nombuff:Đoạt Mệnh Cổ,nombuff:Khô Tàn Cổ] Đoạt Mệnh Cổ
 
--- 5. Chu trinh 3 DoT & Ky nang chu luc Doc Kinh
--- Uu tien Bach Tuc ngay khi hoi chieu (sat thuong tuc thoi + DoT manh nhat)
-/skill [nocd:Bách Túc] Bách Túc
--- Duy tri DoT Xa Anh (tranh danh lap khi vua niem Xa Anh)
+-- 5. Thu tu: Co > Thiem Khieu > Xa Anh > Hien Te (neu pet Ran) > Bach Tuc > Hat Tam
+/skill [nombuff:Thiềm Khiếu] Thiềm Khiếu
+/skill [mbufftime:Thiềm Khiếu<2] Thiềm Khiếu
 /skill [nombuff:Xà Ảnh,nolastcast:Xà Ảnh] Xà Ảnh
 /skill [mbufftime:Xà Ảnh<2,nolastcast:Xà Ảnh] Xà Ảnh
--- Duy tri DoT Thiem Khieu (hoi mana khi co Đoạt Mệnh Cổ)
-/skill [nombuff:Thiềm Khiếu] Thiềm Khiếu
+/skill [pet:Linh Xà,nocd:Cổ Trùng Hiến Tế,cdtime:Bách Túc>=2] Cổ Trùng Hiến Tế
+/skill [pet:Linh Xà,nocd:Cổ Trùng Hiến Tế,nocd:Bách Túc] Cổ Trùng Hiến Tế
+/skill [nocd:Bách Túc] Bách Túc
 
--- 6. Di chuyen (Instant Cast + hoi mana khi co Khô Tàn Cổ)
+-- 6. Di chuyen
 /skill [moving] Thiên Ti
-/skill [mana<0.25,tbuff:Khô Tàn Cổ] Thiên Ti
-/skill [moving] Xà Ảnh
+/skill [moving,nombuff:Xà Ảnh] Xà Ảnh
 
--- 7. Filler DPS chinh khi dung yen (van cong 1.75s / 1.5s)
+-- 7. Filler DPS chinh khi dung yen
 /skill [cd:Bách Túc] Hạt Tâm
 ]]
 
@@ -5960,7 +5963,7 @@ local DEFAULT_NGUDOC_BOTHIEN_MACRO = [[
 /skill [tlife<0.45] Thiên Điệp Thổ Thụy
 
 -- 3. Buff Co Hoac Chung Sinh & Burst Nu Oa
-/skill [tlife<0.85,tnobuff:Cổ Hoặc Chúng Sinh] Cổ Hoặc Chúng Sinh
+/skill [tlife<0.85,nombuff:Cổ Hoặc Chúng Sinh] Cổ Hoặc Chúng Sinh
 /skill [tlife<0.6] Nữ Oa Vá Trời
 /usependant [buff:Nữ Oa Vá Trời]
 
@@ -5982,6 +5985,7 @@ local function CreateDocKinh(deps)
         lastAoKichFrame = -999,
         nPetSummonFrame = -999,
         nLastAoKichSuccessFrame = -999,
+        lastPetKind = nil,
     }
 
     local ID_HAT_TAM = {[2209] = true}
@@ -5989,8 +5993,8 @@ local function CreateDocKinh(deps)
     local ID_THIEM_KHIEU = {[2211] = true, [2490] = true}
     local ID_BACH_TUC = {[2212] = true, [2492] = true, [2496] = true, [5764] = true}
     local ID_DOAT_MENH = {[2214] = true, [2488] = true}
-    local ID_ME_TAM = {[2215] = true, [2489] = true, [6247] = true}
-    local ID_KHO_TAN = {[2216] = true, [2496] = true}
+    local ID_ME_TAM = {[2215] = true, [6247] = true}
+    local ID_KHO_TAN = {[2216] = true}
     local ID_LINH_XA_HIEN_TE = {[2543] = true}
     local ID_THANH_HAT_HIEN_TE = {[2541] = true}
     local ID_NGOC_THIEM_HIEN_TE = {[2542] = true}
@@ -6041,9 +6045,7 @@ local function CreateDocKinh(deps)
             H.ClearChannelLock()
         end
         if bIsPreparing or bIsOT or (not bMoving and H.IsChannelLocked(nCurFrame)) then
-            if bMoving and (dwPrepID == skHatTam or ID_HAT_TAM[dwPrepID]) and me.StopCurrentAction then
-                pcall(function() return me.StopCurrentAction() end)
-            end
+            -- Di chuyen tu dong ngat dan dao/niem, khong can goi ham ngat.
             return false
         end
 
@@ -6054,6 +6056,9 @@ local function CreateDocKinh(deps)
         local bHasLinhXa = H.CheckPet and H.CheckPet("Linh Xà|Linh Xa|灵蛇") or false
         local bHasThanhHat = H.CheckPet and H.CheckPet("Thánh Hạt|Thanh Hat|圣蝎") or false
         local bHasNgocThiem = H.CheckPet and H.CheckPet("Ngọc Thiềm|Ngoc Thiem|玉蟾") or false
+        local bHasOtherPet = H.CheckPet and H.CheckPet("Phong Ngô|Phong Ngo|风蜈|Bích Điệp|Bich Diep|碧蝶") or false
+        local bIsNonSnakePet = bHasPet and (bHasThanhHat or bHasNgocThiem or bHasOtherPet or (not bHasLinhXa and tDocKinhState.lastPetKind == "other"))
+        local bIsSnakePet = bHasPet and not bIsNonSnakePet
 
         if not bHasPet then
             tDocKinhState.lastAoKichFrame = -999
@@ -6063,7 +6068,7 @@ local function CreateDocKinh(deps)
             tDocKinhState.nPetSummonFrame = nCurFrame
         end
 
-        if nLife < 0.50 and bHasPet and H.IsSkillReady(me, skCuongBao, 24) then
+        if nLife < 0.30 and bHasPet and H.IsSkillReady(me, skCuongBao, 24) then
             return H.SendSkill(me, skCuongBao, "Cổ Trùng Cuồng Bạo", false)
         end
 
@@ -6074,16 +6079,25 @@ local function CreateDocKinh(deps)
         local bHienTeReady = H.IsSkillReady(me, skHienTe, 16)
 
         -- 3. Quan ly Pet: Uu tien Linh Xa > Ngoc Thiem > Thanh Hat
-        if not bHasPet and not bMoving and not H.IsGCD(me) then
+        if not bHasPet and not H.IsGCD(me) then
             -- a) Uu tien 1: Linh Xa khong CD -> Luon goi Linh Xa
             if bLinhXaReady then
-                return H.SendSkill(me, skLinhXa, "Linh Xà Dẫn", bHasHienTeBuff)
+                if H.SendSkill(me, skLinhXa, "Linh Xà Dẫn", bHasHienTeBuff) then
+                    tDocKinhState.lastPetKind = "linhxa"
+                    return true
+                end
             -- b) Uu tien 2: Linh Xa dang CD -> Goi Ngoc Thiem (ID 2222)
             elseif bNgocThiemReady then
-                return H.SendSkill(me, skNgocThiem, "Ngọc Thiềm Dẫn", false)
+                if H.SendSkill(me, skNgocThiem, "Ngọc Thiềm Dẫn", false) then
+                    tDocKinhState.lastPetKind = "other"
+                    return true
+                end
             -- c) Uu tien 3: Ca Linh Xa & Ngoc Thiem deu CD -> Goi Thanh Hat (ID 2221)
             elseif bThanhHatReady then
-                return H.SendSkill(me, skThanhHat, "Thánh Hạt Dẫn", false)
+                if H.SendSkill(me, skThanhHat, "Thánh Hạt Dẫn", false) then
+                    tDocKinhState.lastPetKind = "other"
+                    return true
+                end
             end
         end
 
@@ -6103,8 +6117,10 @@ local function CreateDocKinh(deps)
         end
 
         -- 5. Co Trung Hien Te: Co bat ky pet nao thi hien te ngay khi Hien Te san sang (khong uu tien hay tri hoan rieng cho Linh Xa)
-        if bHasPet and bHienTeReady and not bHasHienTeBuff then
-            if H.SendSkill(me, skHienTe, "Cổ Trùng Hiến Tế", bHasLinhXa) then
+        -- Pet khac Ran (Ngoc Thiem / Thanh Hat): hien te o DAU combo.
+        -- Pet Ran: hien te sau Thiem Khieu + Xa Anh va truoc Bach Tuc (xem muc 5b) de buff 50% sat thuong cho Bach Tuc & Hat Tam.
+        if bIsNonSnakePet and bHienTeReady then
+            if H.SendSkill(me, skHienTe, "Cổ Trùng Hiến Tế", false) then
                 return true
             end
         end
@@ -6112,55 +6128,112 @@ local function CreateDocKinh(deps)
         if not tar then return false end
 
         -- 4. Co Trung & Ngat chieu Boss (off-GCD)
-        local bHasDoatMenh = H.FindBuff(tar, me, ID_DOAT_MENH, NAME_DOAT_MENH, true) ~= nil
-        local bHasKhoTan = H.FindBuff(tar, me, ID_KHO_TAN, NAME_KHO_TAN, true) ~= nil
+        local bDoatMenh = H.FindBuff(tar, me, ID_DOAT_MENH, NAME_DOAT_MENH, true)
+        local bKhoTan = H.FindBuff(tar, me, ID_KHO_TAN, NAME_KHO_TAN, true)
+        local bHasDoatMenh = bDoatMenh ~= nil
+        local bHasKhoTan = bKhoTan ~= nil
+        local nDoatMenhLeft = bDoatMenh and H.BuffRemainingSec(bDoatMenh) or 0
+        local nKhoTanLeft = bKhoTan and H.BuffRemainingSec(bKhoTan) or 0
         local bHasMeTam = H.FindBuff(tar, me, ID_ME_TAM, NAME_ME_TAM, true) ~= nil
         local bTargetPreparing = H.CheckPrepare and H.CheckPrepare(tar) or false
 
-        if bTargetPreparing and not bHasDoatMenh and not bHasKhoTan and not bHasMeTam and H.IsSkillReady(me, skMeTam, 24) then
-            H.SendSkill(me, skMeTam, "Mê Tâm Cổ", false)
-        elseif nMana < 0.35 and not bHasDoatMenh and not bHasKhoTan and H.IsSkillReady(me, skKhoTan, 24) then
-            H.SendSkill(me, skKhoTan, "Khô Tàn Cổ", false)
-        elseif not bHasDoatMenh and not bHasKhoTan and H.IsSkillReady(me, skDoatMenh, 24) then
+        -- Muc tieu dang chuan bi chieu hoac co con duoi 10s: danh lai dung loai co muc tieu dang co (Kho Tan / Doat Menh);
+        -- chua co co nao thi mac dinh Doat Menh Co.
+        if bHasKhoTan then
+            if (bTargetPreparing or nKhoTanLeft < 10.0) and H.IsSkillReady(me, skKhoTan, 24) then
+                H.SendSkill(me, skKhoTan, "Khô Tàn Cổ", false)
+            end
+        elseif bHasDoatMenh then
+            if (bTargetPreparing or nDoatMenhLeft < 10.0) and H.IsSkillReady(me, skDoatMenh, 24) then
+                H.SendSkill(me, skDoatMenh, "Đoạt Mệnh Cổ", false)
+            end
+        elseif H.IsSkillReady(me, skDoatMenh, 24) then
             H.SendSkill(me, skDoatMenh, "Đoạt Mệnh Cổ", false)
+        end
+
+        -- 5. Thu tu combo: Co (Doat Menh/Kho Tan) > Thiem Khieu > Xa Anh > [Hien Te Ran] > Bach Tuc > Hat Tam
+        local bXaAnh = H.FindBuff(tar, me, ID_XA_ANH, NAME_XA_ANH, true)
+        local nXaAnhLeft = bXaAnh and H.BuffRemainingSec(bXaAnh) or 0
+        local bRecentXaAnh = (lastcast and lastcast(skXaAnh)) or ((nCurFrame - tDocKinhState.lastXaAnhFrame) < 24)
+        local bThiemKhieu = H.FindBuff(tar, me, ID_THIEM_KHIEU, NAME_THIEM_KHIEU, true)
+        local nThiemKhieuLeft = bThiemKhieu and H.BuffRemainingSec(bThiemKhieu) or 0
+        local bNeedThiem = (not bThiemKhieu or nThiemKhieuLeft < 2.0) and H.IsSkillReady(me, skThiemKhieu, 8)
+        local bNeedXaAnh = (not bXaAnh or nXaAnhLeft < 2.0) and not bRecentXaAnh and H.IsSkillReady(me, skXaAnh, 8)
+
+        -- 5b. Pet Ran: Hien Te (off-GCD) sau khi Thiem Khieu & Xa Anh da len.
+        -- Chi cho khi Bach Tuc dang hoi chieu rieng con duoi 2s (0 < CD < 2s); cac truong hop khac hien te binh thuong.
+        local bWaitBachTucForSac = false
+        if me.GetSkillCDProgress then
+            local nBTLvl = (me.GetSkillLevel and me.GetSkillLevel(skBachTuc)) or 1
+            if nBTLvl <= 0 then nBTLvl = 1 end
+            local okCD, bCool, nLeft, nTotal = pcall(function() return me.GetSkillCDProgress(skBachTuc, nBTLvl) end)
+            if okCD and bCool then
+                local fps = (GLOBAL and GLOBAL.GAME_FPS) or 16
+                local nLeftSec = (tonumber(nLeft) or 0) / fps
+                local nTotalSec = (tonumber(nTotal) or 0) / fps
+                if nTotalSec > 2.0 and nLeftSec > 0 and nLeftSec < 2.0 then
+                    bWaitBachTucForSac = true
+                end
+            end
+        end
+        local nGCDLeftSec = 0
+        if me.GetSkillCDProgress then
+            local okGCD, bCoolGCD, nLeftGCD = pcall(function() return me.GetSkillCDProgress(53, 1) end)
+            if okGCD and bCoolGCD and tonumber(nLeftGCD or 0) > 0 then
+                local fps = (GLOBAL and GLOBAL.GAME_FPS) or 16
+                nGCDLeftSec = tonumber(nLeftGCD) / fps
+            end
+        end
+        if nGCDLeftSec == 0 and (nCurFrame - tDocKinhState.lastXaAnhFrame) >= 0 and (nCurFrame - tDocKinhState.lastXaAnhFrame) < 16 then
+            local fps = (GLOBAL and GLOBAL.GAME_FPS) or 16
+            nGCDLeftSec = 1.5 - ((nCurFrame - tDocKinhState.lastXaAnhFrame) / fps)
+        end
+        local bThiemOnRealCD = false
+        if me.GetSkillCDProgress then
+            local nTKLvl = (me.GetSkillLevel and me.GetSkillLevel(skThiemKhieu)) or 1
+            if nTKLvl <= 0 then nTKLvl = 1 end
+            local okTK, bCoolTK, nLeftTK, nTotalTK = pcall(function() return me.GetSkillCDProgress(skThiemKhieu, nTKLvl) end)
+            if okTK and bCoolTK and tonumber(nLeftTK or 0) > 0 and (tonumber(nTotalTK or 0) / ((GLOBAL and GLOBAL.GAME_FPS) or 16)) > 2.0 then
+                bThiemOnRealCD = true
+            end
+        end
+        local bHasThiemForSac = (bThiemKhieu ~= nil and nThiemKhieuLeft >= 2.0) or bThiemOnRealCD
+        local bHasXaAnhForSac = (bXaAnh ~= nil and nXaAnhLeft >= 2.0) or bRecentXaAnh
+        if bIsSnakePet and bHienTeReady and not bHasHienTeBuff and bHasThiemForSac and bHasXaAnhForSac and not bWaitBachTucForSac and nGCDLeftSec < 0.5 then
+            if H.SendSkill(me, skHienTe, "Cổ Trùng Hiến Tế", true) then
+                return true
+            end
         end
 
         if H.IsGCD(me) then return false end
 
-        -- 5. Chu trinh 3 DoT & Ky nang chu luc Doc Kinh
-        -- a) Bach Tuc: Uu tien so 1 ngay khi hoi chieu (luon dat thang vao target)
-        if H.IsSkillReady(me, skBachTuc, 8) then
-            return H.SendSkill(me, skBachTuc, "Bách Túc", bHasHienTeBuff)
+        -- a) Thiem Khieu (DoT 12s)
+        if bNeedThiem then
+            return H.SendSkill(me, skThiemKhieu, "Thiềm Khiếu", bHasHienTeBuff)
         end
 
-        -- b) Xa Anh: Duy tri DoT 12s (chong danh lap khi vua niem < 1.5s)
-        local bXaAnh = H.FindBuff(tar, me, ID_XA_ANH, NAME_XA_ANH, true)
-        local nXaAnhLeft = bXaAnh and H.BuffRemainingSec(bXaAnh) or 0
-        local bRecentXaAnh = (lastcast and lastcast(skXaAnh)) or ((nCurFrame - tDocKinhState.lastXaAnhFrame) < 24)
-        if (not bXaAnh or nXaAnhLeft < 2.0) and not bRecentXaAnh and H.IsSkillReady(me, skXaAnh, 8) then
+        -- b) Xa Anh (DoT 12s, chong danh lap khi vua niem)
+        if bNeedXaAnh then
             if H.SendSkill(me, skXaAnh, "Xà Ảnh", bHasHienTeBuff) then
                 tDocKinhState.lastXaAnhFrame = nCurFrame
                 return true
             end
         end
 
-        -- c) Thiem Khieu: Duy tri DoT 12s & hoi mana khi co Doat Menh Co
-        local bThiemKhieu = H.FindBuff(tar, me, ID_THIEM_KHIEU, NAME_THIEM_KHIEU, true)
-        local nThiemKhieuLeft = bThiemKhieu and H.BuffRemainingSec(bThiemKhieu) or 0
-        if (not bThiemKhieu or nThiemKhieuLeft < 2.0) and H.IsSkillReady(me, skThiemKhieu, 8) then
-            return H.SendSkill(me, skThiemKhieu, "Thiềm Khiếu", bHasHienTeBuff)
+        -- c) Bach Tuc (sau Hien Te Ran de an buff 50%)
+        if H.IsSkillReady(me, skBachTuc, 8) then
+            return H.SendSkill(me, skBachTuc, "Bách Túc", bHasHienTeBuff)
         end
 
         -- d) Di chuyen hoac can hut mana voi Kho Tan Co -> Thien Ti / Xa Anh
-        if (bMoving or (nMana < 0.25 and bHasKhoTan)) and H.IsSkillReady(me, skThienTi, 8) then
+        if bMoving and H.IsSkillReady(me, skThienTi, 8) then
             return H.SendSkill(me, skThienTi, "Thiên Ti", false)
         end
-        if bMoving and H.IsSkillReady(me, skXaAnh, 8) then
+        if bMoving and not bXaAnh and H.IsSkillReady(me, skXaAnh, 8) then
             return H.SendSkill(me, skXaAnh, "Xà Ảnh", false)
         end
 
-        -- e) Filler dung yen: Hat Tam (1.75s / 1.5s)
-        -- TUYET DOI khong dung Hat Tam neu Bach Tuc dang san sang (CD <= 0) hoac vua cast trong vong 625ms
+        -- e) Hat Tam: filler dung yen (khong dung neu Bach Tuc dang san sang / vua cast)
         local bBachTucReady = false
         if me.GetSkillCDProgress then
             local okCD, bCool, nLeft = pcall(function() return me.GetSkillCDProgress(skBachTuc, 1) end)
@@ -6250,7 +6323,7 @@ local function CreateBoThien(deps)
         end
 
         -- 4. Duy tri Co Hoac Chung Sinh & Nu Oa Va Troi
-        local bHasCoHoac = H.FindBuff(tar, me, ID_CO_HOAC, NAME_CO_HOAC, false) ~= nil
+        local bHasCoHoac = H.FindBuff(tar, me, ID_CO_HOAC, NAME_CO_HOAC, true) ~= nil
         if nTarLife < 0.85 and not bHasCoHoac and H.IsSkillReady(me, skCoHoac, 24) then
             return H.SendSkill(me, skCoHoac, "Cổ Hoặc Chúng Sinh", false)
         end
@@ -6339,35 +6412,25 @@ local DEFAULT_THATTU_BANGTAM_MACRO = [[
 #tip Macro That Tu Bang Tam v80: Dai Huyen Cap Khuc tu no Cap Khuc (Khong dung Giang Hai Ngung Quang)
 
 /config channel-on
-/wpwatch U Nguyệt-Loạn Hoa|Phất Khởi Long Y|Thủy Thông Thiết|10|1.5|U Nguyệt-Loạn Hoa|4
-/procwatch U Nguyệt-Loạn Hoa|Kiếm Khí Trường Giang|Đại Huyền Cấp Khúc
-
-/config before:[xmnobuff:U Nguyệt-Loạn Hoa]
 /usependant [xmtbuffstack:Cấp Khúc>=3]
 /skill [xmtbuffstack:Cấp Khúc>=3] Phồn Âm Cấp Tiết
 
 /skill [mana<0.85] Long Trì Nhạc
 /skill [qidian<=2] Mãn Đường Thế
-/skill [qidian>0,mana>0.15,distance<10] Kiếm Thần Vô Ngã
+/skill [distance<10,nobuff:Kiếm Thần Vô Ngã] Kiếm Thần Vô Ngã
 
 /skill [qidian>=7] Kiếm Phá Hư Không
 /skill [qidian>=4,xmtbuffstack:Cấp Khúc>=3] Kiếm Khí Trường Giang
-
-/skill [xmnobuff:Thủy Thông Thiết] Đại Huyền Cấp Khúc
-/skill [xmbufftime:Thủy Thông Thiết>1.5] Đại Huyền Cấp Khúc
-/config before:null
+/skill Đại Huyền Cấp Khúc
 ]]
 
 local function CreateBangTam(deps)
     local H = xMacro.Schools.BuildCombatHelpers(deps)
     local ExecuteMacroCommand = _G.ExecuteMacroCommand
-    local XMCore_UseEquipSlot = deps.XMCore_UseEquipSlot
-    local XMCore_Sys = deps.XMCore_Sys
-    local tSkillCastFrame = deps.tSkillCastFrame
 
     local ID_CAP_KHUC = {[2920] = true}
     local NAME_CAP_KHUC = {"Cấp Khúc", "Cap Khuc", "急曲"}
-    local ID_KIEM_THAN = {[559] = true}
+    local ID_KIEM_THAN = {[547] = true, [559] = true, [622] = true}
     local NAME_KIEM_THAN = {"Kiếm Thần Vô Ngã", "Kiem Than Vo Nga", "剑神无我"}
 
     local function Run(szName)
@@ -6383,7 +6446,20 @@ local function CreateBangTam(deps)
         end
 
         -- 2. Kiem tra bao ve channeling Dai Huyen Cap Khuc: khong ngat chieu
-        if me.GetOTActionState and me.GetOTActionState() ~= 0 then
+        local nCurFrame = (GetLogicFrameCount and GetLogicFrameCount()) or 0
+        local nStand = (MOVE_STATE and MOVE_STATE.ON_STAND) or 0
+        local bMoving = (me.nMoveState or 0) ~= nStand
+        if bMoving then
+            H.ClearChannelLock()
+        end
+        local bIsPreparing = false
+        if me.GetSkillPrepareState then
+            local okP, prep = pcall(function() return me.GetSkillPrepareState() end)
+            if okP and prep then bIsPreparing = true end
+        end
+        local okOT, nOT = pcall(function() return me.GetOTActionState() end)
+        local bIsOT = okOT and tonumber(nOT or 0) ~= 0
+        if bIsPreparing or bIsOT or (not bMoving and H.IsChannelLocked(nCurFrame)) then
             return false
         end
 
@@ -6434,13 +6510,11 @@ local function CreateBangTam(deps)
             return H.SendSkill(me, skPhonAm, "Phồn Âm Cấp Tiết", true)
         end
 
-        -- C. Kiem Than Vo Nga (ID 559): duy tri xung quanh khi khoang cach <= 10m
-        if nQiDian > 0 and nMana > 0.15 and nDist <= 10 and H.IsSkillReady(me, skKiemThan, 16) then
-            local bHasKiemThan = H.FindBuff(me, me, ID_KIEM_THAN, NAME_KIEM_THAN, true)
-            local nRemain = bHasKiemThan and H.BuffRemainingSec(bHasKiemThan) or 0
-            if not bHasKiemThan or nRemain <= 1.0 then
-                return H.SendSkill(me, skKiemThan, "Kiếm Thần Vô Ngã", false)
-            end
+        if H.IsGCD(me) then return false end
+
+        -- C. Kiem Than Vo Nga: distance < 10m va khong co buff Kiem Than Vo Nga
+        if nDist < 10 and not H.FindBuff(me, me, ID_KIEM_THAN, NAME_KIEM_THAN, false) and H.IsSkillReady(me, skKiemThan, 16) then
+            return H.SendSkill(me, skKiemThan, "Kiếm Thần Vô Ngã", false)
         end
 
         -- D. Chieu sat thuong chinh: Kiem Pha Hu Khong (qidian >= 7)
@@ -6454,13 +6528,8 @@ local function CreateBangTam(deps)
         end
 
         -- F. Dai Huyen Cap Khuc: Giu stack & tu kich no (khong dung Giang Hai Ngung Quang)
-        if H.IsSkillReady(me, skDaiHuyen, 4) then
+        if not bMoving and H.IsSkillReady(me, skDaiHuyen, 4) then
             return H.SendSkill(me, skDaiHuyen, "Đại Huyền Cấp Khúc", false)
-        end
-
-        -- G. Fallback text macro neu can
-        if ExecuteMacroCommand then
-            return ExecuteMacroCommand(DEFAULT_THATTU_BANGTAM_MACRO)
         end
 
         return false
