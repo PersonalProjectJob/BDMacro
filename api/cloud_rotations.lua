@@ -47,10 +47,17 @@
             name = "ThuanDuong_ThaiHuKiemY_80",
             script = [[
 #name ThuanDuong_ThaiHuKiemY_80
+/skill [tprepare,distance<=4] Kiếm Phi Kinh Thiên
 /skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
+/skill [distance<=4,tnobuff:Vạn Kiếm Quy Tông] Vạn Kiếm Quy Tông
+/skill [fight,distance<=4,qidian<=4] Thao Quang Dưỡng Hối
 /skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
 /skill [tlife<0.40] Bát Hoang Quy Nguyên
 /skill [qidian>=8] Vô Ngã Vô Kiếm
+/skill [fight,distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qidian<8,buff:Toái Tinh Thần,buff:Hóa Tam Thanh,buff:Lăng Thái Hư] Nhân Kiếm Hợp Nhất
+/skill [fight,moving,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qidian<8,buff:Toái Tinh Thần|Hóa Tam Thanh|Lăng Thái Hư] Nhân Kiếm Hợp Nhất
+/skill [fight,distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,buff:Toái Tinh Thần,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
+/skill [fight,distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,buff:Toái Tinh Thần,buff:Hóa Tam Thanh,nobuff:Lăng Thái Hư] Lăng Thái Hư
 /skill Bát Hoang Quy Nguyên
 /skill Thiên Địa Vô Cực
 /skill Tam Hoàn Sáo Nguyệt

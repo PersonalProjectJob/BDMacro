@@ -16,7 +16,7 @@
       "sha256": "5c111ad68e6b9198e8aaafaef947438e44b7d3f671d7018b9760b18005650fac"
     },
     "Native/XM04_Core.lua": {
-      "sha256": "d8b311ac3e8ca2904362af5f4ae51dfcb9bd89647a9b42785b08024314ec286b"
+      "sha256": "bc264e35fbe1ccf9443663f0a84a42d833a6d5c14455243e0e78150a48aea012"
     },
     "Native/XM05_VanHoa.lua": {
       "sha256": "66259bfe2ab4c4859b732c9ec6fc7ad710773fb6e5a16f852b707f65a52d662c"
@@ -43,7 +43,7 @@
       "sha256": "947f8007751bb531170d7a28df61dee388b11ecc1f0d2deaf181868ad5f87628"
     },
     "Native/XM13_ThuanDuong.lua": {
-      "sha256": "c395965de610e4839d4e3817fd078d6161ca7a71dbfdd1a9e5c35a5383726825"
+      "sha256": "acc2f6ccab0be5fe59930dac88cde3e43ff129ed7155019ca1d6ed3633cc7bfe"
     },
     "Native/XM14_Dispatch.lua": {
       "sha256": "ad6a8a52bccf0277ba77006b7688059e2f311899e13a6e96cbd2ae5976fa1a5b"

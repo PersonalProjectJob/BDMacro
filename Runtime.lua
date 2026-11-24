@@ -1053,6 +1053,8 @@ local tCanonicalSkillNames = {
 	["Bang Hu Ngu Phong"] = "Bằng Hư Ngự Phong", ["bang hu ngu phong"] = "Bằng Hư Ngự Phong", ["凭虚御风"] = "Bằng Hư Ngự Phong",
 	["Bang Hu"] = "Bằng Hư Ngự Phong", ["bang hu"] = "Bằng Hư Ngự Phong",
 	["The Van Tung"] = "Thê Vân Tung", ["the van tung"] = "Thê Vân Tung", ["梯云纵"] = "Thê Vân Tung",
+	["Thao Quang Dưỡng Hối"] = "Thao Quang Dưỡng Hối",
+	["Van Kiem Quy Tong"] = "Vạn Kiếm Quy Tông", ["van kiem quy tong"] = "Vạn Kiếm Quy Tông", ["万剑归宗"] = "Vạn Kiếm Quy Tông",
 	["Thao Quang Duong Hoi"] = "Thao Quang Dưỡng Hối", ["thao quang duong hoi"] = "Thao Quang Dưỡng Hối", ["韬光养晦"] = "Thao Quang Dưỡng Hối",
 	["Thao Quang"] = "Thao Quang Dưỡng Hối", ["thao quang"] = "Thao Quang Dưỡng Hối",
 	["Dai Dao Vo Thuat"] = "Đại Đạo Vô Thuật", ["dai dao vo thuat"] = "Đại Đạo Vô Thuật", ["大道无术"] = "Đại Đạo Vô Thuật",
@@ -1375,6 +1377,7 @@ local tStaticBuffNames = {
 	["Thôn Nhật Nguyệt"] = 6292, ["Thon Nhat Nguyet"] = 6292, ["thon nhat nguyet"] = 6292, ["吞日月"] = 6292,
 	["Trấn Sơn Hà"] = 377, ["Tran Son Ha"] = 377, ["tran son ha"] = 377, ["镇山河"] = 377,
 	["Tử Khí Đông Lai"] = 2757, ["Tu Khi Dong Lai"] = 2757, ["tu khi dong lai"] = 2757, ["Tử Khí"] = 2757, ["Tu Khi"] = 2757, ["紫气东来"] = 2757,
+	["Thao Quang Dưỡng Hối"] = 613, ["Thao Quang Duong Hoi"] = 613, ["thao quang duong hoi"] = 613, ["Thao Quang"] = 613, ["韬光养晦"] = 613,
 	["Chuyển Càn Khôn"] = 2781, ["Chuyen Can Khon"] = 2781, ["chuyen can khon"] = 2781, ["转乾坤"] = 2781,
 	["Bát Quái Động Huyền"] = 2182, ["Bat Quai Dong Huyen"] = 2182, ["bat quai dong huyen"] = 2182, ["八卦洞玄"] = 2182,
 	["Đại Đạo Vô Thuật"] = 554, ["Dai Dao Vo Thuat"] = 554, ["dai dao vo thuat"] = 554, ["大道无术"] = 554,
@@ -2894,6 +2897,7 @@ local _tXMacroOrig = {}
 local _tXMacroWrapped = {}
 
 -- Khi truong Thuan Duong tha vao muc tieu (Target): Sinh Thai Cuc & Toai Tinh Than
+-- Rieng Thai Hu Kiem Y (10014): Hoa Tam Thanh (357) cung tha vao muc tieu de kich no 3 khi truong.
 local tTargetQiFields = {
 	[358] = true,  -- Sinh Thai Cuc (生太极)
 	[362] = true,  -- Toai Tinh Than (碎星辰)
@@ -2902,6 +2906,27 @@ local tTargetQiFields = {
 	[4976] = true, -- Sinh Thai Cuc aura template ID
 	[4980] = true, -- Toai Tinh Than aura template ID
 }
+
+local tHoaTamThanhQiField = {
+	[357] = true,  -- Hoa Tam Thanh skill
+	[373] = true,  -- Hoa Tam Thanh buff
+	[3080] = true, -- Hoa Tam Thanh aura template
+}
+
+local function IsTargetQiField(qid)
+	if not qid then return false end
+	if tTargetQiFields and tTargetQiFields[qid] then return true end
+	if tHoaTamThanhQiField[qid] then
+		local me = (MeCache and MeCache.Get and MeCache:Get()) or (GetClientPlayer and GetClientPlayer())
+		local mount = me and me.GetKungfuMount and me.GetKungfuMount()
+		local kfID = mount and (mount.dwSkillID or mount.dwMountKungfuID)
+		if not kfID and type(mount) == "number" then kfID = mount end
+		if tonumber(kfID) == 10014 then
+			return true
+		end
+	end
+	return false
+end
 
 -- Danh sach toan bo cac Khi Truong Thuan Duong (tu dong tha duoi chan, tru Sinh Thai Cuc & Toai Tinh Than)
 local tThuanDuongQiFields = {
@@ -2945,10 +2970,10 @@ local function GetSmartTargetXYZ(skillID)
 	local nSkillID = tonumber(skillID) or _lastGroundSkillID
 
 	-- Neu la Khi Truong Thuan Duong:
-	-- "cac khi truong se tu tha duoi chan, tru Sinh thai cuc va toai tinh than la tha vao muc tieu"
+	-- Cac khi truong tu tha duoi chan, tru Sinh Thai Cuc, Toai Tinh Than (va Hoa Tam Thanh khi dang Thai Hu 10014) tha vao muc tieu
 	if nSkillID and tThuanDuongQiFields and tThuanDuongQiFields[nSkillID] then
-		if not (tTargetQiFields and tTargetQiFields[nSkillID]) then
-			-- Cac khi truong con lai (Pha Thuong Khung, Hoa Tam Thanh, Thon Nhat Nguyet, Tran Son Ha...):
+		if not IsTargetQiField(nSkillID) then
+			-- Cac khi truong con lai (Pha Thuong Khung, Lang Thai Hu, Thon Nhat Nguyet, Tran Son Ha...):
 			-- Tu dong tha duoi chan nhan vat (Self)!
 			if me.nX and me.nY and me.nZ then
 				return me.nX, me.nY, me.nZ
@@ -3031,7 +3056,7 @@ local function SyncAIOTLHelperBachTuc()
 			AIO_TLHelper.tTrapList[2496] = tlMode
 			AIO_TLHelper.tTrapList[5764] = tlMode
 			for qid, _ in pairs(tThuanDuongQiFields or {}) do
-				if tTargetQiFields and tTargetQiFields[qid] then
+				if IsTargetQiField(qid) then
 					AIO_TLHelper.tTrapList[qid] = (mode == "mouse") and 2 or (mode == "manual" and 0 or 3)
 				else
 					AIO_TLHelper.tTrapList[qid] = (mode == "manual") and 0 or 1
@@ -3050,10 +3075,10 @@ local function SyncAIOTLHelperBachTuc()
 	end
 	if HM_Force and type(HM_Force.tSelfQC) == "table" then
 		for qid, _ in pairs(tThuanDuongQiFields or {}) do
-			if tTargetQiFields and tTargetQiFields[qid] then
-				HM_Force.tSelfQC[qid] = false -- Sinh Thai Cuc & Toai Tinh Than tha vao Target
+			if IsTargetQiField(qid) then
+				HM_Force.tSelfQC[qid] = false -- Sinh Thai Cuc, Toai Tinh Than (va Hoa Tam Thanh khi Thai Hu) tha vao Target
 			else
-				HM_Force.tSelfQC[qid] = true  -- Cac khi truong con lai (Pha Thuong Khung, Hoa Tam Thanh...) tha duoi chan
+				HM_Force.tSelfQC[qid] = true  -- Cac khi truong con lai (Pha Thuong Khung, Lang Thai Hu...) tha duoi chan
 			end
 		end
 	end
@@ -3077,7 +3102,7 @@ local function PrepareGroundSkillOnTarget(dwSkillID)
 	_lastGroundSkillTime = now
 	if AIO_TLHelper and type(AIO_TLHelper.ForcePlace) == "function" then
 		local tlMode = (mode == "mouse") and 2 or 3
-		if tThuanDuongQiFields and tThuanDuongQiFields[nID] and not (tTargetQiFields and tTargetQiFields[nID]) then
+		if tThuanDuongQiFields and tThuanDuongQiFields[nID] and not IsTargetQiField(nID) then
 			tlMode = 1 -- Mode 1 trong AIO_TLHelper la duoi chan (Self)
 		end
 		pcall(AIO_TLHelper.ForcePlace, nID, tlMode)
@@ -3204,8 +3229,8 @@ local function MakeDoSelectPointInterceptor(origFn)
 		if mode ~= "manual" then
 			local skillID = GetCurrentGroundSkillID()
 			if skillID and tThuanDuongQiFields and tThuanDuongQiFields[skillID] then
-				if not (tTargetQiFields and tTargetQiFields[skillID]) then
-					-- Day la khi truong dat duoi chan (Pha Thuong Khung, Hoa Tam Thanh, Thon Nhat Nguyet, Tran Son Ha...)
+				if not IsTargetQiField(skillID) then
+					-- Day la khi truong dat duoi chan (Pha Thuong Khung, Lang Thai Hu, Thon Nhat Nguyet, Tran Son Ha...)
 					local me = (MeCache and MeCache.Get and MeCache:Get()) or (GetClientPlayer and GetClientPlayer())
 					if me and me.nX and me.nY and me.nZ then
 						x, y, z = me.nX, me.nY, me.nZ
@@ -6978,17 +7003,26 @@ end
 do
 local function InitializeModule()
 -- Thái Hư Kiếm Ý (10014) - Nội công DPS Kiếm Thuần Dương v80
--- Khí trường: Toái Tinh Thần (tăng bạo kích ngoại công và sát thương bạo kích).
--- Tự hồi mana bằng Bão Nguyên Quy Nhất khi mana < 40% và Khí Điểm >= 8.
+-- Khí trường chính: Toái Tinh Thần (thả vào mục tiêu).
+-- Bùng nổ sát thương: Thao Quang Dưỡng Hối khi vào chiến đấu, áp sát mục tiêu và Khí Điểm <= 4.
+-- Combo kích nổ 3 khí trường: Toái Tinh Thần (mục tiêu) + Hóa Tam Thanh (mục tiêu) + Lăng Thái Hư (bản thân).
+-- Điều kiện kích nổ: Toái Tinh Thần không CD, không có buff Thao Quang Dưỡng Hối (hoặc đang di chuyển có thể nổ ngay).
+-- Dự phòng hồi mana bằng Bão Nguyên Quy Nhất khi mana < 40% và Khí Điểm >= 8.
 -- Chuỗi dồn sát thương: Bát Hoang Quy Nguyên + Vô Ngã Vô Kiếm (khi Khí Điểm >= 8).
--- Hồi khí điểm: Tam Hoàn Sáo Nguyệt (ID 364) chỉ đánh khi các chiêu khác không khả dụng.
--- Kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神) đỉnh cao để tích thêm khí điểm.
+-- Hồi khí điểm: Tam Hoàn Sáo Nguyệt (ID 364) + kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神).
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
+/skill [tprepare,distance<=4] Kiếm Phi Kinh Thiên
 /skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
+/skill [distance<=4,tnobuff:Vạn Kiếm Quy Tông] Vạn Kiếm Quy Tông
+/skill [fight,distance<=4,qidian<=4] Thao Quang Dưỡng Hối
 /skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
 /skill [tlife<0.40] Bát Hoang Quy Nguyên
 /skill [qidian>=8] Vô Ngã Vô Kiếm
+/skill [fight,distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qidian<8,buff:Toái Tinh Thần,buff:Hóa Tam Thanh,buff:Lăng Thái Hư] Nhân Kiếm Hợp Nhất
+/skill [fight,moving,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qidian<8,buff:Toái Tinh Thần|Hóa Tam Thanh|Lăng Thái Hư] Nhân Kiếm Hợp Nhất
+/skill [fight,distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,buff:Toái Tinh Thần,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
+/skill [fight,distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,buff:Toái Tinh Thần,buff:Hóa Tam Thanh,nobuff:Lăng Thái Hư] Lăng Thái Hư
 /skill Bát Hoang Quy Nguyên
 /skill Thiên Địa Vô Cực
 /skill Tam Hoàn Sáo Nguyệt
