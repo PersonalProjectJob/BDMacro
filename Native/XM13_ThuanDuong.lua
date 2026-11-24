@@ -57,16 +57,15 @@ local function InitializeModule()
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
 /skill [tprepare,distance<=4] Kiếm Phi Kinh Thiên
-/skill [nobuff:Toái Tinh Thần;noqichang:Toái Tinh Thần] Toái Tinh Thần
+/skill [nocd:Toái Tinh Thần,nobuff:Toái Tinh Thần;nocd:Toái Tinh Thần,noqichang:Toái Tinh Thần] Toái Tinh Thần
 /skill [distance<=4,tnobuff:Vạn Kiếm Quy Tông] Vạn Kiếm Quy Tông
-/skill [distance<=4,qidian<=2] Thao Quang Dưỡng Hối
-/skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
-/skill [tlife<0.40] Bát Hoang Quy Nguyên
+/skill [distance<=4,qidian<=2,nocd:Thao Quang Dưỡng Hối] Thao Quang Dưỡng Hối
+/skill [distance<=4,qidian<9,nocd:Hóa Tam Thanh,noqichang:Hóa Tam Thanh] Hóa Tam Thanh
+/skill [distance<=4,qidian<9,nocd:Sinh Thái Cực,cdtime:Nhân Kiếm Hợp Nhất>2,noqichang:Sinh Thái Cực] Sinh Thái Cực
+/skill [distance<=4,nocd:Nhân Kiếm Hợp Nhất,cdtime:Toái Tinh Thần<=1.5,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh] Nhân Kiếm Hợp Nhất
+/skill [moving,distance<=10,nocd:Nhân Kiếm Hợp Nhất,cdtime:Toái Tinh Thần<=1.5,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh] Nhân Kiếm Hợp Nhất
+/skill [mana<0.40,qidian>8,nocd:Bão Nguyên Thủ Khuyết] Bão Nguyên Thủ Khuyết
 /skill [qidian>=8] Vô Ngã Vô Kiếm
-/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,qichang:Lăng Thái Hư] Nhân Kiếm Hợp Nhất
-/skill [moving,distance<=10,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần|Hóa Tam Thanh|Lăng Thái Hư] Nhân Kiếm Hợp Nhất
-/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,noqichang:Hóa Tam Thanh] Hóa Tam Thanh
-/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,noqichang:Lăng Thái Hư] Lăng Thái Hư
 /skill Bát Hoang Quy Nguyên
 /skill Thiên Địa Vô Cực
 /skill Tam Hoàn Sáo Nguyệt

@@ -1107,7 +1107,6 @@ local function GetPlayerSkillInfo(szName)
 		["Phá Thương Khung"]=359, ["Pha Thuong Khung"]=359, ["pha thuong khung"]=359, ["破苍穹"]=359,
 		["Hóa Tam Thanh"]=357, ["Hoa Tam Thanh"]=357, ["hoa tam thanh"]=357, ["化三清"]=357,
 		["Xung Âm Dương"]=360, ["Xung Am Duong"]=360, ["xung am duong"]=360, ["冲阴阳"]=360,
-		["Bão Nguyên Thủ Khuyết"]=302, ["Bao Nguyen Thu Khuyet"]=302, ["Bão Nguyên Quy Nhất"]=302, ["Bao Nguyen Quy Nhat"]=302, ["Bão Nguyên"]=302, ["Bao Nguyen"]=302, ["抱元守缺"]=302,
 		["Lưỡng Nghi Hóa Hình"]=301, ["Luong Nghi Hoa Hinh"]=301, ["luong nghi hoa hinh"]=301, ["两仪化形"]=301,
 		["Tứ Tượng Luân Hồi"]=367, ["Tu Tuong Luan Hoi"]=367, ["tu tuong luan hoi"]=367, ["四象轮回"]=367,
 		["Thái Cực Vô Cực"]=306, ["Thai Cuc Vo Cuc"]=306, ["thai cuc vo cuc"]=306, ["太极无极"]=306,
@@ -7095,16 +7094,15 @@ local function InitializeModule()
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
 /skill [tprepare,distance<=4] Kiếm Phi Kinh Thiên
-/skill [nobuff:Toái Tinh Thần;noqichang:Toái Tinh Thần] Toái Tinh Thần
+/skill [nocd:Toái Tinh Thần,nobuff:Toái Tinh Thần;nocd:Toái Tinh Thần,noqichang:Toái Tinh Thần] Toái Tinh Thần
 /skill [distance<=4,tnobuff:Vạn Kiếm Quy Tông] Vạn Kiếm Quy Tông
-/skill [distance<=4,qidian<=2] Thao Quang Dưỡng Hối
-/skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
-/skill [tlife<0.40] Bát Hoang Quy Nguyên
+/skill [distance<=4,qidian<=2,nocd:Thao Quang Dưỡng Hối] Thao Quang Dưỡng Hối
+/skill [distance<=4,qidian<9,nocd:Hóa Tam Thanh,noqichang:Hóa Tam Thanh] Hóa Tam Thanh
+/skill [distance<=4,qidian<9,nocd:Sinh Thái Cực,cdtime:Nhân Kiếm Hợp Nhất>2,noqichang:Sinh Thái Cực] Sinh Thái Cực
+/skill [distance<=4,nocd:Nhân Kiếm Hợp Nhất,cdtime:Toái Tinh Thần<=1.5,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh] Nhân Kiếm Hợp Nhất
+/skill [moving,distance<=10,nocd:Nhân Kiếm Hợp Nhất,cdtime:Toái Tinh Thần<=1.5,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh] Nhân Kiếm Hợp Nhất
+/skill [mana<0.40,qidian>8,nocd:Bão Nguyên Thủ Khuyết] Bão Nguyên Thủ Khuyết
 /skill [qidian>=8] Vô Ngã Vô Kiếm
-/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,qichang:Lăng Thái Hư] Nhân Kiếm Hợp Nhất
-/skill [moving,distance<=10,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần|Hóa Tam Thanh|Lăng Thái Hư] Nhân Kiếm Hợp Nhất
-/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,noqichang:Hóa Tam Thanh] Hóa Tam Thanh
-/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,noqichang:Lăng Thái Hư] Lăng Thái Hư
 /skill Bát Hoang Quy Nguyên
 /skill Thiên Địa Vô Cực
 /skill Tam Hoàn Sáo Nguyệt
