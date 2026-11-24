@@ -55,21 +55,20 @@ return {
             name = "ThuanDuong_ThaiHuKiemY_80",
             script = [[
 #name ThuanDuong_ThaiHuKiemY_80
-/skill [tprepare,distance<=4] Kiếm Phi Kinh Thiên
-/skill [nobuff:Toái Tinh Thần;noqichang:Toái Tinh Thần] Toái Tinh Thần
-/skill [distance<=4,tnobuff:Vạn Kiếm Quy Tông] Vạn Kiếm Quy Tông
-/skill [distance<=4,qidian<=2] Thao Quang Dưỡng Hối
-/skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
-/skill [tlife<0.40] Bát Hoang Quy Nguyên
-/skill [qidian>=8] Vô Ngã Vô Kiếm
-/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,qichang:Lăng Thái Hư] Nhân Kiếm Hợp Nhất
-/skill [moving,distance<=10,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần|Hóa Tam Thanh|Lăng Thái Hư] Nhân Kiếm Hợp Nhất
-/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,noqichang:Hóa Tam Thanh] Hóa Tam Thanh
-/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,noqichang:Lăng Thái Hư] Lăng Thái Hư
-/skill Bát Hoang Quy Nguyên
-/skill Thiên Địa Vô Cực
-/skill Tam Hoàn Sáo Nguyệt
-/skill [qidian<10] Ngưng Thần Tụ Khí
+/fcast [mana<0.40 & qidian>8] Bão Nguyên Thủ Khuyết
+/fcast [buff:Toái Tinh Thần & buff:Sinh Thái Cực] Nhân Kiếm Hợp Nhất
+/fcast [tcast & distance<=20] Kiếm Phi Kinh Thiên
+/fcast [distance<=5 & qidian<8 & nobuff:Thao Quang Dưỡng Hối] Thao Quang Dưỡng Hối
+/fcast [distance<=5 & tnobuff:Vạn Kiếm Quy Tông] Vạn Kiếm Quy Tông
+/fcast [qidian<9 & nobuff:Toái Tinh Thần] Toái Tinh Thần
+/fcast [qidian>8] Vô Ngã Vô Kiếm
+/fcast Bát Hoang Quy Nguyên
+/fcast Thiên Địa Vô Cực
+/fcast [qidian<9 & nobuff:Hóa Tam Thanh] Hóa Tam Thanh
+/fcast [distance<=5 & qidian<10] Vạn Kiếm Quy Tông
+/fcast [qidian<9 & nobuff:Sinh Thái Cực] Sinh Thái Cực
+/fcast Tam Hoàn Sáo Nguyệt
+/cast [qidian<10] Ngưng Thần Tụ Khí
 ]]
         },
         [10015] = {

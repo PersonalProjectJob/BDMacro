@@ -232,6 +232,10 @@ local function IsChannelingNgungThan(me)
 	if not me then return false end
 	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
 	if not okOT or tonumber(nOT or 0) ~= 2 then
+		if me.GetSkillPrepareState then
+			local ok, preparing, id = pcall(function() return me.GetSkillPrepareState() end)
+			if ok and preparing and tonumber(id) == 300 then return true end
+		end
 		dwCurrentChannelSkillID = 0
 		return false
 	end
@@ -2083,6 +2087,14 @@ setmetatable(tOptions, {__index = function(t, k)
 end})
 
 
+local thaiHuFieldSkills = {[357] = true, [358] = true, [362] = true}
+local function IsThaiHu(me)
+	if me.dwForceID ~= 5 then return false end
+	local mount = me.GetKungfuMount and me.GetKungfuMount()
+	local id = type(mount) == "number" and mount or (mount and (mount.dwSkillID or mount.dwMountKungfuID))
+	return tonumber(id) == 10014
+end
+
 local function UITestCast(dwSkillID, dwLevel, index)
 	local me = (MeCache and MeCache.Get and MeCache:Get()) or GetClientPlayer()
 	if not me then return false end
@@ -2098,7 +2110,20 @@ local function UITestCast(dwSkillID, dwLevel, index)
 	local nStand = (MOVE_STATE and MOVE_STATE.ON_STAND) or 0
 	local bStanding = (me.nMoveState or nStand) == nStand
 
-	-- Ngung Than Tu Khi (300): khong tin GCD nen co the cast ngay trong GCD khi qidian < 8 va dang dung yen
+	local thaiHu = IsThaiHu(me)
+	if thaiHu then
+		if dwSkillID == 300 and bProtectChannelSkill then
+			if nOTState ~= 0 then return false end
+			if me.GetSkillPrepareState and me.GetSkillPrepareState() then return false end
+		end
+		-- AIO TestCast: refresh the candidate's action box before reading readiness.
+		local box = tSkillBox[index]
+		if not box then return false end
+		box:SetObject(UI_OBJECT_SKILL, dwSkillID, dwLevel or 1)
+		UpdataSkillCDProgress(me, box)
+		return box:IsObjectEnable() and not box:IsObjectCoolDown()
+	end
+
 	if dwSkillID == 300 then
 		if nOTState ~= 0 then
 			return false
@@ -2112,7 +2137,7 @@ local function UITestCast(dwSkillID, dwLevel, index)
 		if not bStanding then
 			return false
 		end
-		if nNgungThanCooldownUntilFrame > 0 and nCurFrame < nNgungThanCooldownUntilFrame then
+		if not thaiHu and nNgungThanCooldownUntilFrame > 0 and nCurFrame < nNgungThanCooldownUntilFrame then
 			return false
 		end
 		if tSkillCastFrame and tSkillCastFrame[300] then
@@ -2137,7 +2162,7 @@ local function UITestCast(dwSkillID, dwLevel, index)
 	if not bStanding then
 		if dwSkillID == 367 and not bVuTap then
 			return false
-		elseif dwSkillID == 359 or dwSkillID == 357 or dwSkillID == 358 or dwSkillID == 362 or dwSkillID == 368 then
+		elseif dwSkillID == 359 or dwSkillID == 368 or (not thaiHu and thaiHuFieldSkills[dwSkillID]) then
 			return false
 		end
 	end
@@ -2160,13 +2185,13 @@ local function UITestCast(dwSkillID, dwLevel, index)
 
 	-- 1. Kiem tra trang thai thi trien:
 	if not IsOTStuck(me) then
-		if nOTState == 1 then
+		if nOTState == 1 and not IsChannelingNgungThan(me) then
 			return false
 		elseif nOTState == 2 then
 			-- Dang dan dao (channel):
 			-- Neu dang dan dao Ngung Than Tu Khi (300) hoac khong bat bao ve channel:
 			-- Cho phep kiem tra CD/GCD thuc te cua skill (nhu Luong Nghi Hoa Hinh 301, Tu Tuong Luan Hoi 367) o buoc 3 & 4
-			local bIsNgungThan = IsChannelingNgungThan(me) or (dwCurrentChannelSkillID == 300) or (me.dwForceID == 5 and dwCurrentChannelSkillID ~= 368)
+			local bIsNgungThan = IsChannelingNgungThan(me)
 			if not bIsNgungThan and bProtectChannelSkill then
 				return false
 			end
@@ -2179,7 +2204,7 @@ local function UITestCast(dwSkillID, dwLevel, index)
 			end
 		end
 	end
-	if not tOffGCDSkill[dwSkillID] and GetTime and nGlobalCastLockUntil > 0 and GetTime() < nGlobalCastLockUntil then
+	if not thaiHu and not tOffGCDSkill[dwSkillID] and GetTime and nGlobalCastLockUntil > 0 and GetTime() < nGlobalCastLockUntil then
 		return false
 	end
 
@@ -2247,7 +2272,7 @@ local function UITestCast(dwSkillID, dwLevel, index)
 		if okU and bCan == false then
 			-- Neu dang van khi Ngung Than Tu Khi (300), client C++ co the tra ve false vi dang OTState channeling.
 			-- Cho phep vuot qua kiem tra nay de OnCastPlayerSkill ngat Ngung Than thi trien skill moi (nhu Luong Nghi Hoa Hinh).
-			local bIsChanNT = (nOTState == 2 and IsChannelingNgungThan(me) and dwSkillID ~= 300)
+			local bIsChanNT = (dwSkillID ~= 300 and IsChannelingNgungThan(me))
 			if not bIsChanNT then
 				return false
 			end
@@ -2355,9 +2380,11 @@ local function GetCurrentTargetObject()
 end
 _G.GetCurrentTargetObject = GetCurrentTargetObject
 
+tOptions["tcast"] = tOptions["tprepare"]
+
 local function ProcessCondition(szText)
 	if not szText then return end
-	szText = string.gsub(szText, "%&", ",")
+	szText = string.gsub(szText, "%s*&%s*", ",")
 	local function fnBracket(szText)
 		while string.find(szText, "%b()") do
 			szText = string.sub(szText:match("%b()"), 2, -2)
@@ -2429,7 +2456,6 @@ local _tXMacroOrig = {}
 local _tXMacroWrapped = {}
 
 -- Khi truong Thuan Duong tha vao muc tieu (Target): Sinh Thai Cuc & Toai Tinh Than
--- Rieng Thai Hu Kiem Y (10014): Hoa Tam Thanh (357) cung tha vao muc tieu de kich no 3 khi truong.
 local tTargetQiFields = {
 	[358] = true,  -- Sinh Thai Cuc (生太极)
 	[362] = true,  -- Toai Tinh Than (碎星辰)
@@ -2439,25 +2465,8 @@ local tTargetQiFields = {
 	[4980] = true, -- Toai Tinh Than aura template ID
 }
 
-local tHoaTamThanhQiField = {
-	[357] = true,  -- Hoa Tam Thanh skill
-	[373] = true,  -- Hoa Tam Thanh buff
-	[3080] = true, -- Hoa Tam Thanh aura template
-}
-
 local function IsTargetQiField(qid)
-	if not qid then return false end
-	if tTargetQiFields and tTargetQiFields[qid] then return true end
-	if tHoaTamThanhQiField[qid] then
-		local me = (MeCache and MeCache.Get and MeCache:Get()) or (GetClientPlayer and GetClientPlayer())
-		local mount = me and me.GetKungfuMount and me.GetKungfuMount()
-		local kfID = mount and (mount.dwSkillID or mount.dwMountKungfuID)
-		if not kfID and type(mount) == "number" then kfID = mount end
-		if tonumber(kfID) == 10014 then
-			return true
-		end
-	end
-	return false
+	return tTargetQiFields[qid] == true
 end
 
 -- Danh sach toan bo cac Khi Truong Thuan Duong (tu dong tha duoi chan, tru Sinh Thai Cuc & Toai Tinh Than)
@@ -2502,7 +2511,7 @@ local function GetSmartTargetXYZ(skillID)
 	local nSkillID = tonumber(skillID) or _lastGroundSkillID
 
 	-- Neu la Khi Truong Thuan Duong:
-	-- Cac khi truong tu tha duoi chan, tru Sinh Thai Cuc, Toai Tinh Than (va Hoa Tam Thanh khi dang Thai Hu 10014) tha vao muc tieu
+	-- Cac khi truong tu tha duoi chan, tru Sinh Thai Cuc, Toai Tinh Than tha vao muc tieu
 	if nSkillID and tThuanDuongQiFields and tThuanDuongQiFields[nSkillID] then
 		if not IsTargetQiField(nSkillID) then
 			-- Cac khi truong con lai (Pha Thuong Khung, Lang Thai Hu, Thon Nhat Nguyet, Tran Son Ha...):
@@ -2608,7 +2617,7 @@ local function SyncAIOTLHelperBachTuc()
 	if HM_Force and type(HM_Force.tSelfQC) == "table" then
 		for qid, _ in pairs(tThuanDuongQiFields or {}) do
 			if IsTargetQiField(qid) then
-				HM_Force.tSelfQC[qid] = false -- Sinh Thai Cuc, Toai Tinh Than (va Hoa Tam Thanh khi Thai Hu) tha vao Target
+				HM_Force.tSelfQC[qid] = false -- Sinh Thai Cuc, Toai Tinh Than tha vao Target
 			else
 				HM_Force.tSelfQC[qid] = true  -- Cac khi truong con lai (Pha Thuong Khung, Lang Thai Hu...) tha duoi chan
 			end
@@ -2816,28 +2825,30 @@ local function HookUserSelectPoint()
 end
 HookUserSelectPoint()
 
+local function XMCore_Sys(msg)
+    if OutputMessage then
+        OutputMessage("MSG_SYS", tostring(msg) .. "\n")
+    else
+        print(msg)
+    end
+end
+
 local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 	local nCur = (GetLogicFrameCount and GetLogicFrameCount()) or 0
 	local okOT, nOT = pcall(function() return me.GetOTActionState() end)
 	local bIsChanneling = okOT and tonumber(nOT or 0) == 2
 	local bWasChanneling = false
 
-	-- Dan dao: neu dang kep Ngung Than Tu Khi (300) hoac khong bat bao ve thi ngat dan dao de danh skill moi
-	local bIsNgungThan = IsChannelingNgungThan(me) or (dwCurrentChannelSkillID == 300) or (me.dwForceID == 5 and dwCurrentChannelSkillID ~= 368)
-	if bIsChanneling and dwSkillID ~= 300 then
-		if bIsNgungThan or not bProtectChannelSkill then
-			if me.StopCurrentAction then
-				pcall(function() me.StopCurrentAction() end)
-			end
-			dwCurrentChannelSkillID = 0
-			szLastOTA = nil
-			nNgungThanCooldownUntilFrame = nCur + 6
-			bWasChanneling = true
-			bIsChanneling = false
-		else
-			-- Dang dan dao chieu tan cong / ho tro (nhu Luc Hop Doc Ton 368, Tuy Vu 2235...) va co bao ve dan dao
-			return false
-		end
+	-- A ready skill replaces Ngung Than directly, including during preparation.
+	if bIsChanneling and dwSkillID ~= 300 and not IsThaiHu(me) and not IsChannelingNgungThan(me) then
+		if bProtectChannelSkill then return false end
+		if not me.StopCurrentAction then return true end
+		local stopped, result = pcall(function() return me.StopCurrentAction() end)
+		if not stopped or result == false then return true end
+		dwCurrentChannelSkillID = 0
+		szLastOTA = nil
+		bWasChanneling = true
+		bIsChanneling = false
 	end
 
 	if not (bIsChanneling and bProtectChannelSkill and dwSkillID == 300) then
@@ -2847,7 +2858,9 @@ local function OnCastPlayerSkill(me, dwSkillID, dwLevel)
 		if dwSkillID ~= 300 and nCur + 6 > nNgungThanCooldownUntilFrame then
 			nNgungThanCooldownUntilFrame = nCur + 6
 		end
-		PrepareGroundSkillOnTarget(dwSkillID)
+		if OnAddOnUseSkill ~= _tXMacroWrapped["_G.OnAddOnUseSkill"] then
+			PrepareGroundSkillOnTarget(dwSkillID)
+		end
 		OnAddOnUseSkill(dwSkillID, dwLevel)
 		if dwSkillID == 300 then
 			dwCurrentChannelSkillID = 300
@@ -2888,13 +2901,15 @@ RegisterEvent("UPDATE_SELECT_TARGET", function()
 	TarCache:Set(tar)
 end)
 
+local function OpenSkillBoxes()
+	local frame = Wnd.OpenWindow("Interface\\xMacro\\xMacro.ini", "xMacro")
+	local hBox = frame:Lookup("",""):Lookup("Handle_Box")
+	tSkillBox[1] = hBox:Lookup("Box")
+	tSkillBox[2] = hBox:Lookup("Box_P")
+end
+
 RegisterEvent("CUSTOM_DATA_LOADED", function()
-	if arg0 == "Role" then
-		local frame = Wnd.OpenWindow("Interface\\xMacro\\xMacro.ini", "xMacro")
-		local hBox = frame:Lookup("",""):Lookup("Handle_Box")
-		tSkillBox[1] = hBox:Lookup("Box")
-		tSkillBox[2] = hBox:Lookup("Box_P")
-	end
+	if arg0 == "Role" then OpenSkillBoxes() end
 end)
 
 
@@ -3371,13 +3386,6 @@ end)
 --   Ten Buff@3
 -- ================================================================
 
-local function XMCore_Sys(msg)
-    if OutputMessage then
-        OutputMessage("MSG_SYS", tostring(msg) .. "\n")
-    else
-        print(msg)
-    end
-end
 
 AppendCommand("xver", function(szText)
     XMCore_Sys("[xMacro] Generic Core 1.5 NAME TEST loaded")
@@ -4140,13 +4148,13 @@ end
 
 -- Khoi tao an toan UI xMacro.ini
 if Wnd and Wnd.OpenWindow then
-    pcall(Wnd.OpenWindow, "Interface/xMacro/xMacro.ini", "xMacro")
+    pcall(OpenSkillBoxes)
 end
 
 if RegisterEvent then
     pcall(RegisterEvent, "PLAYER_ENTER_SCENE", function()
         if Wnd and Wnd.OpenWindow then
-            pcall(Wnd.OpenWindow, "Interface/xMacro/xMacro.ini", "xMacro")
+            pcall(OpenSkillBoxes)
         end
         if HookUserSelectPoint then pcall(HookUserSelectPoint) end
     end)
@@ -4183,10 +4191,10 @@ function ExecuteMacroCommand(szMacroText)
 
     -- Chi chan khi dang thi trien chuan bi (prepare = 1).
     -- Dang dan dao (channel = 2) thi khong chan de macro quet skill va tu dong ngat dan dao khi danh chieu!
-    if not IsOTStuck(me) then
+    if not IsThaiHu(me) and not IsOTStuck(me) then
         local okOT, nOT = pcall(function() return me.GetOTActionState() end)
         local nOTState = okOT and tonumber(nOT or 0) or 0
-        if nOTState == 1 then
+        if nOTState == 1 and not IsChannelingNgungThan(me) then
             return false
         end
         if nOTState ~= 2 and me.GetSkillPrepareState then
@@ -4293,7 +4301,7 @@ if AppendCommand then
     pcall(AppendCommand, "rl", function() if ReloadUIAddon then ReloadUIAddon() end end)
 end
 
-XMCore_Sys("[xMacro] Generic Core 1.5 San sang")
+XMCore_Sys("[xMacro] Generic Core 1.5 San sang (Thai Hu AIO14)")
 -- ================================================================
 
 -- Private lexical dependencies shared with independently loaded school modules.
