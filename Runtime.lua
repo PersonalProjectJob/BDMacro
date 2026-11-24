@@ -756,7 +756,7 @@ local tMoonSkill = {[4024] = 1,[4025] = 2,[4026] = 3}
 local tSunSkill =  {[4028] = 1,[4029] = 2,[4030] = 3}
 
 local tChannelSkill = {[545] = true, [3110] = true, [5268] = true, [2235] = true, [2209] = true, [2231] = true, [2232] = true, [300] = true, [368] = true, [567] = true}
-local tOffGCDSkill = {[2214] = true, [2215] = true, [2216] = true, [2226] = true, [2227] = true, [2230] = true, [2236] = true, [2472] = true, [2477] = true, [300] = true}
+local tOffGCDSkill = {[2214] = true, [2215] = true, [2216] = true, [2226] = true, [2227] = true, [2230] = true, [2236] = true, [2472] = true, [2477] = true, [300] = true, [307] = true, [313] = true}
 local tGroundTargetSkill = {[2212] = 3}
 local nGlobalCastLockUntil = 0
 local dwCurrentChannelSkillID = 0
@@ -1497,12 +1497,94 @@ local function IsBuffExist(tCache, szText, bSrc)
 end
 
 
+local tAuraNameMap = {
+	["Toái Tinh Thần"] = 4980, ["Toai Tinh Than"] = 4980, ["toai tinh than"] = 4980, ["碎星辰"] = 4980,
+	["Sinh Thái Cực"] = 4976, ["Sinh Thai Cuc"] = 4976, ["sinh thai cuc"] = 4976, ["生太极"] = 4976,
+	["Phá Thương Khung"] = 4977, ["Pha Thuong Khung"] = 4977, ["pha thuong khung"] = 4977, ["破苍穹"] = 4977,
+	["Thôn Nhật Nguyệt"] = 4981, ["Thon Nhat Nguyet"] = 4981, ["thon nhat nguyet"] = 4981, ["吞日月"] = 4981,
+	["Hóa Tam Thanh"] = 3080, ["hóa Tam Thanh"] = 3080, ["Hoa Tam Thanh"] = 3080, ["hoa tam thanh"] = 3080, ["化三清"] = 3080,
+	["Lăng Thái Hư"] = 4979, ["Lang Thai Hu"] = 4979, ["lang thai hu"] = 4979, ["凌太虚"] = 4979,
+	["Xung Âm Dương"] = 4978, ["Xung Am Duong"] = 4978, ["xung am duong"] = 4978, ["冲阴阳"] = 4978,
+	["Trấn Sơn Hà"] = 4982, ["Tran Son Ha"] = 4982, ["tran son ha"] = 4982, ["镇山河"] = 4982,
+}
+
+local tAltAuraTemplateMap = {
+	[14976] = 4976, [14977] = 4977, [14978] = 4978, [14979] = 4979,
+	[14980] = 4980, [14981] = 4981, [14982] = 4982, [24976] = 4976,
+	[24980] = 4980, [24982] = 4982,
+}
+
+local function NormalizeAuraTemplate(dwTemplateID)
+	if not dwTemplateID then return nil end
+	if tAuraList[dwTemplateID] then return dwTemplateID end
+	return tAltAuraTemplateMap[dwTemplateID]
+end
+
+local function IsOwnAuraNpcMatch(npc, vEntry, targetTpl, szText, me, meID)
+	if not npc then return nil end
+	local tpl = NormalizeAuraTemplate(npc.dwTemplateID)
+	local bMatch = false
+	if targetTpl and tpl == targetTpl then
+		bMatch = true
+	elseif npc.szName and npc.szName ~= "" and StringFindW(npc.szName, szText) then
+		bMatch = true
+	end
+	if not bMatch then return nil end
+
+	local emp = (npc.dwEmployer and npc.dwEmployer ~= 0 and npc.dwEmployer) or (vEntry and vEntry[2]) or 0
+	if emp ~= 0 and meID ~= 0 and emp ~= meID then
+		return nil
+	end
+	if me and me.nX and npc.nX then
+		local nDist = math.floor(((me.nX - npc.nX) ^ 2 + (me.nY - npc.nY) ^ 2 + ((me.nZ or 0)/8 - (npc.nZ or 0)/8) ^ 2) ^ 0.5) / 64
+		if nDist > 10 then
+			return nil
+		end
+	end
+	if vEntry then
+		if tpl then vEntry[1] = tpl end
+		return vEntry
+	end
+	return {tpl or npc.dwTemplateID, meID, (GetTime and GetTime()) or 0}
+end
+
 local function IsAuraExist(szText)
+	if not szText or szText == "" then return nil end
+	local me = (MeCache and MeCache.Get and MeCache:Get()) or (GetClientPlayer and GetClientPlayer())
+	local meID = (me and me.dwID) or (UI_GetClientPlayerID and UI_GetClientPlayerID()) or 0
+	local targetTpl = tonumber(szText) or tAuraNameMap[szText] or tAuraNameMap[string.lower(szText)]
+
 	for k, v in pairs(tNpcList) do
 		local npc = GetNpc(k)
-		if npc and StringFindW(npc.szName, szText) then
-			if v[2] == UI_GetClientPlayerID() then
-				return v
+		if npc then
+			local hit = IsOwnAuraNpcMatch(npc, v, targetTpl, szText, me, meID)
+			if hit then return hit end
+		else
+			tNpcList[k] = nil
+		end
+	end
+
+	if AIO and type(AIO.GetAllNpcID) == "function" then
+		local ok, list = pcall(AIO.GetAllNpcID)
+		if ok and type(list) == "table" then
+			for _, dwID in ipairs(list) do
+				local npc = GetNpc(dwID)
+				if npc then
+					tNpcList[dwID] = tNpcList[dwID] or {npc.dwTemplateID, npc.dwEmployer, (GetTime and GetTime()) or 0}
+					local hit = IsOwnAuraNpcMatch(npc, tNpcList[dwID], targetTpl, szText, me, meID)
+					if hit then return hit end
+				end
+			end
+		end
+	elseif GetAllNpc then
+		local ok, list = pcall(GetAllNpc)
+		if ok and type(list) == "table" then
+			for _, npc in ipairs(list) do
+				if npc and npc.dwID then
+					tNpcList[npc.dwID] = tNpcList[npc.dwID] or {npc.dwTemplateID, npc.dwEmployer, (GetTime and GetTime()) or 0}
+					local hit = IsOwnAuraNpcMatch(npc, tNpcList[npc.dwID], targetTpl, szText, me, meID)
+					if hit then return hit end
+				end
 			end
 		end
 	end
@@ -3486,7 +3568,7 @@ RegisterEvent("NPC_LEAVE_SCENE", function()
 		if (t[1] == 16175 or t[1] == 16176 or t[1] == 16177) and t[2] == UI_GetClientPlayerID() then
 			bAttackState = false
 		end
-		t = nil
+		tNpcList[arg0] = nil
 	end
 end)
 
@@ -7004,25 +7086,25 @@ do
 local function InitializeModule()
 -- Thái Hư Kiếm Ý (10014) - Nội công DPS Kiếm Thuần Dương v80
 -- Khí trường chính: Toái Tinh Thần (thả vào mục tiêu).
--- Bùng nổ sát thương: Thao Quang Dưỡng Hối khi vào chiến đấu, áp sát mục tiêu và Khí Điểm <= 4.
--- Combo kích nổ 3 khí trường: Toái Tinh Thần (mục tiêu) + Hóa Tam Thanh (mục tiêu) + Lăng Thái Hư (bản thân).
--- Điều kiện kích nổ: Toái Tinh Thần không CD, không có buff Thao Quang Dưỡng Hối (hoặc đang di chuyển có thể nổ ngay).
+-- Bùng nổ sát thương: Thao Quang Dưỡng Hối (ID 313) khi áp sát mục tiêu (<=4m) và Khí <= 2 ô.
+-- Combo kích nổ 3 khí trường trên sân (<=10m): Toái Tinh Thần (mục tiêu) + Hóa Tam Thanh (mục tiêu) + Lăng Thái Hư (bản thân).
+-- Điều kiện kích nổ Nhân Kiếm Hợp Nhất (ID 588): Toái Tinh Thần không CD, không có buff Thao Quang Dưỡng Hối (hoặc đang di chuyển có thể nổ ngay).
 -- Dự phòng hồi mana bằng Bão Nguyên Quy Nhất khi mana < 40% và Khí Điểm >= 8.
 -- Chuỗi dồn sát thương: Bát Hoang Quy Nguyên + Vô Ngã Vô Kiếm (khi Khí Điểm >= 8).
 -- Hồi khí điểm: Tam Hoàn Sáo Nguyệt (ID 364) + kẹp Ngưng Thần Tụ Khí trong GCD (卡凝神).
 xMacro.Schools.RegisterDamageScript("ThuanDuong", "ThaiHuKiemY", {[10014] = [[
 #name ThuanDuong_ThaiHuKiemY_80
 /skill [tprepare,distance<=4] Kiếm Phi Kinh Thiên
-/skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
+/skill [nobuff:Toái Tinh Thần;noqichang:Toái Tinh Thần] Toái Tinh Thần
 /skill [distance<=4,tnobuff:Vạn Kiếm Quy Tông] Vạn Kiếm Quy Tông
-/skill [fight,distance<=4,qidian<=4] Thao Quang Dưỡng Hối
+/skill [distance<=4,qidian<=2] Thao Quang Dưỡng Hối
 /skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
 /skill [tlife<0.40] Bát Hoang Quy Nguyên
 /skill [qidian>=8] Vô Ngã Vô Kiếm
-/skill [fight,distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qidian<8,buff:Toái Tinh Thần,buff:Hóa Tam Thanh,buff:Lăng Thái Hư] Nhân Kiếm Hợp Nhất
-/skill [fight,moving,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qidian<8,buff:Toái Tinh Thần|Hóa Tam Thanh|Lăng Thái Hư] Nhân Kiếm Hợp Nhất
-/skill [fight,distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,buff:Toái Tinh Thần,nobuff:Hóa Tam Thanh] Hóa Tam Thanh
-/skill [fight,distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,buff:Toái Tinh Thần,buff:Hóa Tam Thanh,nobuff:Lăng Thái Hư] Lăng Thái Hư
+/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,qichang:Lăng Thái Hư] Nhân Kiếm Hợp Nhất
+/skill [moving,distance<=10,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần|Hóa Tam Thanh|Lăng Thái Hư] Nhân Kiếm Hợp Nhất
+/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,noqichang:Hóa Tam Thanh] Hóa Tam Thanh
+/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,noqichang:Lăng Thái Hư] Lăng Thái Hư
 /skill Bát Hoang Quy Nguyên
 /skill Thiên Địa Vô Cực
 /skill Tam Hoàn Sáo Nguyệt
@@ -7222,16 +7304,16 @@ xmacro = xMacro.Run
 xMacro.Cloud = xMacro.Cloud or {}
 local Cloud = xMacro.Cloud
 Cloud.version = "built-in"
-Cloud.builtinVersion = "20261113.1"
+Cloud.builtinVersion = "20261124.4"
 Cloud.lastSyncTime = 0
 Cloud.rotationsCount = 0
 Cloud.status = "IDLE"
 
 local CLOUD_ENDPOINTS = {
-    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.html",
     "https://raw.githubusercontent.com/PersonalProjectJob/BDMacro/main/api/cloud_rotations.html",
-    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.lua",
     "https://raw.githubusercontent.com/PersonalProjectJob/BDMacro/main/api/cloud_rotations.lua",
+    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.html",
+    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.lua",
 }
 
 local function OutputSys(msg)
@@ -7267,8 +7349,8 @@ local function ApplyCloudPayload(payloadOrString)
         return false, "missing_rotations_table"
     end
 
-    if Cloud.builtinVersion and tostring(payload.version or "") < Cloud.builtinVersion then
-        return false, "older_than_builtin"
+    if Cloud.builtinVersion and tostring(payload.version or "") <= Cloud.builtinVersion then
+        return false, "not_newer_than_builtin"
     end
 
     local nLoaded = 0

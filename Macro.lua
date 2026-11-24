@@ -146,16 +146,16 @@ xmacro = xMacro.Run
 xMacro.Cloud = xMacro.Cloud or {}
 local Cloud = xMacro.Cloud
 Cloud.version = "built-in"
-Cloud.builtinVersion = "20261113.1"
+Cloud.builtinVersion = "20261124.4"
 Cloud.lastSyncTime = 0
 Cloud.rotationsCount = 0
 Cloud.status = "IDLE"
 
 local CLOUD_ENDPOINTS = {
-    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.html",
     "https://raw.githubusercontent.com/PersonalProjectJob/BDMacro/main/api/cloud_rotations.html",
-    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.lua",
     "https://raw.githubusercontent.com/PersonalProjectJob/BDMacro/main/api/cloud_rotations.lua",
+    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.html",
+    "https://cdn.jsdelivr.net/gh/PersonalProjectJob/BDMacro@main/api/cloud_rotations.lua",
 }
 
 local function OutputSys(msg)
@@ -191,8 +191,8 @@ local function ApplyCloudPayload(payloadOrString)
         return false, "missing_rotations_table"
     end
 
-    if Cloud.builtinVersion and tostring(payload.version or "") < Cloud.builtinVersion then
-        return false, "older_than_builtin"
+    if Cloud.builtinVersion and tostring(payload.version or "") <= Cloud.builtinVersion then
+        return false, "not_newer_than_builtin"
     end
 
     local nLoaded = 0
