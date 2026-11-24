@@ -1,6 +1,6 @@
 ﻿return {
     version = "20261124.4",
-    timestamp = "2026-11-24 14:35:00",
+    timestamp = "2026-11-24 14:45:00",
     client = "JX3-v80",
     rotations = {
         [10002] = {
@@ -147,7 +147,7 @@
 /skill [xmtbuffstack:Cấp Khúc>=3] Phồn Âm Cấp Tiết
 /skill [mana<0.85] Long Trì Nhạc
 /skill [qidian<=2] Mãn Đường Thế
-/skill [distance<10,nobuff:Kiếm Thần Vô Ngã] Kiếm Thần Vô Ngã
+/skill [qidian>0,mana>0.15,distance<10] Kiếm Thần Vô Ngã
 /skill [qidian>=7] Kiếm Phá Hư Không
 /skill [qidian>=4,xmtbuffstack:Cấp Khúc>=3] Kiếm Khí Trường Giang
 /skill Đại Huyền Cấp Khúc
@@ -219,7 +219,7 @@
 /skill [life<0.3,pet] Cổ Trùng Hiến Tế
 /skill [tlife<0.35] Thánh Thủ Chức Thiên
 /skill [tlife<0.45] Thiên Điệp Thổ Thụy
-/skill [tlife<0.85,nombuff:Cổ Hoặc Chúng Sinh] Cổ Hoặc Chúng Sinh
+/skill [tlife<0.85,tnobuff:Cổ Hoặc Chúng Sinh] Cổ Hoặc Chúng Sinh
 /skill [tlife<0.6] Nữ Oa Vá Trời
 /skill [moving,tlife<0.95] Túy Vũ Cửu Thiên
 /skill [tlife<0.75] Băng Tàm Khiên Ti

@@ -42,10 +42,17 @@ scripts = {
         "alias": "TDTK",
         "name": "ThuanDuong_ThaiHuKiemY_80",
         "script": """#name ThuanDuong_ThaiHuKiemY_80
-/skill [nobuff:Toái Tinh Thần] Toái Tinh Thần
+/skill [tprepare,distance<=4] Kiếm Phi Kinh Thiên
+/skill [nobuff:Toái Tinh Thần;noqichang:Toái Tinh Thần] Toái Tinh Thần
+/skill [distance<=4,tnobuff:Vạn Kiếm Quy Tông] Vạn Kiếm Quy Tông
+/skill [distance<=4,qidian<=2] Thao Quang Dưỡng Hối
 /skill [mana<0.40,qidian>=8] Bão Nguyên Quy Nhất
 /skill [tlife<0.40] Bát Hoang Quy Nguyên
 /skill [qidian>=8] Vô Ngã Vô Kiếm
+/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,qichang:Lăng Thái Hư] Nhân Kiếm Hợp Nhất
+/skill [moving,distance<=10,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,qichang:Toái Tinh Thần|Hóa Tam Thanh|Lăng Thái Hư] Nhân Kiếm Hợp Nhất
+/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,noqichang:Hóa Tam Thanh] Hóa Tam Thanh
+/skill [distance<=4,nocd:Toái Tinh Thần,nobuff:Thao Quang Dưỡng Hối,cdtime:Nhân Kiếm Hợp Nhất<=3,qichang:Toái Tinh Thần,qichang:Hóa Tam Thanh,noqichang:Lăng Thái Hư] Lăng Thái Hư
 /skill Bát Hoang Quy Nguyên
 /skill Thiên Địa Vô Cực
 /skill Tam Hoàn Sáo Nguyệt
@@ -257,8 +264,8 @@ scripts = {
 }
 lua_lines = [
     'return {',
-    '    version = "20261113.1",',
-    '    timestamp = "2026-11-13 15:25:00",',
+    '    version = "20261124.4",',
+    '    timestamp = "2026-11-24 14:45:00",',
     '    client = "JX3-v80",',
     '    rotations = {'
 ]
@@ -293,12 +300,12 @@ html_content = f'''<!DOCTYPE html>
 
 # Write to all destinations
 BDMACRO_DIR = Path(__file__).resolve().parent.parent
-WORKSPACE_ROOT = BDMACRO_DIR.parent.parent
-for target_dir in [BDMACRO_DIR, WORKSPACE_ROOT / "interface/xMacro"]:
-    if target_dir.exists():
+WORKSPACE_ROOT = BDMACRO_DIR.parent
+for target_dir in [BDMACRO_DIR, WORKSPACE_ROOT / "interface/xMacro", WORKSPACE_ROOT]:
+    if target_dir.exists() and (target_dir / "api").exists():
         api_dir = target_dir / "api"
         api_dir.mkdir(parents=True, exist_ok=True)
         (api_dir / "cloud_rotations.lua").write_text(lua_content, encoding="utf-8-sig")
         (api_dir / "cloud_rotations.html").write_text(html_content, encoding="utf-8-sig")
 
-print("Successfully synced all 16 rotations into cloud_rotations.lua and cloud_rotations.html (v20261113.1)!")
+print("Successfully synced all 16 rotations into cloud_rotations.lua and cloud_rotations.html (v20261124.4)!")
